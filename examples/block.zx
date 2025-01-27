@@ -1,0 +1,7 @@
+define MyBlock {
+    let user = "Unknown";
+
+    fn construct(name) {
+        this.user = name;
+    }
+}

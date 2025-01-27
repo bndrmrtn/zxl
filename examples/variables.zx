@@ -1,0 +1,6 @@
+// Single line comment
+let x = 5;
+let y = 3.14;
+let z = "Hello, World!";
+let a = true;
+let b = false;
