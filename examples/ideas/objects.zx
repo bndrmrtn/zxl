@@ -1,0 +1,5 @@
+// Built-in object type
+let object = new Object();
+
+object["name"] = "Martin";
+println(object["name"]);

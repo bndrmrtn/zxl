@@ -39,13 +39,33 @@ func (e *Executer) Execute(ts []*models.Node) ([]*builtin.FuncReturn, error) {
 			e.fns[token.Content] = token
 		case tokens.Let, tokens.Const:
 			if _, ok := e.vars[token.Content]; ok {
-				return nil, errs.WithDebug(fmt.Errorf("%w: %v", errs.VariableAlreadyExists, token.Content), token.Debug)
+				return nil, errs.WithDebug(fmt.Errorf("%w: %v", errs.CannotRedeclareVariable, token.Content), token.Debug)
 			}
+
+			if token.VariableType == tokens.ExpressionVariable {
+				v, err := e.evaluateExpression(token)
+				if err != nil {
+					return nil, err
+				}
+				e.vars[token.Content] = v
+				break
+			}
+
 			e.vars[token.Content] = token
+			break
 		case tokens.Define:
 			e.blocks[token.Content] = token
 		case tokens.FuncCall:
 			e.executeFn(token)
+		case tokens.Assign:
+			v, ok := e.vars[token.Content]
+			if !ok {
+				return nil, errs.WithDebug(fmt.Errorf("%w: %v", errs.VariableNotDeclared, token.Content), token.Debug)
+			}
+			if v.Type == tokens.Const {
+				return nil, errs.WithDebug(fmt.Errorf("%w: %v", errs.CannotReassignConstant, token.Content), token.Debug)
+			}
+			e.vars[token.Content] = token
 		}
 	}
 	return nil, nil

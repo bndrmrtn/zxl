@@ -1,0 +1,8 @@
+fn greet(name) {
+    let greet = "Hello, " + name + "!";
+    println(greet);
+}
+
+let name = read("What is your name? ");
+
+greet(name);

@@ -6,14 +6,17 @@ import (
 )
 
 type Runtime struct {
+	mode RuntimeMode
+
 	// funcs is a map of function names to functions
 	funcs map[string]builtin.Function
 	// variables is a map of variable names to variables
 	variables map[string]*builtin.Variable
 }
 
-func New() *Runtime {
+func New(mode RuntimeMode) *Runtime {
 	return &Runtime{
+		mode:      mode,
 		funcs:     builtin.GetBuiltins(),
 		variables: make(map[string]*builtin.Variable),
 	}
@@ -21,9 +24,5 @@ func New() *Runtime {
 
 func (r *Runtime) Execute(tokens []*models.Node) ([]*builtin.FuncReturn, error) {
 	ex := NewExecuter(r, nil)
-	_, err := ex.Execute(tokens)
-	if err != nil {
-		return nil, err
-	}
-	return ex.ExecuteFn("main", nil)
+	return ex.Execute(tokens)
 }

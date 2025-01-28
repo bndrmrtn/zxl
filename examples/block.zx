@@ -5,3 +5,5 @@ define MyBlock {
         this.user = name;
     }
 }
+
+let block = MyBlock("Martin");

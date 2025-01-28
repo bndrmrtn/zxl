@@ -28,6 +28,9 @@ func (b *Builder) Build(tokens []*models.Token) ([]*models.Node, error) {
 		if err != nil {
 			return nil, err
 		}
+		if node == nil {
+			continue
+		}
 		nodes = append(nodes, node)
 	}
 
@@ -38,6 +41,13 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 	token := ts[*inx]
 
 	switch token.Type {
+	case tokens.Addition, tokens.Subtraction, tokens.Multiplication, tokens.Division:
+		*inx++
+		return &models.Node{
+			Type:    token.Type,
+			Content: token.Value,
+			Debug:   token.Debug,
+		}, nil
 	case tokens.String, tokens.Number, tokens.Bool, tokens.Nil:
 		return b.parseInlineValue(ts, inx)
 	case tokens.Let, tokens.Const:
@@ -48,6 +58,9 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 		return b.parseFunction(ts, inx)
 	case tokens.Identifier, tokens.This:
 		return b.parseIdentifier(ts, inx)
+	case tokens.Semicolon:
+		*inx++
+		return nil, nil
 	default:
 		return nil, errs.WithDebug(fmt.Errorf("%w: invalid token '%v'", errs.SyntaxError, token.Value), token.Debug)
 	}

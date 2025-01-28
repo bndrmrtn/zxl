@@ -9,3 +9,17 @@ func isLetter(ch byte) bool {
 func isDigit(ch byte) bool {
 	return ch >= '0' && ch <= '9'
 }
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}

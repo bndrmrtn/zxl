@@ -3,6 +3,7 @@ package lexer
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/bndrmrtn/zexlang/internal/errs"
 	"github.com/bndrmrtn/zexlang/internal/models"
@@ -34,10 +35,11 @@ func (lx *Lexer) Parse(r io.Reader) ([]*models.Token, error) {
 // parse reads the content of the string and returns the tokens
 func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 	var (
-		pos    int
-		line   int = 1
-		col    int
-		parsed []*models.Token
+		pos     int
+		line    int = 1
+		col     int
+		fileLen = len(s)
+		parsed  []*models.Token
 	)
 
 	for pos < len(s) {
@@ -93,6 +95,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 							Line:   line,
 							Column: col,
 							File:   lx.filename,
+							Near:   lx.near(s, pos, fileLen),
 						})
 					}
 				} else if s[pos] == quote {
@@ -111,6 +114,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					Line:   line,
 					Column: col,
 					File:   lx.filename,
+					Near:   lx.near(s, pos, fileLen),
 				})
 			}
 
@@ -122,6 +126,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					Line:   line,
 					Column: col,
 					File:   lx.filename,
+					Near:   lx.near(s, pos, fileLen),
 				},
 				Map: map[string]any{
 					"quote": quote,
@@ -139,6 +144,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					Line:   line,
 					Column: col,
 					File:   lx.filename,
+					Near:   lx.near(s, pos, fileLen),
 				},
 			})
 		case '=':
@@ -150,6 +156,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Line:   line,
 						Column: col,
 						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
 					},
 				})
 				pos++
@@ -161,6 +168,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Line:   line,
 						Column: col,
 						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
 					},
 				})
 			}
@@ -173,6 +181,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Line:   line,
 						Column: col,
 						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
 					},
 				})
 				pos++
@@ -184,6 +193,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Line:   line,
 						Column: col,
 						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
 					},
 				})
 			}
@@ -205,6 +215,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Line:   line,
 						Column: col,
 						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
 					},
 				})
 				pos--
@@ -219,6 +230,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 								Line:   line,
 								Column: col,
 								File:   lx.filename,
+								Near:   lx.near(s, pos, fileLen),
 							})
 						}
 						isFloat = true
@@ -233,6 +245,12 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					Map: map[string]any{
 						"isFloat": isFloat,
 					},
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
 				})
 				pos--
 			} else {
@@ -241,6 +259,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					Line:   line,
 					Column: col,
 					File:   lx.filename,
+					Near:   lx.near(s, pos, fileLen),
 				})
 			}
 		}
@@ -314,4 +333,16 @@ func (lx *Lexer) getIdentType(s string) tokens.TokenType {
 	default:
 		return tokens.Identifier
 	}
+}
+
+func (lx *Lexer) near(s string, pos int, fileLen int) string {
+	if pos < 0 || pos >= fileLen || len(s) == 0 {
+		return ""
+	}
+
+	start := max(0, pos-20)
+	end := min(pos+20, fileLen)
+	substr := s[start:end]
+
+	return strings.TrimSpace(substr)
 }

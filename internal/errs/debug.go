@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/bndrmrtn/zexlang/internal/models"
+	"github.com/bndrmrtn/zexlang/internal/version"
+	"github.com/fatih/color"
 )
 
 // WithDebug adds debug information to an error
@@ -20,7 +22,15 @@ type DebugError struct {
 // Error returns the error message with debug information
 func (de DebugError) Error() string {
 	if de.debug == nil {
-		return de.err.Error()
+		return de.err.Error() + "\n"
 	}
-	return fmt.Sprintf("%s at line %d position %d", de.err.Error(), de.debug.Line, de.debug.Column)
+
+	redBold := color.New(color.FgRed, color.Bold).SprintFunc()
+
+	near := ""
+	if de.debug.Near != "" {
+		near = fmt.Sprintf("near:\n%s\n", color.New(color.FgHiBlack).Sprint(de.debug.Near))
+	}
+
+	return fmt.Sprintf("%s\n%s\nat %s:%d:%d\n%s", color.New(color.FgBlue, color.Bold).Sprint("Zex - ", version.Version), redBold(de.err.Error()), de.debug.File, de.debug.Line, de.debug.Column, near)
 }

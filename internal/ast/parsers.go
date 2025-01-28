@@ -11,7 +11,8 @@ import (
 func (b *Builder) parseLetConst(ts []*models.Token, inx *int) (*models.Node, error) {
 	token := ts[*inx]
 	node := &models.Node{
-		Type: token.Type,
+		Type:  token.Type,
+		Debug: token.Debug,
 	}
 	*inx++
 	if *inx >= len(ts) {
@@ -28,9 +29,18 @@ func (b *Builder) parseLetConst(ts []*models.Token, inx *int) (*models.Node, err
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator", errs.SyntaxError), token.Debug)
 	}
 
+	if b.isExpression(ts[*inx]) {
+		return &models.Node{
+			Type:         ts[*inx].Type,
+			VariableType: tokens.ExpressionVariable,
+			Content:      ts[*inx].Value,
+			Debug:        ts[*inx].Debug,
+		}, nil
+	}
+
 	if ts[*inx].Type == tokens.Semicolon {
 		node.VariableType = tokens.NilVariable
-		node.Value = "nil"
+		node.Value = nil
 		*inx++
 		return node, nil
 	}
@@ -59,12 +69,20 @@ func (b *Builder) parseLetConst(ts []*models.Token, inx *int) (*models.Node, err
 	}
 
 	if len(values) == 1 {
-		node.Value = values[0].Value
+		node.Value = b.getValue(values[0])
 		typ, err := b.getType(values[0])
 		if err != nil {
 			return nil, err
 		}
 		node.VariableType = typ
+	} else {
+		values = append(values, SemiColonToken)
+		children, err := b.Build(values)
+		if err != nil {
+			return nil, err
+		}
+		node.VariableType = tokens.ExpressionVariable
+		node.Children = children
 	}
 
 	return node, nil
@@ -73,7 +91,8 @@ func (b *Builder) parseLetConst(ts []*models.Token, inx *int) (*models.Node, err
 func (b *Builder) parseFunction(ts []*models.Token, inx *int) (m *models.Node, e error) {
 	token := ts[*inx]
 	node := &models.Node{
-		Type: token.Type,
+		Type:  token.Type,
+		Debug: token.Debug,
 	}
 	*inx++
 	if *inx >= len(ts) {
@@ -184,6 +203,7 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 	node := &models.Node{
 		Type:    token.Type,
 		Content: token.Value,
+		Debug:   token.Debug,
 	}
 
 	if *inx >= len(ts) {
@@ -195,6 +215,15 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 			Type:         token.Type,
 			VariableType: tokens.ReferenceVariable,
 			Content:      token.Value,
+		}, nil
+	}
+
+	if b.isExpression(ts[*inx]) {
+		return &models.Node{
+			Type:         ts[*inx].Type,
+			VariableType: tokens.ExpressionVariable,
+			Content:      ts[*inx].Value,
+			Debug:        ts[*inx].Debug,
 		}, nil
 	}
 
@@ -218,7 +247,16 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 
 		*inx++
 		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator", errs.SyntaxError), token.Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator or expression", errs.SyntaxError), token.Debug)
+		}
+
+		if b.isExpression(token) {
+			return &models.Node{
+				Type:         token.Type,
+				VariableType: tokens.ExpressionVariable,
+				Content:      token.Value,
+				Debug:        token.Debug,
+			}, nil
 		}
 
 		if ts[*inx].Type != tokens.Assign {
@@ -228,10 +266,13 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 		*inx--
 	}
 
+	node.Type = tokens.Assign
+
 	*inx++
 	if *inx >= len(ts) {
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression", errs.SyntaxError), token.Debug)
 	}
+	*inx--
 
 	var values []*models.Token
 	for {
@@ -253,12 +294,20 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 	}
 
 	if len(values) == 1 {
-		node.Value = values[0].Value
+		node.Value = b.getValue(values[0])
 		typ, err := b.getType(values[0])
 		if err != nil {
 			return nil, err
 		}
 		node.VariableType = typ
+	} else {
+		values = append(values, SemiColonToken)
+		children, err := b.Build(values)
+		if err != nil {
+			return nil, err
+		}
+		node.VariableType = tokens.ExpressionVariable
+		node.Children = children
 	}
 
 	return node, nil
@@ -267,7 +316,8 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 func (b *Builder) parseDefine(ts []*models.Token, inx *int) (*models.Node, error) {
 	token := ts[*inx]
 	node := &models.Node{
-		Type: token.Type,
+		Type:  token.Type,
+		Debug: token.Debug,
 	}
 	*inx++
 
@@ -378,6 +428,7 @@ func (b *Builder) parseFunctionCall(ts []*models.Token, inx *int, node *models.N
 	*inx++
 	node.Args = args
 	node.Type = tokens.FuncCall
+	node.VariableType = tokens.FunctionCallVariable
 
 	return node, nil
 }
@@ -390,17 +441,20 @@ func (b *Builder) parseInlineValue(ts []*models.Token, inx *int) (*models.Node, 
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected value", errs.SyntaxError), ts[*inx].Debug)
 	}
 
-	if ts[*inx].Type == tokens.Semicolon || ts[*inx].Type == tokens.Comma || ts[*inx].Type == tokens.RightParenthesis {
+	if ts[*inx].Type == tokens.Semicolon || ts[*inx].Type == tokens.Comma || ts[*inx].Type == tokens.RightParenthesis || b.isExpression(ts[*inx]) {
 		return &models.Node{
 			Type:         token.Type,
 			VariableType: tokens.InlineValue,
 			Content:      token.Value,
+			Value:        b.getValue(token),
+			Debug:        ts[*inx].Debug,
 		}, nil
 	}
 
 	node := &models.Node{
 		Type:         tokens.Unkown,
 		VariableType: tokens.ExpressionVariable,
+		Debug:        token.Debug,
 	}
 
 	var values []*models.Token
@@ -422,17 +476,19 @@ func (b *Builder) parseInlineValue(ts []*models.Token, inx *int) (*models.Node, 
 	}
 
 	if len(values) == 1 {
-		node.Value = values[0].Value
+		node.Value = b.getValue(values[0])
 		typ, err := b.getType(values[0])
 		if err != nil {
 			return nil, err
 		}
 		node.VariableType = typ
 	} else {
+		values = append(values, SemiColonToken)
 		children, err := b.Build(values)
 		if err != nil {
 			return nil, err
 		}
+		node.VariableType = tokens.ExpressionVariable
 		node.Children = children
 	}
 

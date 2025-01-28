@@ -61,3 +61,20 @@ const (
 	ElseIf
 	Else
 )
+
+func (t TokenType) IsOperator() bool {
+	return t >= Addition && t <= Not
+}
+
+func (t TokenType) ToVariableType() VariableType {
+	switch t {
+	case Number:
+		return IntVariable
+	case String:
+		return StringVariable
+	case Bool:
+		return BoolVariable
+	default:
+		return NilVariable
+	}
+}

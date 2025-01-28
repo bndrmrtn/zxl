@@ -12,5 +12,5 @@ type Token struct {
 	// Map is a map of key value pairs
 	Map map[string]any `yaml:"map,omitempty"`
 	// Debug is a debug object
-	Debug *Debug `yaml:"debug,omitempty"`
+	Debug *Debug `yaml:"-"`
 }

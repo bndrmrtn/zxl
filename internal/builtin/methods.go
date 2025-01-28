@@ -12,6 +12,8 @@ func GetBuiltins() map[string]Function {
 		"print":   print,
 		"println": println,
 		"printf":  printf,
+		"type":    getType,
+		"read":    read,
 	}
 }
 
@@ -69,6 +71,39 @@ func printf(args []*Variable) ([]*FuncReturn, error) {
 		{
 			Type:  tokens.IntVariable,
 			Value: n,
+		},
+	}, err
+}
+
+func getType(args []*Variable) ([]*FuncReturn, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf("expected 1 argument, got %d", len(args))
+	}
+
+	return []*FuncReturn{
+		{
+			Type:  tokens.StringVariable,
+			Value: args[0].Type.String(),
+		},
+	}, nil
+}
+
+func read(args []*Variable) ([]*FuncReturn, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf("expected 1 arguments, got %d", len(args))
+	}
+
+	if args[0].Type != tokens.StringVariable {
+		return nil, fmt.Errorf("expected string argument, got %v", args[0].Type)
+	}
+
+	var value string
+	fmt.Print(args[0].Value)
+	_, err := fmt.Scan(&value)
+	return []*FuncReturn{
+		{
+			Type:  tokens.StringVariable,
+			Value: value,
 		},
 	}, err
 }

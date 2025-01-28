@@ -28,11 +28,11 @@ func (v VariableType) String() string {
 	case BoolVariable:
 		return "bool"
 	case FunctionCallVariable:
-		return "function()"
+		return "call:fn()"
 	case ExpressionVariable:
 		return "expression"
 	case ReferenceVariable:
-		return ":reference:"
+		return ":ref:"
 	default:
 		return "unknown"
 	}
