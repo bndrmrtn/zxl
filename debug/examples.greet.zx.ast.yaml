@@ -5,16 +5,16 @@
   reference: false
   children:
     - type: 104
+      variableType: 3
+      content: greet
+      value: ""
+      reference: false
+    - type: 10025
       variableType: 6
       content: greet
       value: null
       reference: false
       children:
-        - type: 1013
-          variableType: 8
-          content: '"Hello, "'
-          value: 'Hello, '
-          reference: false
         - type: 10018
           variableType: 0
           content: +
@@ -69,11 +69,6 @@
           content: '"What is your name? "'
           value: 'What is your name? '
           reference: false
-- type: 111
-  variableType: 5
-  content: read
-  value: null
-  reference: false
 - type: 111
   variableType: 5
   content: greet

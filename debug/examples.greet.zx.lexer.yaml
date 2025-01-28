@@ -17,6 +17,16 @@
 - type: 10025
   value: =
 - type: 1013
+  value: '""'
+  map:
+    quote: 34
+- type: 1000043
+  value: ;
+- type: 110
+  value: greet
+- type: 10025
+  value: =
+- type: 1013
   value: '"Hello, "'
   map:
     quote: 34
@@ -72,5 +82,3 @@
   value: )
 - type: 1000043
   value: ;
-- type: 110
-  value: xd

@@ -13,6 +13,7 @@ const (
 	ExpressionVariable
 	ReferenceVariable
 	InlineValue
+	DefinitionBlock
 )
 
 func (v VariableType) String() string {

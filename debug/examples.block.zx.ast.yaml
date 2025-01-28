@@ -1,0 +1,61 @@
+- type: 106
+  variableType: 0
+  content: MyBlock
+  value: null
+  reference: false
+  children:
+    - type: 104
+      variableType: 3
+      content: user
+      value: Unknown
+      reference: false
+    - type: 1016
+      variableType: 0
+      content: construct
+      value: null
+      reference: false
+      children:
+        - type: 111
+          variableType: 5
+          content: println
+          value: null
+          reference: false
+          args:
+            - type: 1013
+              variableType: 8
+              content: '"constructed"'
+              value: constructed
+              reference: false
+    - type: 1016
+      variableType: 0
+      content: sayHi
+      value: null
+      reference: false
+      children:
+        - type: 111
+          variableType: 5
+          content: println
+          value: null
+          reference: false
+          args:
+            - type: 1013
+              variableType: 8
+              content: '"Hi"'
+              value: Hi
+              reference: false
+- type: 104
+  variableType: 6
+  content: block
+  value: null
+  reference: false
+  children:
+    - type: 111
+      variableType: 5
+      content: MyBlock
+      value: null
+      reference: false
+- type: 111
+  variableType: 5
+  content: block.sayHi
+  value: null
+  reference: true

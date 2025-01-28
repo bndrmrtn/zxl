@@ -9,6 +9,7 @@ import (
 	"github.com/bndrmrtn/zexlang/internal/ast"
 	"github.com/bndrmrtn/zexlang/internal/builtin"
 	"github.com/bndrmrtn/zexlang/internal/lexer"
+	"github.com/bndrmrtn/zexlang/internal/models"
 	"github.com/bndrmrtn/zexlang/internal/runtime"
 	"gopkg.in/yaml.v3"
 )
@@ -27,13 +28,17 @@ const (
 
 // Interpreter is a language interpreter
 type Interpreter struct {
+	// mode is the mode of the interpreter
 	mode InterpreterMode
+	// cache is the cache flag
+	cache bool
 }
 
 // NewInterpreter creates a new interpreter
-func NewInterpreter(mode InterpreterMode) *Interpreter {
+func NewInterpreter(mode InterpreterMode, cache bool) *Interpreter {
 	return &Interpreter{
-		mode: mode,
+		mode:  mode,
+		cache: cache,
 	}
 }
 
@@ -43,6 +48,18 @@ func (ir *Interpreter) Interpret(fileName string, data io.Reader) ([]*builtin.Fu
 		return nil, fmt.Errorf("Zex can only run files that has .zx extesion.")
 	}
 
+	// Get the nodes from the given data
+	nodes, err := ir.getNodes(fileName, data)
+	if err != nil {
+		return nil, err
+	}
+
+	// Write debug information to file
+	return runtime.New(runtime.EntryPoint).Execute(nodes)
+}
+
+// getNodes gets the nodes from the given data
+func (ir *Interpreter) getNodes(fileName string, data io.Reader) ([]*models.Node, error) {
 	// Tokenize the source code with lexer
 	lx := lexer.New(fileName)
 	ts, err := lx.Parse(data)
@@ -65,8 +82,10 @@ func (ir *Interpreter) Interpret(fileName string, data io.Reader) ([]*builtin.Fu
 		ir.writeDebug(fileName, "ast", nodes)
 	}
 
-	// Write debug information to file
-	return runtime.New(runtime.EntryPoint).Execute(nodes)
+	// Store cache information
+	ir.storeCache(data, nodes)
+
+	return nodes, nil
 }
 
 // writeDebug writes debug information to file

@@ -1,5 +1,6 @@
 fn greet(name) {
-    let greet = "Hello, " + name + "!";
+    let greet = "";
+    greet = "Hello, " + name + "!";
     println(greet);
 }
 

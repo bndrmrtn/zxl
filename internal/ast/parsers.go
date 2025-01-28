@@ -16,17 +16,17 @@ func (b *Builder) parseLetConst(ts []*models.Token, inx *int) (*models.Node, err
 	}
 	*inx++
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 	if ts[*inx].Type != tokens.Identifier {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier", errs.SyntaxError), ts[*inx].Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
 	node.Content = ts[*inx].Value
 
 	*inx++
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator, but got '%s'", errs.SyntaxError, ts[*inx].Type), token.Debug)
 	}
 
 	if b.isExpression(ts[*inx]) {
@@ -46,14 +46,14 @@ func (b *Builder) parseLetConst(ts []*models.Token, inx *int) (*models.Node, err
 	}
 
 	if ts[*inx].Type != tokens.Assign {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator", errs.SyntaxError), ts[*inx].Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
 	var values []*models.Token
 	for {
 		*inx++
 		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression", errs.SyntaxError), token.Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 		}
 
 		if ts[*inx].Type == tokens.Semicolon {
@@ -65,7 +65,7 @@ func (b *Builder) parseLetConst(ts []*models.Token, inx *int) (*models.Node, err
 	}
 
 	if len(values) == 0 {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 
 	if len(values) == 1 {
@@ -96,21 +96,21 @@ func (b *Builder) parseFunction(ts []*models.Token, inx *int) (m *models.Node, e
 	}
 	*inx++
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 	if ts[*inx].Type != tokens.Identifier {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier", errs.SyntaxError), ts[*inx].Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
 	node.Content = ts[*inx].Value
 	*inx++
 
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '('", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '(', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 
 	if ts[*inx].Type != tokens.LeftParenthesis {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '('", errs.SyntaxError), ts[*inx].Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '(', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
 	*inx++
@@ -121,7 +121,7 @@ func (b *Builder) parseFunction(ts []*models.Token, inx *int) (m *models.Node, e
 	)
 	for {
 		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected ')'", errs.SyntaxError), token.Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected ')', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 		}
 
 		if ts[*inx].Type == tokens.RightParenthesis {
@@ -146,15 +146,15 @@ func (b *Builder) parseFunction(ts []*models.Token, inx *int) (m *models.Node, e
 	node.Args = args
 
 	if parenCount != 0 {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected ')'", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected ')', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{'", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 
 	if ts[*inx].Type != tokens.LeftBrace {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{'", errs.SyntaxError), ts[*inx].Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
 	var (
@@ -165,7 +165,7 @@ func (b *Builder) parseFunction(ts []*models.Token, inx *int) (m *models.Node, e
 	for {
 		*inx++
 		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}'", errs.SyntaxError), token.Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 		}
 
 		if ts[*inx].Type == tokens.RightBrace {
@@ -184,7 +184,7 @@ func (b *Builder) parseFunction(ts []*models.Token, inx *int) (m *models.Node, e
 	}
 
 	if braceCount != 0 {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '}'", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 
 	child, err := b.Build(children)
@@ -207,7 +207,7 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 	}
 
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: unexpected end of file", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: unexpected end of file, got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 
 	if ts[*inx].Type == tokens.Semicolon || (ts[*inx].Type != tokens.Assign && ts[*inx].Type != tokens.Dot && ts[*inx].Type != tokens.LeftParenthesis) {
@@ -235,11 +235,11 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 		node.Content += "."
 		*inx++
 		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier", errs.SyntaxError), token.Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 		}
 
 		if ts[*inx].Type != tokens.Identifier {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier", errs.SyntaxError), ts[*inx].Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 		}
 
 		node.Content += ts[*inx].Value
@@ -247,7 +247,7 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 
 		*inx++
 		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator or expression", errs.SyntaxError), token.Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator or expression, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 		}
 
 		if b.isExpression(token) {
@@ -259,18 +259,23 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 			}, nil
 		}
 
+		if ts[*inx].Type == tokens.LeftParenthesis {
+			return b.parseFunctionCall(ts, inx, node)
+		}
+
 		if ts[*inx].Type != tokens.Assign {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator", errs.SyntaxError), ts[*inx].Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 		}
 
 		*inx--
 	}
 
 	node.Type = tokens.Assign
-
 	*inx++
+	*inx++
+
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 	*inx--
 
@@ -278,7 +283,7 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 	for {
 		*inx++
 		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression", errs.SyntaxError), token.Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 		}
 
 		if ts[*inx].Type == tokens.Semicolon {
@@ -290,7 +295,7 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 	}
 
 	if len(values) == 0 {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 
 	if len(values) == 1 {
@@ -322,22 +327,22 @@ func (b *Builder) parseDefine(ts []*models.Token, inx *int) (*models.Node, error
 	*inx++
 
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 
 	if ts[*inx].Type != tokens.Identifier {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier", errs.SyntaxError), ts[*inx].Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
 	node.Content = ts[*inx].Value
 	*inx++
 
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{'", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 
 	if ts[*inx].Type != tokens.LeftBrace {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{'", errs.SyntaxError), ts[*inx].Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
 	var (
@@ -348,7 +353,7 @@ func (b *Builder) parseDefine(ts []*models.Token, inx *int) (*models.Node, error
 	for {
 		*inx++
 		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}'", errs.SyntaxError), token.Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 		}
 
 		if ts[*inx].Type == tokens.RightBrace {
@@ -369,7 +374,7 @@ func (b *Builder) parseDefine(ts []*models.Token, inx *int) (*models.Node, error
 	}
 
 	if braceCount != 0 {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '}'", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 
 	child, err := b.Build(children)
@@ -391,7 +396,7 @@ func (b *Builder) parseFunctionCall(ts []*models.Token, inx *int, node *models.N
 
 	for {
 		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected ')'", errs.SyntaxError), node.Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected ')', but got '%s'", errs.SyntaxError, node.Type), node.Debug)
 		}
 
 		if ts[*inx].Type == tokens.RightParenthesis {
@@ -414,15 +419,15 @@ func (b *Builder) parseFunctionCall(ts []*models.Token, inx *int, node *models.N
 	}
 
 	if parenCount != 0 {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected ')'", errs.SyntaxError), node.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected ')', but got '%s'", errs.SyntaxError, node.Type), node.Debug)
 	}
 
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';'", errs.SyntaxError), node.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got '%s'", errs.SyntaxError, node.Type), node.Debug)
 	}
 
 	if ts[*inx].Type != tokens.Semicolon {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';'", errs.SyntaxError), ts[*inx].Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
 	*inx++
@@ -460,7 +465,7 @@ func (b *Builder) parseInlineValue(ts []*models.Token, inx *int) (*models.Node, 
 	var values []*models.Token
 	for {
 		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression", errs.SyntaxError), token.Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 		}
 
 		if ts[*inx].Type == tokens.Semicolon || ts[*inx].Type == tokens.Comma || ts[*inx].Type == tokens.RightParenthesis {
@@ -472,7 +477,7 @@ func (b *Builder) parseInlineValue(ts []*models.Token, inx *int) (*models.Node, 
 	}
 
 	if len(values) == 0 {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 
 	if len(values) == 1 {

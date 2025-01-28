@@ -46,6 +46,13 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 				return nil, errs.WithDebug(fmt.Errorf("function call in expression must return a single value"), node.Debug)
 			}
 
+			if ret[0].Type == tokens.DefinitionBlock {
+				return &models.Node{
+					VariableType: tokens.DefinitionBlock,
+					Value:        ret[0].Value,
+				}, nil
+			}
+
 			sum := fmt.Sprintf("%x", md5.Sum([]byte(node.Content)))
 			node.Content = sum
 			args[sum] = ret[0].Value

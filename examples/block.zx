@@ -1,9 +1,14 @@
 define MyBlock {
     let user = "Unknown";
 
-    fn construct(name) {
-        this.user = name;
+    fn construct() {
+        println("constructed");
+    }
+
+    fn sayHi() {
+        println("Hi");
     }
 }
 
-let block = MyBlock("Martin");
+let block = MyBlock();
+block.sayHi();

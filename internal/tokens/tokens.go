@@ -78,3 +78,108 @@ func (t TokenType) ToVariableType() VariableType {
 		return NilVariable
 	}
 }
+
+func (t TokenType) String() string {
+	switch t {
+	case Unkown:
+		return "unkown"
+	case Use:
+		return "use"
+	case As:
+		return "as"
+	case From:
+		return "from"
+	case Let:
+		return "let"
+	case Const:
+		return "const"
+	case Define:
+		return "define"
+	case Return:
+		return "return"
+	case New:
+		return "new"
+	case This:
+		return "this"
+	case Identifier:
+		return "identifier"
+	case FuncCall:
+		return "funcCall"
+	case Number:
+		return "number"
+	case String:
+		return "string"
+	case Bool:
+		return "bool"
+	case Nil:
+		return "nil"
+	case Function:
+		return "function"
+	case Definiton:
+		return "definiton"
+	case Addition:
+		return "+"
+	case Subtraction:
+		return "-"
+	case Multiplication:
+		return "*"
+	case Division:
+		return "/"
+	case Modulo:
+		return "%"
+	case Increment:
+		return "++"
+	case Decrement:
+		return "--"
+	case Assign:
+		return "="
+	case Equation:
+		return "=="
+	case NotEquation:
+		return "!="
+	case Greater:
+		return ">"
+	case Less:
+		return "<"
+	case GreaterOrEqual:
+		return ">="
+	case LessOrEqual:
+		return "<="
+	case And:
+		return "&&"
+	case Or:
+		return "||"
+	case Not:
+		return "!"
+	case LeftParenthesis:
+		return "("
+	case RightParenthesis:
+		return ")"
+	case LeftBrace:
+		return "{"
+	case RightBrace:
+		return "}"
+	case LeftBracket:
+		return "["
+	case RightBracket:
+		return "]"
+	case Comma:
+		return ","
+	case Dot:
+		return "."
+	case Semicolon:
+		return ";"
+	case Colon:
+		return ":"
+	case At:
+		return "@"
+	case If:
+		return "if"
+	case ElseIf:
+		return "else if"
+	case Else:
+		return "else"
+	default:
+		return "unkown"
+	}
+}

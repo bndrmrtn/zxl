@@ -19,7 +19,8 @@ func init() {
 	// Add the run command to the root command
 	rootCmd.AddCommand(runCmd)
 	runCmd.Flags().BoolP("debug", "d", false, "Run the program in debug mode")
-	runCmd.Flags().BoolP("color", "c", true, "Enable or disable colorized output")
+	runCmd.Flags().BoolP("cache", "c", false, "Allow or disallow caching")
+	runCmd.Flags().BoolP("nocolor", "n", false, "Enable or disable colorized output")
 }
 
 // execRun executes the run command
@@ -30,6 +31,7 @@ func execRun(cmd *cobra.Command, args []string) {
 	}
 
 	debug := cmd.Flag("debug").Value.String() == "true"
+	caching := cmd.Flag("cache").Value.String() == "true"
 
 	if len(args) == 0 {
 		cmd.PrintErr("No file specified")
@@ -60,7 +62,7 @@ func execRun(cmd *cobra.Command, args []string) {
 	}
 	defer file.Close()
 
-	interpreter := language.NewInterpreter(mode)
+	interpreter := language.NewInterpreter(mode, caching)
 
 	if _, err = interpreter.Interpret(args[0], file); err != nil {
 		cmd.PrintErr(err)
