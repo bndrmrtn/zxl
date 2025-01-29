@@ -1,32 +1,22 @@
-package language
+package cache
 
 import (
 	"crypto/md5"
 	"encoding/gob"
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/bndrmrtn/zexlang/internal/models"
 )
 
-// storeCache stores the cache information to file
-func (ir *Interpreter) storeCache(data io.Reader, nodes []*models.Node) {
-	if !ir.cache {
-		return
-	}
-
+// Store stores the cache information to file
+func Store(data []byte, nodes []*models.Node) {
 	if info, err := os.Stat(".zxcache/"); err != nil || !info.IsDir() {
 		// Create cache directory if it does not exist
 		_ = os.MkdirAll(".zxcache/", os.ModePerm)
 	}
 
-	b, err := io.ReadAll(data)
-	if err != nil {
-		return
-	}
-
-	hash := fmt.Sprintf("%x", md5.Sum(b))
+	hash := fmt.Sprintf("%x", md5.Sum(data))
 
 	// Write cache information to file
 	f, err := os.Create(".zxcache/" + hash + ".zxbin")
@@ -39,21 +29,12 @@ func (ir *Interpreter) storeCache(data io.Reader, nodes []*models.Node) {
 	_ = gob.NewEncoder(f).Encode(nodes)
 }
 
-// getCache gets the cache information from file
-func (ir *Interpreter) getCache(data io.Reader) ([]*models.Node, bool) {
-	if !ir.cache {
-		return nil, false
-	}
-
+// Get gets the cache information from file
+func Get(data []byte) ([]*models.Node, bool) {
 	// Create cache directory if it does not exist
 	_ = os.MkdirAll(".zxcache/", os.ModePerm)
 
-	b, err := io.ReadAll(data)
-	if err != nil {
-		return nil, false
-	}
-
-	hash := fmt.Sprintf("%x", md5.Sum(b))
+	hash := fmt.Sprintf("%x", md5.Sum(data))
 
 	// Read cache information from file
 	f, err := os.Open(".zxcache/" + hash + ".zxbin")

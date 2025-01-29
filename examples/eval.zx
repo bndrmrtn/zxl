@@ -1,0 +1,7 @@
+let content = "
+    let x = 0;
+    let y = x + 1;
+    println(y);
+";
+
+eval(content);

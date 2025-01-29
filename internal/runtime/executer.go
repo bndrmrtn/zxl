@@ -9,7 +9,10 @@ import (
 	"github.com/bndrmrtn/zexlang/internal/tokens"
 )
 
+// Executer is the runtime executer
 type Executer struct {
+	scope ExecuterScope
+
 	runtime *Runtime
 	parent  *Executer
 
@@ -18,8 +21,10 @@ type Executer struct {
 	blocks map[string]*models.Node
 }
 
-func NewExecuter(r *Runtime, parent *Executer) *Executer {
+// NewExecuter creates a new runtime executer
+func NewExecuter(scope ExecuterScope, r *Runtime, parent *Executer) *Executer {
 	return &Executer{
+		scope:   scope,
 		runtime: r,
 		parent:  parent,
 		fns:     make(map[string]*models.Node),
@@ -28,44 +33,43 @@ func NewExecuter(r *Runtime, parent *Executer) *Executer {
 	}
 }
 
+// Bind binds a variable to the executer
 func (e *Executer) Bind(variable *models.Node) {
 	e.vars[variable.Content] = variable
 }
 
+// Execute executes the given nodes
 func (e *Executer) Execute(ts []*models.Node) ([]*builtin.FuncReturn, error) {
 	for _, token := range ts {
 		switch token.Type {
+		// Handle function declarations
 		case tokens.Function:
 			e.fns[token.Content] = token
-		case tokens.Let, tokens.Const:
-			if _, ok := e.vars[token.Content]; ok {
-				return nil, errs.WithDebug(fmt.Errorf("%w: %v", errs.CannotRedeclareVariable, token.Content), token.Debug)
-			}
-
-			if token.VariableType == tokens.ExpressionVariable {
-				v, err := e.evaluateExpression(token)
-				if err != nil {
-					return nil, err
-				}
-				e.vars[token.Content] = v
-				break
-			}
-
-			e.vars[token.Content] = token
-			break
+		// Handle block definitions
 		case tokens.Define:
 			e.blocks[token.Content] = token
+		// Handle variable declarations
+		case tokens.Let, tokens.Const:
+			err := e.handleLetConst(token)
+			if err != nil {
+				return nil, err
+			}
+			break
+		// Handle function calls
 		case tokens.FuncCall:
-			e.executeFn(token)
+			_, err := e.executeFn(token)
+			if err != nil {
+				return nil, err
+			}
+			break
 		case tokens.Assign:
-			v, ok := e.vars[token.Content]
-			if !ok {
-				return nil, errs.WithDebug(fmt.Errorf("%w: %v", errs.VariableNotDeclared, token.Content), token.Debug)
+			err := e.handleAssignment(token)
+			if err != nil {
+				return nil, err
 			}
-			if v.Type == tokens.Const {
-				return nil, errs.WithDebug(fmt.Errorf("%w: %v", errs.CannotReassignConstant, token.Content), token.Debug)
-			}
-			e.vars[token.Content] = token
+			break
+		case tokens.Return:
+			return e.handleReturn(token)
 		}
 	}
 	return nil, nil
@@ -77,5 +81,16 @@ func (e *Executer) ExecuteFn(name string, args []*builtin.Variable) ([]*builtin.
 		return nil, errs.WithDebug(fmt.Errorf("function %v not found", name), nil)
 	}
 
-	return NewExecuter(e.runtime, e).Execute(fn.Children)
+	ex := NewExecuter(ExecuterScopeFunction, e.runtime, e)
+
+	for i, arg := range args {
+		ex.Bind(&models.Node{
+			Type:         tokens.Let,
+			VariableType: arg.Type,
+			Content:      fn.Args[i].Content,
+			Value:        arg.Value,
+		})
+	}
+
+	return ex.Execute(fn.Children)
 }

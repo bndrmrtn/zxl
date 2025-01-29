@@ -1,0 +1,7 @@
+let hello = "Hello, World!";
+let hello2 = hello; // ref is a reference to hello
+
+hello = "New value"; // hello2 is changed because it is a reference to hello, not its value
+
+println(hello);
+println(hello2);

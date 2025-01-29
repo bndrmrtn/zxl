@@ -10,14 +10,31 @@ import (
 	"github.com/bndrmrtn/zexlang/internal/tokens"
 )
 
+// GetVariableValue gets the value of a variable
 func (e *Executer) GetVariableValue(name string) (*models.Node, error) {
+	if strings.Contains(name, ".") {
+		parts := strings.Split(name, ".")
+		last := parts[len(parts)-1]
+		parts = parts[:len(parts)-1]
+		ex, _, err := e.accessUnderlyingVariable(parts)
+		if err != nil {
+			return nil, err
+		}
+
+		return ex.GetVariableValue(last)
+	}
+
 	v, ok := e.vars[name]
 	if !ok {
-		return nil, errs.WithDebug(fmt.Errorf("variable %v cannot be referenced", name), nil)
+		return nil, fmt.Errorf("variable '%v' cannot be referenced", name)
 	}
 
 	if v.Reference {
 		return e.GetVariableValue(v.Content)
+	}
+
+	if v.VariableType == tokens.ReferenceVariable {
+		return e.GetVariableValue(v.Value.(string))
 	}
 
 	if v.VariableType == tokens.ExpressionVariable {
@@ -27,43 +44,32 @@ func (e *Executer) GetVariableValue(name string) (*models.Node, error) {
 	return v, nil
 }
 
+// executeFn executes a function
 func (e *Executer) executeFn(token *models.Node) ([]*builtin.FuncReturn, error) {
 	name := token.Content
 	args := token.Args
 
+	switch name {
+	case "eval":
+		convArgs, err := e.convertArgument(args)
+		if err != nil {
+			return nil, errs.WithDebug(err, token.Debug)
+		}
+		return e.runFuncEval(token.Debug, convArgs)
+	case "import":
+		convArgs, err := e.convertArgument(args)
+		if err != nil {
+			return nil, errs.WithDebug(err, token.Debug)
+		}
+		return e.runFuncImport(token.Debug, convArgs)
+	}
+
+	// if
 	if strings.Contains(name, ".") {
 		parts := strings.Split(name, ".")
 		last := parts[len(parts)-1]
 		parts = parts[:len(parts)-1]
-
-		if last == "construct" {
-			return nil, errs.WithDebug(fmt.Errorf("construct is a reserved method"), token.Debug)
-		}
-
-		executer := e
-
-		for _, part := range parts {
-			variable, err := executer.GetVariableValue(part)
-			if err != nil {
-				return nil, err
-			}
-
-			if variable.VariableType == tokens.DefinitionBlock {
-				exec, ok := variable.Value.(*Executer)
-				if !ok {
-					return nil, errs.WithDebug(fmt.Errorf("variable %v is not a block", part), token.Debug)
-				}
-				executer = exec
-			} else {
-				return nil, errs.WithDebug(fmt.Errorf("variable %v is not a block", part), token.Debug)
-			}
-		}
-
-		convertArgs, err := e.convertArgument(args)
-		if err != nil {
-			return nil, errs.WithDebug(err, token.Debug)
-		}
-		return executer.ExecuteFn(last, convertArgs)
+		return e.executeComplexFuncCall(token, parts, last, args)
 	}
 
 	fn, ok := e.fns[name]
@@ -72,7 +78,7 @@ func (e *Executer) executeFn(token *models.Node) ([]*builtin.FuncReturn, error) 
 			return nil, errs.WithDebug(fmt.Errorf("function %v expects %v arguments, got %v", name, len(fn.Args), len(args)), fn.Debug)
 		}
 
-		ex := NewExecuter(e.runtime, e)
+		ex := NewExecuter(ExecuterScopeFunction, e.runtime, e)
 		for i, arg := range args {
 			if arg.VariableType == tokens.ReferenceVariable {
 				arg, err := e.GetVariableValue(arg.Content)
@@ -115,6 +121,26 @@ func (e *Executer) executeFn(token *models.Node) ([]*builtin.FuncReturn, error) 
 	return nil, errs.WithDebug(fmt.Errorf("function %v not found", name), token.Debug)
 }
 
+// executeComplexFuncCall executes a function with a complex name
+func (e *Executer) executeComplexFuncCall(token *models.Node, args []string, fn string, variables []*models.Node) ([]*builtin.FuncReturn, error) {
+	if fn == "construct" {
+		return nil, errs.WithDebug(fmt.Errorf("construct is a reserved method"), token.Debug)
+	}
+
+	ex, _, err := e.accessUnderlyingVariable(args)
+	if err != nil {
+		return nil, errs.WithDebug(err, token.Debug)
+	}
+
+	convertArgs, err := e.convertArgument(variables)
+	if err != nil {
+		return nil, errs.WithDebug(err, token.Debug)
+	}
+
+	return ex.ExecuteFn(fn, convertArgs)
+}
+
+// convertArgument converts arguments to builtin variables
 func (e *Executer) convertArgument(args []*models.Node) ([]*builtin.Variable, error) {
 	var convArgs []*builtin.Variable
 
@@ -141,8 +167,9 @@ func (e *Executer) convertArgument(args []*models.Node) ([]*builtin.Variable, er
 	return convArgs, nil
 }
 
+// newBlock creates a new block
 func (e *Executer) newBlock(block *models.Node, args []*models.Node) ([]*builtin.FuncReturn, error) {
-	ex := NewExecuter(e.runtime, e)
+	ex := NewExecuter(ExecuterScopeDefinition, e.runtime, e)
 	_, err := ex.Execute(block.Children)
 	if err != nil {
 		return nil, errs.WithDebug(err, block.Debug)

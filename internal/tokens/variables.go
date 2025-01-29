@@ -14,6 +14,7 @@ const (
 	ReferenceVariable
 	InlineValue
 	DefinitionBlock
+	DefinitionReference
 )
 
 func (v VariableType) String() string {
@@ -29,11 +30,15 @@ func (v VariableType) String() string {
 	case BoolVariable:
 		return "bool"
 	case FunctionCallVariable:
-		return "call:fn()"
+		return "@call:fn()"
 	case ExpressionVariable:
-		return "expression"
+		return "@expression"
 	case ReferenceVariable:
-		return ":ref:"
+		return "@ref"
+	case DefinitionReference:
+		return "@ref:def{}"
+	case DefinitionBlock:
+		return "@def{}"
 	default:
 		return "unknown"
 	}

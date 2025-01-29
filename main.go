@@ -5,9 +5,23 @@
 // Created by Martin Binder
 package main
 
-import "github.com/bndrmrtn/zexlang/cmd"
+import (
+	"fmt"
+
+	"github.com/bndrmrtn/zexlang/cmd"
+	"github.com/fatih/color"
+)
 
 func main() {
 	// Execute the command
+	// defer fatal()
 	cmd.Execute()
+}
+
+// fatal is a helper function to recover from a panic
+func fatal() {
+	if r := recover(); r != nil {
+		f := color.New(color.FgRed, color.Bold).SprintFunc()
+		fmt.Printf("%s: %v\n", f("Fatal error"), r)
+	}
 }

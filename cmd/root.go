@@ -3,13 +3,15 @@ package cmd
 import (
 	"log"
 
+	"github.com/bndrmrtn/zexlang/internal/version"
 	"github.com/spf13/cobra"
 )
 
 // rootCmd is the root command for the CLI
 var rootCmd = &cobra.Command{
-	Use:   "zex",
-	Short: "Zex ✨ A small programming language for template rendering.",
+	Use:     "zex",
+	Short:   "Zex ✨ A small programming language for template rendering.",
+	Version: version.Version,
 }
 
 // Execute executes the root command

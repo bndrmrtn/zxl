@@ -1,6 +1,7 @@
 package language
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/bndrmrtn/zexlang/internal/ast"
 	"github.com/bndrmrtn/zexlang/internal/builtin"
+	"github.com/bndrmrtn/zexlang/internal/cache"
 	"github.com/bndrmrtn/zexlang/internal/lexer"
 	"github.com/bndrmrtn/zexlang/internal/models"
 	"github.com/bndrmrtn/zexlang/internal/runtime"
@@ -60,9 +62,21 @@ func (ir *Interpreter) Interpret(fileName string, data io.Reader) ([]*builtin.Fu
 
 // getNodes gets the nodes from the given data
 func (ir *Interpreter) getNodes(fileName string, data io.Reader) ([]*models.Node, error) {
+	b, err := io.ReadAll(data)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the nodes from cache if it exists
+	if ir.cache {
+		if nodes, ok := cache.Get(b); ok {
+			return nodes, nil
+		}
+	}
+
 	// Tokenize the source code with lexer
 	lx := lexer.New(fileName)
-	ts, err := lx.Parse(data)
+	ts, err := lx.Parse(bytes.NewReader(b))
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +97,9 @@ func (ir *Interpreter) getNodes(fileName string, data io.Reader) ([]*models.Node
 	}
 
 	// Store cache information
-	ir.storeCache(data, nodes)
+	if ir.cache {
+		cache.Store(b, nodes)
+	}
 
 	return nodes, nil
 }

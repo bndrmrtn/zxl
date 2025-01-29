@@ -1,62 +1,62 @@
-- type: 1016
+- type: 1017
   value: fn
-- type: 110
+- type: 111
   value: doSmth
-- type: 100035
-  value: (
-- type: 110
-  value: x
 - type: 100036
-  value: )
+  value: (
+- type: 111
+  value: x
 - type: 100037
-  value: '{'
-- type: 110
-  value: println
-- type: 100035
-  value: (
-- type: 110
-  value: x
-- type: 100036
   value: )
-- type: 1000043
-  value: ;
 - type: 100038
+  value: '{'
+- type: 111
+  value: println
+- type: 100036
+  value: (
+- type: 111
+  value: x
+- type: 100037
+  value: )
+- type: 1000044
+  value: ;
+- type: 100039
   value: '}'
-- type: 104
+- type: 105
   value: let
-- type: 110
+- type: 111
   value: world
-- type: 10025
+- type: 10026
   value: =
-- type: 1013
+- type: 1014
   value: '"World!"'
   map:
     quote: 34
-- type: 1000043
+- type: 1000044
   value: ;
-- type: 104
+- type: 105
   value: let
-- type: 110
+- type: 111
   value: complex
-- type: 10025
+- type: 10026
   value: =
-- type: 1013
+- type: 1014
   value: '"Hello, "'
   map:
     quote: 34
-- type: 10018
+- type: 10019
   value: +
-- type: 110
+- type: 111
   value: world
-- type: 1000043
+- type: 1000044
   value: ;
-- type: 110
+- type: 111
   value: doSmth
-- type: 100035
-  value: (
-- type: 110
-  value: complex
 - type: 100036
+  value: (
+- type: 111
+  value: complex
+- type: 100037
   value: )
-- type: 1000043
+- type: 1000044
   value: ;

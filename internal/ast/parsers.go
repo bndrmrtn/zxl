@@ -210,11 +210,36 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 		return nil, errs.WithDebug(fmt.Errorf("%w: unexpected end of file, got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 
-	if ts[*inx].Type == tokens.Semicolon || (ts[*inx].Type != tokens.Assign && ts[*inx].Type != tokens.Dot && ts[*inx].Type != tokens.LeftParenthesis) {
+	// Handle multi-part identifiers with dots (e.g., "app.core.func")
+	for *inx < len(ts) && ts[*inx].Type == tokens.Dot {
+		node.Content += "."
+		*inx++
+
+		if *inx >= len(ts) {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier after dot, but got EOF", errs.SyntaxError), token.Debug)
+		}
+
+		if ts[*inx].Type != tokens.Identifier {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier after dot, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+		}
+
+		node.Content += ts[*inx].Value
+		*inx++
+	}
+
+	if *inx >= len(ts) {
 		return &models.Node{
 			Type:         token.Type,
 			VariableType: tokens.ReferenceVariable,
-			Content:      token.Value,
+			Content:      node.Content,
+		}, nil
+	}
+
+	if ts[*inx].Type == tokens.Semicolon || (ts[*inx].Type != tokens.Assign && ts[*inx].Type != tokens.LeftParenthesis) {
+		return &models.Node{
+			Type:         token.Type,
+			VariableType: tokens.ReferenceVariable,
+			Content:      node.Content,
 		}, nil
 	}
 
@@ -231,71 +256,22 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 		return b.parseFunctionCall(ts, inx, node)
 	}
 
-	if ts[*inx].Type == tokens.Dot {
-		node.Content += "."
-		*inx++
-		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
-		}
-
-		if ts[*inx].Type != tokens.Identifier {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
-		}
-
-		node.Content += ts[*inx].Value
-		node.Reference = true
-
-		*inx++
-		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator or expression, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
-		}
-
-		if b.isExpression(token) {
-			return &models.Node{
-				Type:         token.Type,
-				VariableType: tokens.ExpressionVariable,
-				Content:      token.Value,
-				Debug:        token.Debug,
-			}, nil
-		}
-
-		if ts[*inx].Type == tokens.LeftParenthesis {
-			return b.parseFunctionCall(ts, inx, node)
-		}
-
-		if ts[*inx].Type != tokens.Assign {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
-		}
-
-		*inx--
+	if ts[*inx].Type != tokens.Assign {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator or expression, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
 	node.Type = tokens.Assign
-	*inx++
-	*inx++
 
-	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
-	}
-	*inx--
-
+	// Process assignment and value expressions
+	*inx++
 	var values []*models.Token
-	for {
-		*inx++
-		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
-		}
-
-		if ts[*inx].Type == tokens.Semicolon {
-			*inx++
-			break
-		}
-
+	for *inx < len(ts) && ts[*inx].Type != tokens.Semicolon {
 		values = append(values, ts[*inx])
+		*inx++
 	}
 
 	if len(values) == 0 {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, '%s'", errs.SyntaxError, token.Type), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got nothing", errs.SyntaxError), token.Debug)
 	}
 
 	if len(values) == 1 {
@@ -497,5 +473,69 @@ func (b *Builder) parseInlineValue(ts []*models.Token, inx *int) (*models.Node, 
 		node.Children = children
 	}
 
+	return node, nil
+}
+
+func (b *Builder) parseNamespace(ts []*models.Token, inx *int) (*models.Node, error) {
+	token := ts[*inx]
+	node := &models.Node{
+		Type:  token.Type,
+		Debug: token.Debug,
+	}
+
+	*inx++
+
+	if *inx >= len(ts) {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
+	}
+
+	if ts[*inx].Type != tokens.Identifier {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	}
+
+	node.Content = ts[*inx].Value
+	*inx++
+
+	if *inx >= len(ts) {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
+	}
+
+	if ts[*inx].Type != tokens.Semicolon {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	}
+
+	*inx++
+	return node, nil
+}
+
+func (b *Builder) parseReturn(ts []*models.Token, inx *int) (*models.Node, error) {
+	node := &models.Node{
+		Type:         ts[*inx].Type,
+		VariableType: tokens.ExpressionVariable,
+	}
+
+	*inx++
+	if *inx >= len(ts) {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got EOF", errs.SyntaxError), node.Debug)
+	}
+
+	var children = []*models.Token{}
+	for {
+		if ts[*inx].Type == tokens.Semicolon {
+			*inx++
+			break
+		}
+
+		children = append(children, ts[*inx])
+		*inx++
+	}
+
+	children = append(children, SemiColonToken)
+	child, err := b.Build(children)
+	if err != nil {
+		return nil, err
+	}
+
+	node.Children = child
 	return node, nil
 }

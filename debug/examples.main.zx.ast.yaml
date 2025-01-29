@@ -1,59 +1,59 @@
-- type: 1016
+- type: 1017
   variableType: 0
   content: doSmth
   value: null
   reference: false
   children:
-    - type: 111
-      variableType: 0
+    - type: 112
+      variableType: 5
       content: println
       value: null
       reference: false
       args:
-        - type: 110
+        - type: 111
           variableType: 7
           content: x
           value: null
           reference: false
   args:
-    - type: 110
+    - type: 111
       variableType: 7
       content: x
       value: null
       reference: false
-- type: 104
+- type: 105
   variableType: 3
   content: world
   value: World!
   reference: false
-- type: 104
+- type: 105
   variableType: 6
   content: complex
   value: null
   reference: false
   children:
-    - type: 1013
+    - type: 1014
       variableType: 8
       content: '"Hello, "'
       value: 'Hello, '
       reference: false
-    - type: 10018
+    - type: 10019
       variableType: 0
       content: +
       value: null
       reference: false
-    - type: 110
+    - type: 111
       variableType: 7
       content: world
       value: null
       reference: false
-- type: 111
-  variableType: 0
+- type: 112
+  variableType: 5
   content: doSmth
   value: null
   reference: false
   args:
-    - type: 110
+    - type: 111
       variableType: 7
       content: complex
       value: null

@@ -17,14 +17,26 @@ func NewBuilder() *Builder {
 }
 
 // Build builds the AST from the tokens
-func (b *Builder) Build(tokens []*models.Token) ([]*models.Node, error) {
+func (b *Builder) Build(ts []*models.Token) ([]*models.Node, error) {
 	var (
 		inx   int
 		nodes []*models.Node
 	)
 
-	for inx < len(tokens) {
-		node, err := b.buildNode(tokens, &inx)
+	if len(ts) == 0 {
+		return nil, fmt.Errorf("%w: no tokens to build AST", errs.SyntaxError)
+	}
+
+	if ts[0].Type == tokens.Namespace {
+		node, err := b.parseNamespace(ts, &inx)
+		if err != nil {
+			return nil, err
+		}
+		nodes = append(nodes, node)
+	}
+
+	for inx < len(ts) {
+		node, err := b.buildNode(ts, &inx)
 		if err != nil {
 			return nil, err
 		}
@@ -41,6 +53,8 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 	token := ts[*inx]
 
 	switch token.Type {
+	case tokens.Namespace:
+		return nil, errs.WithDebug(fmt.Errorf("%w: namespace can only be at the beginning of the file", errs.SyntaxError), token.Debug)
 	case tokens.Addition, tokens.Subtraction, tokens.Multiplication, tokens.Division:
 		*inx++
 		return &models.Node{
@@ -58,6 +72,8 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 		return b.parseFunction(ts, inx)
 	case tokens.Identifier, tokens.This:
 		return b.parseIdentifier(ts, inx)
+	case tokens.Return:
+		return b.parseReturn(ts, inx)
 	case tokens.Semicolon:
 		*inx++
 		return nil, nil

@@ -302,6 +302,8 @@ func (lx *Lexer) getCharIdent(ch byte) tokens.TokenType {
 
 func (lx *Lexer) getIdentType(s string) tokens.TokenType {
 	switch s {
+	case "namespace":
+		return tokens.Namespace
 	case "use":
 		return tokens.Use
 	case "as":

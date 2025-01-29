@@ -53,7 +53,15 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 				}, nil
 			}
 
-			sum := fmt.Sprintf("%x", md5.Sum([]byte(node.Content)))
+			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(node.Content)))
+			sum = sum[:10]
+
+			// Reset the content after the evaluation
+			oldContent := node.Content
+			defer func() {
+				node.Content = oldContent
+			}()
+
 			node.Content = sum
 			args[sum] = ret[0].Value
 		}

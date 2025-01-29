@@ -6,7 +6,8 @@ type TokenType int
 const (
 	Unkown TokenType = iota
 
-	Use TokenType = iota + 10
+	Namespace TokenType = iota + 10
+	Use
 	As
 	From
 

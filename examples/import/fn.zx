@@ -1,0 +1,11 @@
+namespace ok;
+
+define MyOkBlock {
+    let myVar = "Hi";
+
+    fn myOkFn() {
+        println("I'm from an other file, inside a definition :)");
+    }
+}
+
+let block = MyOkBlock();
