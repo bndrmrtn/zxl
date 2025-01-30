@@ -3,7 +3,6 @@ define MyBlock {
 
     fn construct(name) {
         this.user = name;
-        println(this.user);
     }
 
     fn print() {
@@ -12,5 +11,12 @@ define MyBlock {
 }
 
 let block = MyBlock("Martin");
+block.print();
 
-// block.print();
+let x = block.user;
+
+block.user = "John";
+
+// This will print "Martin" because x is a copy of the user field's value not a reference to it
+// but 'block' is a reference to the object so 'block.user' will print "John"
+println(x);

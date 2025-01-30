@@ -44,7 +44,7 @@ func (e *Executer) accessUnderlyingVariable(args []string) (*Executer, *models.N
 		}
 
 		switch variable.VariableType {
-		case tokens.DefinitionBlock:
+		case tokens.DefinitionReference:
 			exec, ok := variable.Value.(*Executer)
 			if !ok {
 				return nil, nil, fmt.Errorf("variable %v is not a block", part)

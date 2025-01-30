@@ -243,6 +243,52 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					File:   lx.filename,
 				},
 			})
+		case '<':
+			if pos+1 < len(s) && s[pos+1] == '=' {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.LessOrEqual,
+					Value: "<=",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+					},
+				})
+				pos++
+			} else {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.Less,
+					Value: "<",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+					},
+				})
+			}
+		case '>':
+			if pos+1 < len(s) && s[pos+1] == '=' {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.GreaterOrEqual,
+					Value: ">=",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+					},
+				})
+				pos++
+			} else {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.Greater,
+					Value: ">",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+					},
+				})
+			}
 		default:
 			start := pos
 			if isLetter(s[pos]) || s[pos] == '_' {

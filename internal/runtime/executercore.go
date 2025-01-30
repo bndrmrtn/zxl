@@ -65,6 +65,8 @@ func (e *Executer) executeFn(token *models.Node) ([]*builtin.FuncReturn, error) 
 			return nil, errs.WithDebug(err, token.Debug)
 		}
 		return e.runFuncImport(token.Debug, convArgs)
+	case "ref":
+		return e.runFuncRef(token)
 	}
 
 	// if
@@ -121,7 +123,17 @@ func (e *Executer) executeFn(token *models.Node) ([]*builtin.FuncReturn, error) 
 		return e.newBlock(block, args)
 	}
 
-	return nil, errs.WithDebug(fmt.Errorf("function %v not found", name), token.Debug)
+	if e.scope == ExecuterScopeFunction || e.scope == ExecuterScopeBlock {
+		convArgs, err := e.convertArgument(args)
+		if err != nil {
+			return nil, err
+		}
+		if e.parent != nil {
+			return e.parent.ExecuteFn(name, convArgs)
+		}
+	}
+
+	return nil, errs.WithDebug(fmt.Errorf("%w: function '%v' not found", errs.RuntimeError, name), token.Debug)
 }
 
 // executeComplexFuncCall executes a function with a complex name
@@ -161,6 +173,18 @@ func (e *Executer) convertArgument(args []*models.Node) ([]*builtin.Variable, er
 			arg.VariableType = arg.Type.ToVariableType()
 		}
 
+		if arg.VariableType == tokens.ExpressionVariable {
+			arg, err := e.evaluateExpression(arg)
+			if err != nil {
+				return nil, err
+			}
+			convArgs = append(convArgs, &builtin.Variable{
+				Type:  arg.VariableType,
+				Value: arg.Value,
+			})
+			continue
+		}
+
 		convArgs = append(convArgs, &builtin.Variable{
 			Type:  arg.VariableType,
 			Value: arg.Value,
@@ -191,7 +215,7 @@ func (e *Executer) newBlock(block *models.Node, args []*models.Node) ([]*builtin
 
 	return []*builtin.FuncReturn{
 		{
-			Type:  tokens.DefinitionBlock,
+			Type:  tokens.DefinitionReference,
 			Value: ex,
 		},
 	}, nil

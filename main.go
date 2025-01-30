@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// Execute the command
-	// defer fatal()
+	defer fatal()
 	cmd.Execute()
 }
 

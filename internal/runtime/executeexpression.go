@@ -33,8 +33,18 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 			if err != nil {
 				return nil, err
 			}
-			node.Content = variable
-			args[variable] = node.Value
+
+			// Reset the content after the evaluation
+			oldContent := node.Content
+			defer func() {
+				node.Content = oldContent
+			}()
+
+			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(variable)))
+			sum = sum[:10]
+
+			node.Content = sum
+			args[sum] = node.Value
 		}
 
 		if node.VariableType == tokens.FunctionCallVariable {
@@ -46,9 +56,9 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 				return nil, errs.WithDebug(fmt.Errorf("function call in expression must return a single value"), node.Debug)
 			}
 
-			if ret[0].Type == tokens.DefinitionBlock {
+			if ret[0].Type == tokens.DefinitionReference {
 				return &models.Node{
-					VariableType: tokens.DefinitionBlock,
+					VariableType: tokens.DefinitionReference,
 					Value:        ret[0].Value,
 				}, nil
 			}
@@ -69,14 +79,19 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 		expressionList = append(expressionList, node.Content)
 	}
 
-	expression, err := govaluate.NewEvaluableExpression(strings.Join(expressionList, " "))
+	if len(expressionList) == 0 {
+		return nil, errs.WithDebug(fmt.Errorf("empty expression"), n.Debug)
+	}
+
+	value := strings.Join(expressionList, " ")
+	expression, err := govaluate.NewEvaluableExpression(value)
 	if err != nil {
-		return nil, errs.WithDebug(err, n.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: %w: %s", errs.RuntimeError, err, value), n.Debug)
 	}
 
 	result, err := expression.Evaluate(args)
 	if err != nil {
-		return nil, errs.WithDebug(err, n.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: %w: %s", errs.RuntimeError, err, value), n.Debug)
 	}
 
 	return &models.Node{

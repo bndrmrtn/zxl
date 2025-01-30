@@ -1,6 +1,7 @@
 package errs
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/bndrmrtn/zexlang/internal/models"
@@ -10,6 +11,13 @@ import (
 
 // WithDebug adds debug information to an error
 func WithDebug(err error, debug *models.Debug) error {
+	// Check if the error is already a DebugError
+	var de DebugError
+	if errors.As(err, &de) {
+		return de
+	}
+
+	// If not, create a new DebugError
 	return DebugError{err: err, debug: debug}
 }
 

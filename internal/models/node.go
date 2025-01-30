@@ -36,6 +36,10 @@ type Node struct {
 }
 
 func (n *Node) String() string {
+	if n == nil {
+		return "nil: this node does not exist"
+	}
+
 	return fmt.Sprintf("type: %d, variable: %d, content: %s, value: %v, ref: %v, children: %v, args: %v",
 		n.Type,
 		n.VariableType,

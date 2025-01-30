@@ -11,13 +11,19 @@ import (
 
 // Executer is the runtime executer
 type Executer struct {
+	// scope of the executer
 	scope ExecuterScope
 
+	// runtime reference
 	runtime *Runtime
-	parent  *Executer
+	// parent executer
+	parent *Executer
 
-	fns    map[string]*models.Node
-	vars   map[string]*models.Node
+	// fns is the map of functions
+	fns map[string]*models.Node
+	// vars is the map of variables
+	vars map[string]*models.Node
+	// blocks is the map of blocks
 	blocks map[string]*models.Node
 }
 
@@ -35,7 +41,24 @@ func NewExecuter(scope ExecuterScope, r *Runtime, parent *Executer) *Executer {
 
 // Bind binds a variable to the executer
 func (e *Executer) Bind(variable *models.Node) {
-	e.vars[variable.Content] = variable
+	name := variable.Content
+	v, ok := e.vars[name]
+	if !ok {
+		if e.scope == ExecuterScopeBlock {
+			if e.parent != nil {
+				e.parent.Bind(variable)
+				return
+			}
+		}
+		e.vars[variable.Content] = variable
+		return
+	}
+	v.Value = variable.Value
+	v.Type = variable.Type
+	v.VariableType = tokens.ReferenceVariable
+	v.Children = variable.Children
+	v.Args = variable.Args
+	v.Reference = variable.Reference
 }
 
 // Execute executes the given nodes
@@ -87,7 +110,10 @@ func (e *Executer) Execute(ts []*models.Node) ([]*builtin.FuncReturn, error) {
 func (e *Executer) ExecuteFn(name string, args []*builtin.Variable) ([]*builtin.FuncReturn, error) {
 	fn, ok := e.fns[name]
 	if !ok {
-		return nil, errs.WithDebug(fmt.Errorf("function %v not found", name), nil)
+		if (e.scope == ExecuterScopeBlock || e.scope == ExecuterScopeFunction) && e.parent != nil {
+			return e.parent.ExecuteFn(name, args)
+		}
+		return nil, errs.WithDebug(fmt.Errorf("%w: function '%v' not found", errs.RuntimeError, name), nil)
 	}
 
 	ex := NewExecuter(ExecuterScopeFunction, e.runtime, e)

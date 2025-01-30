@@ -1,11 +1,22 @@
 package builtin
 
-import "github.com/bndrmrtn/zexlang/internal/tokens"
+import (
+	"fmt"
+
+	"github.com/bndrmrtn/zexlang/internal/tokens"
+)
 
 // Variable is a runtime variable that can be used in the language
 type Variable struct {
 	Type  tokens.VariableType
 	Value any
+}
+
+func (v *Variable) String() string {
+	if v == nil {
+		return "nil: this variable does not exist"
+	}
+	return fmt.Sprintf("%s: %v", v.Type, v.Value)
 }
 
 // FuncReturn is a return value from a function

@@ -1,0 +1,17 @@
+define User {
+    let name = "Martin";
+    let age = 0;
+
+    fn constructor(name) {
+        this.name = name;
+        this.age = 20;
+    }
+}
+
+fn printUser(user) {
+    let msg = "User: " + user.name + ", " + user.age;
+    println(msg);
+}
+
+let user = User("John"); // comma separated arguments should be supported
+printUser(user);

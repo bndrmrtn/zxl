@@ -109,8 +109,31 @@ func (e *Executer) runFuncImport(debug *models.Debug, args []*builtin.Variable) 
 }
 
 func (e *Executer) runFuncRef(token *models.Node) ([]*builtin.FuncReturn, error) {
-	if token.VariableType != tokens.ReferenceVariable {
-		return nil, fmt.Errorf("ref function takes only referenced variable argument")
+	if len(token.Args) != 1 {
+		return nil, errs.WithDebug(fmt.Errorf("ref function takes only one argument"), token.Debug)
 	}
-	return nil, nil
+
+	n, err := e.GetVariableValue(token.Args[0].Content)
+	if err != nil {
+		return nil, err
+	}
+
+	if n.VariableType == tokens.ReferenceVariable {
+		if token.Value == nil {
+			return nil, errs.WithDebug(fmt.Errorf("ref: referencing a nil value"), token.Debug)
+		}
+
+		node, err := e.GetVariableValue(token.Value.(string))
+		if err != nil {
+			return nil, err
+		}
+		return e.runFuncRef(node)
+	}
+
+	return []*builtin.FuncReturn{
+		{
+			Type:  tokens.StringVariable,
+			Value: fmt.Sprintf("{Type: %s, Value: %v}", n.VariableType, n.Value),
+		},
+	}, nil
 }

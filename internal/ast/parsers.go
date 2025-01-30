@@ -96,9 +96,11 @@ func (b *Builder) parseFunction(ts []*models.Token, inx *int) (m *models.Node, e
 		Content: "func",
 	}
 	*inx++
+
 	if *inx >= len(ts) {
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
+
 	if ts[*inx].Type != tokens.Identifier {
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
@@ -120,6 +122,8 @@ func (b *Builder) parseFunction(ts []*models.Token, inx *int) (m *models.Node, e
 		args       []*models.Node
 		parenCount = 1
 	)
+
+	expectArg := true
 	for {
 		if *inx >= len(ts) {
 			return nil, errs.WithDebug(fmt.Errorf("%w: expected ')', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
@@ -137,11 +141,22 @@ func (b *Builder) parseFunction(ts []*models.Token, inx *int) (m *models.Node, e
 			parenCount++
 		}
 
+		if ts[*inx].Type == tokens.Comma {
+			expectArg = true
+			*inx++
+			continue
+		}
+
+		if !expectArg {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected ',' between arguments", errs.SyntaxError), ts[*inx].Debug)
+		}
+
 		arg, err := b.buildNode(ts, inx)
 		if err != nil {
 			return nil, err
 		}
 		args = append(args, arg)
+		expectArg = false
 	}
 
 	node.Args = args
@@ -178,7 +193,7 @@ func (b *Builder) parseFunction(ts []*models.Token, inx *int) (m *models.Node, e
 		}
 
 		if ts[*inx].Type == tokens.LeftBrace {
-			braceCount += 1
+			braceCount++
 		}
 
 		children = append(children, ts[*inx])
@@ -518,6 +533,12 @@ func (b *Builder) parseReturn(ts []*models.Token, inx *int) (*models.Node, error
 	*inx++
 	if *inx >= len(ts) {
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got EOF", errs.SyntaxError), node.Debug)
+	}
+
+	if ts[*inx].Type == tokens.Semicolon {
+		node.Value = nil
+		*inx++
+		return node, nil
 	}
 
 	var children = []*models.Token{}

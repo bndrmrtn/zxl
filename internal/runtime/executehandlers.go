@@ -16,6 +16,8 @@ func (e *Executer) handleLetConst(token *models.Node) error {
 		return errs.WithDebug(fmt.Errorf("%w: %v", errs.CannotRedeclareVariable, token.Content), token.Debug)
 	}
 
+	variableName := token.Content
+
 	// Check if variable is an expression
 	if token.VariableType == tokens.ExpressionVariable {
 		v, err := e.evaluateExpression(token)
@@ -27,11 +29,11 @@ func (e *Executer) handleLetConst(token *models.Node) error {
 		token.Value = v.Value
 		token.Type = v.Type
 		token.VariableType = v.VariableType
-
 		e.vars[token.Content] = v
+		return nil
 	}
 
-	e.vars[token.Content] = token
+	e.vars[variableName] = token
 	return nil
 }
 
@@ -51,11 +53,22 @@ func (e *Executer) handleAssignment(token *models.Node) error {
 		}
 		ex = exec
 		variableName = last
+
+		if token.VariableType == tokens.ReferenceVariable {
+			ref, err := e.GetVariableValue(token.Value.(string))
+			if err != nil {
+				return err
+			}
+			token = ref
+		}
 	}
 
 	// Check if variable is declared
 	v, ok := ex.vars[variableName]
 	if !ok {
+		if ex.scope == ExecuterScopeBlock {
+			return ex.parent.handleAssignment(token)
+		}
 		return errs.WithDebug(fmt.Errorf("%w: %v", errs.VariableNotDeclared, token.Content), token.Debug)
 	}
 	// Check if variable is a constant
@@ -63,7 +76,25 @@ func (e *Executer) handleAssignment(token *models.Node) error {
 		return errs.WithDebug(fmt.Errorf("%w: %v", errs.CannotReassignConstant, token.Content), token.Debug)
 	}
 
-	ex.vars[token.Content] = token
+	if token.VariableType == tokens.ExpressionVariable {
+		value, err := e.evaluateExpression(token)
+		if err != nil {
+			return err
+		}
+		token.Value = value.Value
+		token.Type = value.Type
+		token.VariableType = value.VariableType
+	}
+
+	if token.VariableType == tokens.ReferenceVariable && e.scope == ExecuterScopeBlock {
+		ref, err := e.GetVariableValue(token.Value.(string))
+		if err != nil {
+			return err
+		}
+		token = ref
+	}
+
+	ex.vars[variableName] = token
 	return nil
 }
 
