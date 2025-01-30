@@ -86,5 +86,17 @@ func (b *Builder) handleEscapedString(s string) string {
 }
 
 func (b *Builder) isExpression(n *models.Token) bool {
-	return n.Type == tokens.Addition || n.Type == tokens.Subtraction || n.Type == tokens.Multiplication || n.Type == tokens.Division
+	return n.Type == tokens.Addition ||
+		n.Type == tokens.Subtraction ||
+		n.Type == tokens.Multiplication ||
+		n.Type == tokens.Division ||
+		n.Type == tokens.Less ||
+		n.Type == tokens.LessOrEqual ||
+		n.Type == tokens.Greater ||
+		n.Type == tokens.GreaterOrEqual ||
+		n.Type == tokens.Equation ||
+		n.Type == tokens.NotEquation ||
+		n.Type == tokens.And ||
+		n.Type == tokens.Or ||
+		n.Type == tokens.Not
 }

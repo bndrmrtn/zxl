@@ -5,6 +5,7 @@ type ExecuterScope int
 
 const (
 	ExecuterScopeGlobal ExecuterScope = iota
+	ExecuterScopeBlock
 	ExecuterScopeFunction
 	ExecuterScopeDefinition
 )

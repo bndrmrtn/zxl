@@ -73,6 +73,15 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					}
 				}
 			} else {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.Division,
+					Value: "/",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+					},
+				})
 				col++
 			}
 		// Handle strings
@@ -198,7 +207,42 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				})
 			}
 			col++
-
+		case '-':
+			if pos+1 < len(s) && s[pos+1] == '-' {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.Decrement,
+					Value: "--",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
+				})
+				pos++
+			} else {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.Subtraction,
+					Value: "-",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
+				})
+			}
+			col++
+		case '*':
+			parsed = append(parsed, &models.Token{
+				Type:  tokens.Multiplication,
+				Value: "*",
+				Debug: &models.Debug{
+					Line:   line,
+					Column: col,
+					File:   lx.filename,
+				},
+			})
 		default:
 			start := pos
 			if isLetter(s[pos]) || s[pos] == '_' {

@@ -59,6 +59,7 @@ const (
 	At
 
 	If TokenType = iota + 10000000
+	Then
 	ElseIf
 	Else
 )

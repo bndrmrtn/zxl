@@ -26,6 +26,9 @@ func (e *Executer) GetVariableValue(name string) (*models.Node, error) {
 
 	v, ok := e.vars[name]
 	if !ok {
+		if e.scope == ExecuterScopeBlock {
+			return e.parent.GetVariableValue(name)
+		}
 		return nil, fmt.Errorf("variable '%v' cannot be referenced", name)
 	}
 

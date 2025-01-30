@@ -1,7 +1,9 @@
 package ast
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	"github.com/bndrmrtn/zexlang/internal/errs"
 	"github.com/bndrmrtn/zexlang/internal/models"
@@ -35,15 +37,23 @@ func (b *Builder) Build(ts []*models.Token) ([]*models.Node, error) {
 		nodes = append(nodes, node)
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
 	for inx < len(ts) {
-		node, err := b.buildNode(ts, &inx)
-		if err != nil {
-			return nil, err
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("%w: timeout while building AST", errs.RuntimeError)
+		default:
+			node, err := b.buildNode(ts, &inx)
+			if err != nil {
+				return nil, err
+			}
+			if node == nil {
+				continue
+			}
+			nodes = append(nodes, node)
 		}
-		if node == nil {
-			continue
-		}
-		nodes = append(nodes, node)
 	}
 
 	return nodes, nil
@@ -55,7 +65,7 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 	switch token.Type {
 	case tokens.Namespace:
 		return nil, errs.WithDebug(fmt.Errorf("%w: namespace can only be at the beginning of the file", errs.SyntaxError), token.Debug)
-	case tokens.Addition, tokens.Subtraction, tokens.Multiplication, tokens.Division:
+	case tokens.Addition, tokens.Subtraction, tokens.Multiplication, tokens.Division, tokens.Equation, tokens.NotEquation, tokens.Greater, tokens.GreaterOrEqual, tokens.Less, tokens.LessOrEqual, tokens.And, tokens.Or, tokens.Not:
 		*inx++
 		return &models.Node{
 			Type:    token.Type,
@@ -74,6 +84,8 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 		return b.parseIdentifier(ts, inx)
 	case tokens.Return:
 		return b.parseReturn(ts, inx)
+	case tokens.If:
+		return b.parseIf(ts, inx)
 	case tokens.Semicolon:
 		*inx++
 		return nil, nil

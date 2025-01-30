@@ -81,3 +81,47 @@ func (e *Executer) handleReturn(token *models.Node) ([]*builtin.FuncReturn, erro
 		},
 	}, nil
 }
+
+func (e *Executer) handleIf(token *models.Node) ([]*builtin.FuncReturn, error) {
+	// Evaluate condition
+	condition, err := e.evaluateExpression(&models.Node{
+		Type:         tokens.If,
+		VariableType: tokens.ExpressionVariable,
+		Children:     token.Args,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if condition is a boolean
+	if condition.VariableType != tokens.BoolVariable {
+		return nil, errs.WithDebug(fmt.Errorf("expected bool value, but got '%v'", condition.Type), token.Debug)
+	}
+
+	ok := condition.Value.(bool)
+
+	// Evaluate block
+	if ok {
+		if len(token.Children) == 0 {
+			return nil, nil
+		}
+
+		child := token.Children[0]
+		if child.Type == tokens.Then {
+			ex := NewExecuter(ExecuterScopeBlock, e.runtime, e)
+			return ex.Execute(child.Children)
+		}
+	} else {
+		if len(token.Children) < 2 {
+			return nil, nil
+		}
+
+		child := token.Children[1]
+		if child.Type == tokens.Else {
+			ex := NewExecuter(ExecuterScopeBlock, e.runtime, e)
+			return ex.Execute(child.Children)
+		}
+	}
+
+	return nil, nil
+}
