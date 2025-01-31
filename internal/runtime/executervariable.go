@@ -30,8 +30,8 @@ func (e *Executer) accessUnderlyingVariable(args []string) (*Executer, *models.N
 	}
 
 	if args[0] == "this" {
-		if executer.parent.scope != ExecuterScopeDefinition {
-			return nil, nil, fmt.Errorf("this can only be accessed in a definition block function")
+		if executer.parent == nil || executer.parent.scope == ExecuterScopeGlobal {
+			return nil, nil, fmt.Errorf("'this' can only be accessed in a definition block function")
 		}
 		args = args[1:]
 		executer = executer.parent

@@ -105,6 +105,10 @@ func (e *Executer) handleReturn(token *models.Node) ([]*builtin.FuncReturn, erro
 		return nil, err
 	}
 
+	if value == nil {
+		return nil, nil
+	}
+
 	return []*builtin.FuncReturn{
 		{
 			Type:  value.VariableType,

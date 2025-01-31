@@ -69,7 +69,7 @@ func (e *Executer) runFuncImport(debug *models.Debug, args []*builtin.Variable) 
 			return nil, errs.WithDebug(err, debug)
 		}
 
-		nodes, ok := cache.Get(b)
+		nodes, ok := cache.Get(path, b)
 		if !ok {
 			lx := lexer.New(path)
 			ts, err := lx.Parse(bytes.NewReader(b))
@@ -87,7 +87,7 @@ func (e *Executer) runFuncImport(debug *models.Debug, args []*builtin.Variable) 
 			}
 		}
 
-		cache.Store(b, nodes)
+		cache.Store(path, b, nodes)
 
 		var ns string
 		if nodes[0].Type == tokens.Namespace {

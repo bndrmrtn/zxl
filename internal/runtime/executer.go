@@ -25,17 +25,20 @@ type Executer struct {
 	vars map[string]*models.Node
 	// blocks is the map of blocks
 	blocks map[string]*models.Node
+
+	packages map[string]string
 }
 
 // NewExecuter creates a new runtime executer
 func NewExecuter(scope ExecuterScope, r *Runtime, parent *Executer) *Executer {
 	return &Executer{
-		scope:   scope,
-		runtime: r,
-		parent:  parent,
-		fns:     make(map[string]*models.Node),
-		vars:    make(map[string]*models.Node),
-		blocks:  make(map[string]*models.Node),
+		scope:    scope,
+		runtime:  r,
+		parent:   parent,
+		fns:      make(map[string]*models.Node),
+		vars:     make(map[string]*models.Node),
+		blocks:   make(map[string]*models.Node),
+		packages: make(map[string]string),
 	}
 }
 
@@ -65,6 +68,15 @@ func (e *Executer) Bind(variable *models.Node) {
 func (e *Executer) Execute(ts []*models.Node) ([]*builtin.FuncReturn, error) {
 	for _, token := range ts {
 		switch token.Type {
+		// Handle package imports
+		case tokens.Use:
+			using := token.Content
+			as := token.Value.(string)
+			if _, ok := e.packages[as]; ok {
+				return nil, errs.WithDebug(fmt.Errorf("%w: package '%v' already imported", errs.RuntimeError, as), nil)
+			}
+			e.packages[as] = using
+			break
 		// Handle function declarations
 		case tokens.Function:
 			e.fns[token.Content] = token

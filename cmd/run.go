@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/bndrmrtn/zexlang/pkg/language"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -30,8 +31,13 @@ func execRun(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	colors := cmd.Flag("nocolor").Value.String() == "false"
 	debug := cmd.Flag("debug").Value.String() == "true"
 	caching := cmd.Flag("cache").Value.String() == "true"
+
+	if !colors {
+		color.NoColor = true
+	}
 
 	if len(args) == 0 {
 		cmd.PrintErr("No file specified")

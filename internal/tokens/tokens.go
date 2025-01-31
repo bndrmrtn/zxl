@@ -25,6 +25,7 @@ const (
 	Bool
 	Nil
 	Function
+	FuncArg
 	Definiton
 
 	Addition TokenType = iota + 10000

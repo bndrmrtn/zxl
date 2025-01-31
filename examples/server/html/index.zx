@@ -1,0 +1,12 @@
+use http as h;
+use html;
+
+html.doc(
+    html.head(
+        html.title("Test Server")
+    ),
+    html.body(
+        html.h1("Test Server"),
+        html.p("URL: " + h.url),
+    )
+);

@@ -16,6 +16,18 @@ func (e *Executer) GetVariableValue(name string) (*models.Node, error) {
 		parts := strings.Split(name, ".")
 		last := parts[len(parts)-1]
 		parts = parts[:len(parts)-1]
+
+		// Check if the variable is a package
+		if pkg, err := e.GetPackage(parts[0]); err == nil {
+			variable, err := pkg.Access(last)
+			if err == nil {
+				return &models.Node{
+					VariableType: variable.Type,
+					Value:        variable.Value,
+				}, nil
+			}
+		}
+
 		ex, _, err := e.accessUnderlyingVariable(parts)
 		if err != nil {
 			return nil, err
@@ -29,7 +41,7 @@ func (e *Executer) GetVariableValue(name string) (*models.Node, error) {
 		if e.scope == ExecuterScopeBlock {
 			return e.parent.GetVariableValue(name)
 		}
-		return nil, fmt.Errorf("variable '%v' cannot be referenced", name)
+		return nil, fmt.Errorf("%w: variable '%v' cannot be referenced", errs.RuntimeError, name)
 	}
 
 	if v.Reference {
@@ -69,7 +81,6 @@ func (e *Executer) executeFn(token *models.Node) ([]*builtin.FuncReturn, error) 
 		return e.runFuncRef(token)
 	}
 
-	// if
 	if strings.Contains(name, ".") {
 		parts := strings.Split(name, ".")
 		last := parts[len(parts)-1]
@@ -140,6 +151,18 @@ func (e *Executer) executeFn(token *models.Node) ([]*builtin.FuncReturn, error) 
 func (e *Executer) executeComplexFuncCall(token *models.Node, args []string, fn string, variables []*models.Node) ([]*builtin.FuncReturn, error) {
 	if fn == "construct" {
 		return nil, errs.WithDebug(fmt.Errorf("construct is a reserved method"), token.Debug)
+	}
+
+	if len(args) == 0 {
+		return e.executeFn(token)
+	}
+
+	if pkg, err := e.GetPackage(args[0]); err == nil {
+		convArgs, err := e.convertArgument(variables)
+		if err != nil {
+			return nil, errs.WithDebug(err, token.Debug)
+		}
+		return pkg.Execute(fn, convArgs)
 	}
 
 	ex, _, err := e.accessUnderlyingVariable(args)
@@ -219,4 +242,22 @@ func (e *Executer) newBlock(block *models.Node, args []*models.Node) ([]*builtin
 			Value: ex,
 		},
 	}, nil
+}
+
+func (e *Executer) GetPackage(name string) (builtin.Package, error) {
+	pkgName, ok := e.packages[name]
+
+	if ok {
+		pkg, ok := e.runtime.pkgs[pkgName]
+		if !ok {
+			return nil, fmt.Errorf("package '%v' not found", name)
+		}
+		return pkg, nil
+	}
+
+	if e.scope != ExecuterScopeGlobal && e.parent != nil {
+		return e.parent.GetPackage(name)
+	}
+
+	return nil, fmt.Errorf("package '%v' not found", name)
 }

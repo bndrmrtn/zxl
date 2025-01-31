@@ -9,7 +9,7 @@ import (
 
 // rootCmd is the root command for the CLI
 var rootCmd = &cobra.Command{
-	Use:     "zex",
+	Use:     "zexlang",
 	Short:   "Zex ✨ A small programming language for template rendering.",
 	Version: version.Version,
 }

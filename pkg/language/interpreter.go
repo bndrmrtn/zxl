@@ -60,6 +60,19 @@ func (ir *Interpreter) Interpret(fileName string, data io.Reader) ([]*builtin.Fu
 	return runtime.New(runtime.EntryPoint).Execute(nodes)
 }
 
+// GetNodes gets the nodes from the given data
+func (ir *Interpreter) GetNodes(fileName string, data io.Reader) ([]*models.Node, error) {
+	if !strings.HasSuffix(fileName, ".zx") {
+		return nil, fmt.Errorf("Zex can only run files that has .zx extesion.")
+	}
+	return ir.getNodes(fileName, data)
+}
+
+func (ir *Interpreter) Serve(dir string, addr string, colors bool) error {
+	server := NewServer(ir, dir, colors)
+	return server.Serve(addr)
+}
+
 // getNodes gets the nodes from the given data
 func (ir *Interpreter) getNodes(fileName string, data io.Reader) ([]*models.Node, error) {
 	b, err := io.ReadAll(data)
@@ -69,7 +82,7 @@ func (ir *Interpreter) getNodes(fileName string, data io.Reader) ([]*models.Node
 
 	// Get the nodes from cache if it exists
 	if ir.cache {
-		if nodes, ok := cache.Get(b); ok {
+		if nodes, ok := cache.Get(fileName, b); ok {
 			return nodes, nil
 		}
 	}
@@ -98,7 +111,7 @@ func (ir *Interpreter) getNodes(fileName string, data io.Reader) ([]*models.Node
 
 	// Store cache information
 	if ir.cache {
-		cache.Store(b, nodes)
+		cache.Store(fileName, b, nodes)
 	}
 
 	return nodes, nil

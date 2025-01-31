@@ -26,7 +26,7 @@ func (b *Builder) Build(ts []*models.Token) ([]*models.Node, error) {
 	)
 
 	if len(ts) == 0 {
-		return nil, fmt.Errorf("%w: no tokens to build AST", errs.SyntaxError)
+		return nil, fmt.Errorf("%w: empty file", errs.SyntaxError)
 	}
 
 	if ts[0].Type == tokens.Namespace {
@@ -89,6 +89,8 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 	case tokens.Semicolon:
 		*inx++
 		return nil, nil
+	case tokens.Use:
+		return b.parseUse(ts, inx)
 	default:
 		return nil, errs.WithDebug(fmt.Errorf("%w: invalid token '%v'", errs.SyntaxError, token.Value), token.Debug)
 	}

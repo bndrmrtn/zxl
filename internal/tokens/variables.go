@@ -30,15 +30,15 @@ func (v VariableType) String() string {
 	case BoolVariable:
 		return "bool"
 	case FunctionCallVariable:
-		return "@call:fn()"
+		return "functionCall"
 	case ExpressionVariable:
-		return "@expression"
+		return "expression"
 	case ReferenceVariable:
-		return "@ref"
+		return "reference(variable)"
 	case DefinitionReference:
-		return "@ref:def{}"
+		return "reference(definition)"
 	case DefinitionBlock:
-		return "@def{}"
+		return "definition"
 	default:
 		return "unknown"
 	}

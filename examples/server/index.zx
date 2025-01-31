@@ -1,0 +1,6 @@
+namespace http;
+use http;
+
+http.json();
+http.write('{"x": 5}');
+http.status(200);

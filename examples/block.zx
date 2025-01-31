@@ -1,22 +1,29 @@
-define MyBlock {
-    let user = "Unknown";
+define User {
+    let name = "";
+    let age = 0;
 
-    fn construct(name) {
-        this.user = name;
+
+    fn construct(name, age) {
+        this.name = name;
+        this.age = age;
     }
 
-    fn print() {
-        println(this.user);
+    fn introduction() {
+        if this.name == "" {
+            println("No user");
+            return;
+        }
+        println("Hello, my name is " + this.name + " and I'm " + this.age + " years old");
     }
 }
 
-let block = MyBlock("Martin");
-block.print();
+let user = User("Martin", 19);
+user.introduction();
 
-let x = block.user;
+let name = user.name;
 
-block.user = "John";
+user.name = "John";
 
-// This will print "Martin" because x is a copy of the user field's value not a reference to it
-// but 'block' is a reference to the object so 'block.user' will print "John"
-println(x);
+// This will print "Martin" because 'name' is a copy of the block's 'name' field VALUE, not a reference to it
+// but 'user' is a reference to the object so 'block.name' will print the modified value: "John"
+println(name);

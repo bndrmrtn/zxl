@@ -76,11 +76,24 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 			args[sum] = ret[0].Value
 		}
 
+		if node.VariableType == tokens.InlineValue {
+			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(node.Content)))
+			sum = sum[:10]
+
+			oldContent := node.Content
+			defer func() {
+				node.Content = oldContent
+			}()
+
+			node.Content = sum
+			args[sum] = node.Value
+		}
+
 		expressionList = append(expressionList, node.Content)
 	}
 
 	if len(expressionList) == 0 {
-		return nil, errs.WithDebug(fmt.Errorf("empty expression"), n.Debug)
+		return nil, nil
 	}
 
 	value := strings.Join(expressionList, " ")
@@ -92,6 +105,10 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 	result, err := expression.Evaluate(args)
 	if err != nil {
 		return nil, errs.WithDebug(fmt.Errorf("%w: %w: %s", errs.RuntimeError, err, value), n.Debug)
+	}
+
+	if fmt.Sprintf("%T", result) == "float64" && result.(float64) == float64(int64(result.(float64))) {
+		result = int(result.(float64))
 	}
 
 	return &models.Node{

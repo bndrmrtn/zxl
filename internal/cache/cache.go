@@ -5,46 +5,70 @@ import (
 	"encoding/gob"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/bndrmrtn/zexlang/internal/models"
 )
 
+// CacheDirectory is the directory where cache files are stored
+const CacheDirectory = ".zxcache"
+
+// Cache is the cache information
+type Cache struct {
+	// Hash is the hash of the data
+	Hash string
+	// Nodes is the nodes
+	Nodes []*models.Node
+}
+
 // Store stores the cache information to file
-func Store(data []byte, nodes []*models.Node) {
-	if info, err := os.Stat(".zxcache/"); err != nil || !info.IsDir() {
+func Store(file string, data []byte, nodes []*models.Node) {
+	fileName := strings.ReplaceAll(file, "/", "$") + "bin"
+
+	if info, err := os.Stat(CacheDirectory); err != nil || !info.IsDir() {
 		// Create cache directory if it does not exist
-		_ = os.MkdirAll(".zxcache/", os.ModePerm)
+		_ = os.MkdirAll(CacheDirectory, os.ModePerm)
 	}
 
 	hash := fmt.Sprintf("%x", md5.Sum(data))
 
-	// Write cache information to file
-	f, err := os.Create(".zxcache/" + hash + ".zxbin")
+	cacheData := Cache{
+		Hash:  hash,
+		Nodes: nodes,
+	}
+
+	f, err := os.Create(filepath.Join(CacheDirectory, fileName))
 	if err != nil {
+		fmt.Println("Error creating cache file:", err)
 		return
 	}
 	defer f.Close()
 
-	// Write cache information to file
-	_ = gob.NewEncoder(f).Encode(nodes)
+	if err := gob.NewEncoder(f).Encode(cacheData); err != nil {
+		fmt.Println("Error encoding cache data to file:", err)
+	}
 }
 
 // Get gets the cache information from file
-func Get(data []byte) ([]*models.Node, bool) {
-	// Create cache directory if it does not exist
-	_ = os.MkdirAll(".zxcache/", os.ModePerm)
-
+func Get(file string, data []byte) ([]*models.Node, bool) {
+	fileName := strings.ReplaceAll(file, "/", "$") + "bin"
 	hash := fmt.Sprintf("%x", md5.Sum(data))
 
-	// Read cache information from file
-	f, err := os.Open(".zxcache/" + hash + ".zxbin")
+	f, err := os.Open(filepath.Join(CacheDirectory, fileName))
 	if err != nil {
 		return nil, false
 	}
 	defer f.Close()
 
-	var nodes []*models.Node
-	_ = gob.NewDecoder(f).Decode(&nodes)
+	var cacheData Cache
+	if err := gob.NewDecoder(f).Decode(&cacheData); err != nil {
+		return nil, false
+	}
 
-	return nodes, true
+	if cacheData.Hash != hash {
+		return nil, false
+	}
+
+	return cacheData.Nodes, true
 }
