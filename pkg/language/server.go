@@ -81,7 +81,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	nodes, err := s.ir.GetNodes(strings.Replace(filePath, s.root, "", 1), file)
+	nodes, err := s.ir.GetNodes(strings.TrimPrefix(filePath, s.root), file)
 	if err != nil {
 		s.handleError(err, w)
 		return
