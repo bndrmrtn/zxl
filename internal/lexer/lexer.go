@@ -236,15 +236,28 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 			}
 			col++
 		case '*':
-			parsed = append(parsed, &models.Token{
-				Type:  tokens.Multiplication,
-				Value: "*",
-				Debug: &models.Debug{
-					Line:   line,
-					Column: col,
-					File:   lx.filename,
-				},
-			})
+			if pos+1 < len(s) && s[pos+1] == '*' {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.Power,
+					Value: "**",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+					},
+				})
+				pos++
+			} else {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.Multiplication,
+					Value: "*",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+					},
+				})
+			}
 		case '<':
 			if pos+1 < len(s) && s[pos+1] == '=' {
 				parsed = append(parsed, &models.Token{

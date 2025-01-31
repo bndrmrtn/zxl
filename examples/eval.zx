@@ -1,6 +1,6 @@
 let content = "
-    let x = 0;
-    let y = x + 1;
+    let x = 2;
+    let y = x ** 30;
     println(y);
 ";
 

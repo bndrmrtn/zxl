@@ -19,6 +19,7 @@ const (
 	This // Reference for blocks
 	Identifier
 	FuncCall
+	EmptyReturn
 
 	Number TokenType = iota + 1000
 	String
@@ -31,6 +32,7 @@ const (
 	Addition TokenType = iota + 10000
 	Subtraction
 	Multiplication
+	Power
 	Division
 	Modulo
 	Increment

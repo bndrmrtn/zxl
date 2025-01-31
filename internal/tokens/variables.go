@@ -15,6 +15,7 @@ const (
 	InlineValue
 	DefinitionBlock
 	DefinitionReference
+	EmptyReturnValue
 )
 
 func (v VariableType) String() string {
@@ -39,6 +40,8 @@ func (v VariableType) String() string {
 		return "reference(definition)"
 	case DefinitionBlock:
 		return "definition"
+	case EmptyReturnValue:
+		return "return(empty)"
 	default:
 		return "unknown"
 	}

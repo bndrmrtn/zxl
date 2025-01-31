@@ -1,0 +1,14 @@
+define Error {
+    let message = "";
+
+    fn construct(message) {
+        this.message = message;
+    }
+
+    fn error() {
+        return this.message;
+    }
+}
+
+let err = Error("Failed to initialize connection");
+println(err.error());

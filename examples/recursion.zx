@@ -1,9 +1,10 @@
 fn recursion(x) {
     if x == 0 {
-        return 0;
+        return;
     } else {
-       x = x - 1;
-       return recursion(x);
+       let z = x - 1;
+       println(z);
+       return recursion(z);
     }
 }
 

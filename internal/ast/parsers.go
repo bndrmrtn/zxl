@@ -532,6 +532,7 @@ func (b *Builder) parseReturn(ts []*models.Token, inx *int) (*models.Node, error
 	node := &models.Node{
 		Type:         ts[*inx].Type,
 		VariableType: tokens.ExpressionVariable,
+		Content:      "return",
 	}
 
 	*inx++
@@ -541,6 +542,8 @@ func (b *Builder) parseReturn(ts []*models.Token, inx *int) (*models.Node, error
 
 	if ts[*inx].Type == tokens.Semicolon {
 		node.Value = nil
+		node.Type = tokens.EmptyReturn
+		node.VariableType = tokens.EmptyReturnValue
 		*inx++
 		return node, nil
 	}

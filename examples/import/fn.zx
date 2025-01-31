@@ -1,5 +1,13 @@
 namespace ok;
 
+fn x() {
+    println(z());
+}
+
+fn z() {
+    return "z";
+}
+
 define MyOkBlock {
     let myVar = "Hi";
 

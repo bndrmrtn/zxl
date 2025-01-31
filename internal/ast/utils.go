@@ -98,5 +98,6 @@ func (b *Builder) isExpression(n *models.Token) bool {
 		n.Type == tokens.NotEquation ||
 		n.Type == tokens.And ||
 		n.Type == tokens.Or ||
-		n.Type == tokens.Not
+		n.Type == tokens.Not ||
+		n.Type == tokens.Power
 }

@@ -65,7 +65,7 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 	switch token.Type {
 	case tokens.Namespace:
 		return nil, errs.WithDebug(fmt.Errorf("%w: namespace can only be at the beginning of the file", errs.SyntaxError), token.Debug)
-	case tokens.Addition, tokens.Subtraction, tokens.Multiplication, tokens.Division, tokens.Equation, tokens.NotEquation, tokens.Greater, tokens.GreaterOrEqual, tokens.Less, tokens.LessOrEqual, tokens.And, tokens.Or, tokens.Not:
+	case tokens.Addition, tokens.Subtraction, tokens.Multiplication, tokens.Division, tokens.Equation, tokens.NotEquation, tokens.Greater, tokens.GreaterOrEqual, tokens.Less, tokens.LessOrEqual, tokens.And, tokens.Or, tokens.Not, tokens.Power:
 		*inx++
 		return &models.Node{
 			Type:    token.Type,

@@ -31,7 +31,7 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 			variable := node.Content
 			node, err = ex.GetVariableValue(node.Content)
 			if err != nil {
-				return nil, err
+				return nil, errs.WithDebug(err, node.Debug)
 			}
 
 			// Reset the content after the evaluation

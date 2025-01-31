@@ -112,7 +112,7 @@ func (e *Executer) Execute(ts []*models.Node) ([]*builtin.FuncReturn, error) {
 				return ret, nil
 			}
 			break
-		case tokens.Return:
+		case tokens.Return, tokens.EmptyReturn:
 			return e.handleReturn(token)
 		}
 	}

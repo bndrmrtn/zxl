@@ -57,7 +57,7 @@ func (e *Executer) handleAssignment(token *models.Node) error {
 		if token.VariableType == tokens.ReferenceVariable {
 			ref, err := e.GetVariableValue(token.Value.(string))
 			if err != nil {
-				return err
+				return errs.WithDebug(err, token.Debug)
 			}
 			token = ref
 		}
@@ -99,10 +99,27 @@ func (e *Executer) handleAssignment(token *models.Node) error {
 }
 
 func (e *Executer) handleReturn(token *models.Node) ([]*builtin.FuncReturn, error) {
+	if token.Type == tokens.EmptyReturn {
+		if e.scope == ExecuterScopeBlock && e.parent != nil {
+			return e.parent.handleReturn(token)
+		}
+
+		return []*builtin.FuncReturn{
+			{
+				Type:  tokens.EmptyReturnValue,
+				Value: nil,
+			},
+		}, nil
+	}
+
 	// Evaluate return value
 	value, err := e.evaluateExpression(token)
 	if err != nil {
 		return nil, err
+	}
+
+	if e.scope == ExecuterScopeBlock && e.parent != nil {
+		return e.parent.handleReturn(token)
 	}
 
 	if value == nil {
