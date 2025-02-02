@@ -114,6 +114,15 @@ func (e *Executer) Execute(ts []*models.Node) ([]*builtin.FuncReturn, error) {
 			break
 		case tokens.Return, tokens.EmptyReturn:
 			return e.handleReturn(token)
+		case tokens.While:
+			ret, err := e.handleWhile(token)
+			if err != nil {
+				return nil, err
+			}
+			if ret != nil {
+				return ret, nil
+			}
+			break
 		}
 	}
 	return nil, nil

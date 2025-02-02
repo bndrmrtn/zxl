@@ -20,6 +20,8 @@ const (
 	Identifier
 	FuncCall
 	EmptyReturn
+	For
+	While
 
 	Number TokenType = iota + 1000
 	String

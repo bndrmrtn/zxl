@@ -732,7 +732,6 @@ func (b *Builder) handleElse(ts []*models.Token, inx *int) (*models.Node, error)
 
 	node.Children = elseChild
 	return node, nil
-
 }
 
 func (b *Builder) parseFuncCallArg(ts []*models.Token, inx *int) (*models.Node, error) {
@@ -841,6 +840,83 @@ func (b *Builder) parseUse(ts []*models.Token, inx *int) (*models.Node, error) {
 	}
 
 	*inx++
+
+	return node, nil
+}
+
+func (b *Builder) parseWhile(ts []*models.Token, inx *int) (*models.Node, error) {
+	token := ts[*inx]
+	node := &models.Node{
+		Type:    token.Type,
+		Content: "while",
+		Debug:   token.Debug,
+	}
+
+	*inx++
+
+	if *inx >= len(ts) {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got EOF", errs.SyntaxError), token.Debug)
+	}
+
+	var args []*models.Token
+	for {
+		if ts[*inx].Type == tokens.LeftBrace {
+			break
+		}
+
+		args = append(args, ts[*inx])
+		*inx++
+	}
+
+	if len(args) == 0 {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got EOF", errs.SyntaxError), token.Debug)
+	}
+
+	args = append(args, SemiColonToken)
+	bArgs, err := b.Build(args)
+	if err != nil {
+		return nil, err
+	}
+	node.Args = bArgs
+
+	*inx++
+
+	var (
+		children   []*models.Token
+		braceCount = 1
+	)
+
+	for {
+		if *inx >= len(ts) {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got EOF", errs.SyntaxError), token.Debug)
+		}
+
+		if ts[*inx].Type == tokens.RightBrace {
+			braceCount--
+			if braceCount == 0 {
+				*inx++
+				break
+			}
+		}
+
+		if ts[*inx].Type == tokens.LeftBrace {
+			braceCount++
+		}
+
+		children = append(children, ts[*inx])
+		*inx++
+	}
+
+	if braceCount != 0 {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got EOF", errs.SyntaxError), token.Debug)
+	}
+
+	child, err := b.Build(children)
+	if err != nil {
+		return nil, err
+	}
+
+	node.Children = child
 
 	return node, nil
 }

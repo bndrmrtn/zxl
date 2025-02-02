@@ -91,6 +91,8 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 		return nil, nil
 	case tokens.Use:
 		return b.parseUse(ts, inx)
+	case tokens.While:
+		return b.parseWhile(ts, inx)
 	default:
 		return nil, errs.WithDebug(fmt.Errorf("%w: invalid token '%v'", errs.SyntaxError, token.Value), token.Debug)
 	}

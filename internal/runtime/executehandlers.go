@@ -177,3 +177,40 @@ func (e *Executer) handleIf(token *models.Node) ([]*builtin.FuncReturn, error) {
 
 	return nil, nil
 }
+
+func (e *Executer) handleWhile(token *models.Node) ([]*builtin.FuncReturn, error) {
+	ex := NewExecuter(ExecuterScopeBlock, e.runtime, e)
+
+	for {
+		// Evaluate condition
+		condition, err := e.evaluateExpression(&models.Node{
+			Type:         tokens.While,
+			VariableType: tokens.ExpressionVariable,
+			Children:     token.Args,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		// Check if condition is a boolean
+		if condition.VariableType != tokens.BoolVariable {
+			return nil, errs.WithDebug(fmt.Errorf("expected bool value, but got '%v'", condition.Type), token.Debug)
+		}
+
+		ok := condition.Value.(bool)
+
+		// Evaluate block
+		if ok {
+			ret, err := ex.Execute(token.Children)
+			if err != nil {
+				return nil, err
+			}
+			if ret != nil {
+				return ret, nil
+			}
+		} else {
+			break
+		}
+	}
+	return nil, nil
+}
