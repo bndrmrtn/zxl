@@ -1,0 +1,3 @@
+use db;
+
+let mydb = db.open(db.sqlite, "test.db");

@@ -43,7 +43,9 @@ func (r *Runtime) Execute(nodes []*models.Node) (*builtin.FuncReturn, error) {
 	}
 
 	if nodes[0].Type == tokens.Namespace {
-
+		namespace := nodes[0].Content
+		nodes = nodes[1:]
+		return r.Exec(ExecuterScopeGlobal, nil, namespace, nodes)
 	}
 
 	return r.Exec(ExecuterScopeGlobal, nil, "", nodes)
@@ -53,7 +55,7 @@ func (r *Runtime) Execute(nodes []*models.Node) (*builtin.FuncReturn, error) {
 func (r *Runtime) Exec(scope ExecuterScope, parent *Executer, namespace string, nodes []*models.Node) (*builtin.FuncReturn, error) {
 	ex, ok := r.executers[namespace]
 	if !ok {
-		ex = NewExecuter(scope, r, parent)
+		ex = NewExecuter(scope, r, parent).WithName(namespace)
 		r.executers[namespace] = ex
 	}
 	return ex.Execute(nodes)

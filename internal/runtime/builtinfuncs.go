@@ -17,6 +17,7 @@ import (
 	"github.com/bndrmrtn/zexlang/internal/tokens"
 )
 
+// runFuncEval runs the eval function
 func (e *Executer) runFuncEval(debug *models.Debug, args []*builtin.Variable) (*builtin.FuncReturn, error) {
 	if len(args) != 1 {
 		return nil, errs.WithDebug(fmt.Errorf("eval function takes only one argument"), debug)
@@ -37,10 +38,11 @@ func (e *Executer) runFuncEval(debug *models.Debug, args []*builtin.Variable) (*
 		return nil, errs.WithDebug(err, debug)
 	}
 
-	ex := NewExecuter(ExecuterScopeGlobal, e.runtime, e)
+	ex := NewExecuter(ExecuterScopeGlobal, e.runtime, e).WithName(e.name + ".{eval}")
 	return ex.Execute(nodes)
 }
 
+// runFuncImport runs the import function
 func (e *Executer) runFuncImport(debug *models.Debug, args []*builtin.Variable) (*builtin.FuncReturn, error) {
 	if len(args) < 1 {
 		return nil, errs.WithDebug(fmt.Errorf("import function takes minimum one argument"), debug)
@@ -108,30 +110,41 @@ func (e *Executer) runFuncImport(debug *models.Debug, args []*builtin.Variable) 
 	return nil, nil
 }
 
+// runFuncRef runs the ref function
 func (e *Executer) runFuncRef(token *models.Node) (*builtin.FuncReturn, error) {
 	if len(token.Args) != 1 {
 		return nil, errs.WithDebug(fmt.Errorf("ref function takes only one argument"), token.Debug)
 	}
 
-	n, err := e.GetVariableValue(token.Args[0].Content)
-	if err != nil {
-		return nil, err
+	n, ok := e.vars[token.Args[0].Content]
+	if !ok {
+		return nil, errs.WithDebug(fmt.Errorf("ref: variable not found"), token.Debug)
 	}
 
 	if n.VariableType == tokens.ReferenceVariable {
-		if token.Value == nil {
+		if n.Value == nil {
 			return nil, errs.WithDebug(fmt.Errorf("ref: referencing a nil value"), token.Debug)
 		}
 
-		node, err := e.GetVariableValue(token.Value.(string))
-		if err != nil {
-			return nil, err
+		return &builtin.FuncReturn{
+			Type:  tokens.ReferenceVariable,
+			Value: n.Value.(string),
+		}, nil
+	}
+
+	if n.VariableType == tokens.DefinitionReference {
+		ex, ok := n.Value.(*Executer)
+		if !ok {
+			return nil, errs.WithDebug(fmt.Errorf("ref: invalid reference"), token.Debug)
 		}
-		return e.runFuncRef(node)
+		return &builtin.FuncReturn{
+			Type:  tokens.DefinitionReference,
+			Value: ex.name,
+		}, nil
 	}
 
 	return &builtin.FuncReturn{
-		Type:  tokens.StringVariable,
-		Value: fmt.Sprintf("{Type: %s, Value: %v}", n.VariableType, n.Value),
+		Type:  tokens.BoolVariable,
+		Value: false,
 	}, nil
 }

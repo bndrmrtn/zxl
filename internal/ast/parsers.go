@@ -251,6 +251,7 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 		return &models.Node{
 			Type:         token.Type,
 			VariableType: tokens.ReferenceVariable,
+			Reference:    true,
 			Content:      node.Content,
 		}, nil
 	}
@@ -259,6 +260,7 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 		return &models.Node{
 			Type:         token.Type,
 			VariableType: tokens.ReferenceVariable,
+			Reference:    true,
 			Content:      node.Content,
 		}, nil
 	}
@@ -770,6 +772,10 @@ func (b *Builder) parseFuncCallArg(ts []*models.Token, inx *int) (*models.Node, 
 	nodes, err := b.Build(children)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(nodes) == 1 && nodes[0].Type != tokens.FuncCall {
+		return nodes[0], nil
 	}
 
 	return &models.Node{

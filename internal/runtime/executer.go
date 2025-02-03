@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/bndrmrtn/zexlang/internal/builtin"
 	"github.com/bndrmrtn/zexlang/internal/errs"
@@ -11,6 +12,9 @@ import (
 
 // Executer is the runtime executer
 type Executer struct {
+	// name of the executer
+	name string
+
 	// scope of the executer
 	scope ExecuterScope
 
@@ -40,6 +44,11 @@ func NewExecuter(scope ExecuterScope, r *Runtime, parent *Executer) *Executer {
 		blocks:   make(map[string]*models.Node),
 		packages: make(map[string]string),
 	}
+}
+
+func (e *Executer) WithName(name string) *Executer {
+	e.name = strings.TrimPrefix(e.name+"."+name, ".")
+	return e
 }
 
 // Bind binds a variable to the executer
@@ -131,7 +140,7 @@ func (e *Executer) ExecuteFn(name string, args []*builtin.Variable) (*builtin.Fu
 		return nil, errs.WithDebug(fmt.Errorf("%w: function '%v' not found", errs.RuntimeError, name), nil)
 	}
 
-	ex := NewExecuter(ExecuterScopeFunction, e.runtime, e)
+	ex := NewExecuter(ExecuterScopeFunction, e.runtime, e).WithName(e.name + ".{" + name + "}")
 
 	for i, arg := range args {
 		ex.Bind(&models.Node{

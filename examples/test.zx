@@ -1,0 +1,10 @@
+let test = 4;
+
+let x = test - 1;
+
+fn z(y) {
+    let x = y - 2;
+    println(x);
+}
+
+z(x);

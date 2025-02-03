@@ -26,7 +26,7 @@ func (b *Builder) Build(ts []*models.Token) ([]*models.Node, error) {
 	)
 
 	if len(ts) == 0 {
-		return nil, fmt.Errorf("%w: empty file", errs.SyntaxError)
+		return nil, nil
 	}
 
 	if ts[0].Type == tokens.Namespace {

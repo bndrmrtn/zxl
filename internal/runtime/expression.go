@@ -11,13 +11,17 @@ import (
 	"github.com/bndrmrtn/zexlang/internal/tokens"
 )
 
+// evaluateExpression evaluates an expression
 func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 	if n.VariableType != tokens.ExpressionVariable {
 		return nil, errs.WithDebug(fmt.Errorf("cannot evaluate non expression variable"), n.Debug)
 	}
 
-	var expressionList []string
-	var args map[string]any = make(map[string]any)
+	var (
+		variableName   = n.Content
+		expressionList []string
+		args           map[string]any = make(map[string]any)
+	)
 
 	for _, node := range n.Children {
 		typ := node.Type
@@ -31,7 +35,7 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 			variable := node.Content
 			node, err = ex.GetVariableValue(node.Content)
 			if err != nil {
-				return nil, errs.WithDebug(err, node.Debug)
+				return nil, errs.WithDebug(err, n.Debug)
 			}
 
 			// Reset the content after the evaluation
@@ -114,7 +118,7 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 	return &models.Node{
 		VariableType: ex.getVarType(result),
 		Type:         n.Type,
-		Content:      fmt.Sprintf("%v", result),
+		Content:      variableName,
 		Value:        result,
 		Debug:        n.Debug,
 	}, nil

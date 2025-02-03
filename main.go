@@ -7,6 +7,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/bndrmrtn/zexlang/cmd"
 	"github.com/fatih/color"
@@ -14,7 +15,9 @@ import (
 
 func main() {
 	// Execute the command
-	defer fatal()
+	if os.Getenv("DEBUG") != "true" {
+		defer fatal()
+	}
 	cmd.Execute()
 }
 

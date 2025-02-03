@@ -50,3 +50,8 @@ func (n *Node) String() string {
 		n.Args,
 	)
 }
+
+func (n *Node) Copy() *Node {
+	cp := *n
+	return &cp
+}

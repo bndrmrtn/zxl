@@ -1,10 +1,15 @@
 define User {
-    let name = "Martin";
+    let name = "Unknown";
     let age = 0;
 
-    fn constructor(name) {
+    fn construct(name, age) {
         this.name = name;
-        this.age = 20;
+        this.age = age;
+    }
+
+    fn print() {
+        let msg = "User: " + this.name + ", " + this.age;
+        println(msg);
     }
 }
 
@@ -13,5 +18,5 @@ fn printUser(user) {
     println(msg);
 }
 
-let user = User("John"); // comma separated arguments should be supported
+let user = User("John", 15); // comma separated arguments should be supported
 printUser(user);

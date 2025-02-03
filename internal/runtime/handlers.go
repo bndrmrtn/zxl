@@ -10,7 +10,10 @@ import (
 	"github.com/bndrmrtn/zexlang/internal/tokens"
 )
 
+// handleLetConst handles let and const tokens
 func (e *Executer) handleLetConst(token *models.Node) error {
+	token = token.Copy()
+
 	// Check if variable is already declared
 	if _, ok := e.vars[token.Content]; ok {
 		return errs.WithDebug(fmt.Errorf("%w: %v", errs.CannotRedeclareVariable, token.Content), token.Debug)
@@ -29,7 +32,7 @@ func (e *Executer) handleLetConst(token *models.Node) error {
 		token.Value = v.Value
 		token.Type = v.Type
 		token.VariableType = v.VariableType
-		e.vars[token.Content] = v
+		e.vars[variableName] = v
 		return nil
 	}
 
@@ -37,7 +40,10 @@ func (e *Executer) handleLetConst(token *models.Node) error {
 	return nil
 }
 
+// handleAssignment handles assignment tokens
 func (e *Executer) handleAssignment(token *models.Node) error {
+	token = token.Copy()
+
 	// Get variable name
 	variableName := token.Content
 	ex := e
@@ -98,6 +104,7 @@ func (e *Executer) handleAssignment(token *models.Node) error {
 	return nil
 }
 
+// handleReturn handles return tokens
 func (e *Executer) handleReturn(token *models.Node) (*builtin.FuncReturn, error) {
 	if token.Type == tokens.EmptyReturn {
 		if e.scope == ExecuterScopeBlock && e.parent != nil {
@@ -105,8 +112,8 @@ func (e *Executer) handleReturn(token *models.Node) (*builtin.FuncReturn, error)
 		}
 
 		return &builtin.FuncReturn{
-				Type:  tokens.EmptyReturnValue,
-				Value: nil,
+			Type:  tokens.EmptyReturnValue,
+			Value: nil,
 		}, nil
 	}
 
@@ -125,11 +132,12 @@ func (e *Executer) handleReturn(token *models.Node) (*builtin.FuncReturn, error)
 	}
 
 	return &builtin.FuncReturn{
-			Type:  value.VariableType,
-			Value: value.Value,
+		Type:  value.VariableType,
+		Value: value.Value,
 	}, nil
 }
 
+// handleIf handles if tokens
 func (e *Executer) handleIf(token *models.Node) (*builtin.FuncReturn, error) {
 	// Evaluate condition
 	condition, err := e.evaluateExpression(&models.Node{
@@ -156,7 +164,7 @@ func (e *Executer) handleIf(token *models.Node) (*builtin.FuncReturn, error) {
 
 		child := token.Children[0]
 		if child.Type == tokens.Then {
-			ex := NewExecuter(ExecuterScopeBlock, e.runtime, e)
+			ex := NewExecuter(ExecuterScopeBlock, e.runtime, e).WithName(e.name)
 			return ex.Execute(child.Children)
 		}
 	} else {
@@ -166,7 +174,7 @@ func (e *Executer) handleIf(token *models.Node) (*builtin.FuncReturn, error) {
 
 		child := token.Children[1]
 		if child.Type == tokens.Else {
-			ex := NewExecuter(ExecuterScopeBlock, e.runtime, e)
+			ex := NewExecuter(ExecuterScopeBlock, e.runtime, e).WithName(e.name)
 			return ex.Execute(child.Children)
 		}
 	}
@@ -174,8 +182,9 @@ func (e *Executer) handleIf(token *models.Node) (*builtin.FuncReturn, error) {
 	return nil, nil
 }
 
+// handleWhile handles while tokens
 func (e *Executer) handleWhile(token *models.Node) (*builtin.FuncReturn, error) {
-	ex := NewExecuter(ExecuterScopeBlock, e.runtime, e)
+	ex := NewExecuter(ExecuterScopeBlock, e.runtime, e).WithName(e.name)
 
 	for {
 		// Evaluate condition

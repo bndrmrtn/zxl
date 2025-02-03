@@ -451,8 +451,8 @@ func (lx *Lexer) near(s string, pos int, fileLen int) string {
 		return ""
 	}
 
-	start := max(0, pos-20)
-	end := min(pos+20, fileLen)
+	start := max(0, pos-30)
+	end := min(pos+30, fileLen)
 	substr := s[start:end]
 
 	return strings.TrimSpace(substr)

@@ -3,6 +3,8 @@ package errs
 import (
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/bndrmrtn/zexlang/internal/models"
 	"github.com/bndrmrtn/zexlang/internal/version"
@@ -34,13 +36,31 @@ func (de DebugError) Error() string {
 	}
 
 	redBold := color.New(color.FgRed, color.Bold).SprintFunc()
-
-	near := ""
-	if de.debug.Near != "" {
-		near = fmt.Sprintf("near:\n%s\n", color.New(color.FgHiBlack).Sprint(de.debug.Near))
-	}
+	near := de.getNear()
 
 	return fmt.Sprintf("%s\n%s\nat %s:%d:%d\n%s", color.New(color.FgBlue, color.Bold).Sprint("Zex - ", version.Version), redBold(de.err.Error()), de.debug.File, de.debug.Line, de.debug.Column, near)
+}
+
+func (de DebugError) getNear() string {
+	if de.debug == nil {
+		return ""
+	}
+
+	var near string
+
+	parts := strings.Split(de.debug.Near, "\n")
+	maxLineNumLen := len(strconv.Itoa(de.debug.Line + len(parts) - 1))
+
+	for i, part := range parts {
+		lineNum := de.debug.Line + i
+		lineNumStr := strconv.Itoa(lineNum)
+		lineNumStr = strings.Repeat(" ", maxLineNumLen-len(lineNumStr)) + lineNumStr
+		near += fmt.Sprintf("%s | %s\n", color.New(color.FgHiBlack).Sprint(lineNumStr), part)
+	}
+
+	near = fmt.Sprintf("near:\n%s\n", color.New(color.FgHiBlack).Sprint(near))
+
+	return near
 }
 
 // HttpError returns the error message with debug information for HTTP

@@ -10,55 +10,6 @@ import (
 	"github.com/bndrmrtn/zexlang/internal/tokens"
 )
 
-// GetVariableValue gets the value of a variable
-func (e *Executer) GetVariableValue(name string) (*models.Node, error) {
-	if strings.Contains(name, ".") {
-		parts := strings.Split(name, ".")
-		last := parts[len(parts)-1]
-		parts = parts[:len(parts)-1]
-
-		// Check if the variable is a package
-		if pkg, err := e.GetPackage(parts[0]); err == nil {
-			variable, err := pkg.Access(last)
-			if err == nil {
-				return &models.Node{
-					VariableType: variable.Type,
-					Value:        variable.Value,
-				}, nil
-			}
-		}
-
-		ex, _, err := e.accessUnderlyingVariable(parts)
-		if err != nil {
-			return nil, err
-		}
-
-		return ex.GetVariableValue(last)
-	}
-
-	v, ok := e.vars[name]
-	if !ok {
-		if e.scope == ExecuterScopeBlock {
-			return e.parent.GetVariableValue(name)
-		}
-		return nil, fmt.Errorf("%w: variable '%v' cannot be referenced", errs.RuntimeError, name)
-	}
-
-	if v.Reference {
-		return e.GetVariableValue(v.Content)
-	}
-
-	if v.VariableType == tokens.ReferenceVariable {
-		return e.GetVariableValue(v.Value.(string))
-	}
-
-	if v.VariableType == tokens.ExpressionVariable {
-		return e.evaluateExpression(v)
-	}
-
-	return v, nil
-}
-
 // executeFn executes a function
 func (e *Executer) executeFn(token *models.Node) (*builtin.FuncReturn, error) {
 	name := token.Content
@@ -94,14 +45,28 @@ func (e *Executer) executeFn(token *models.Node) (*builtin.FuncReturn, error) {
 			return nil, errs.WithDebug(fmt.Errorf("function %v expects %v arguments, got %v", name, len(fn.Args), len(args)), fn.Debug)
 		}
 
-		ex := NewExecuter(ExecuterScopeFunction, e.runtime, e)
+		ex := NewExecuter(ExecuterScopeFunction, e.runtime, e).WithName(e.name + ".{" + name + "}")
 		for i, arg := range args {
 			if arg.VariableType == tokens.ReferenceVariable {
+				debug := arg.Debug
 				arg, err := e.GetVariableValue(arg.Content)
 				if err != nil {
-					return nil, err
+					return nil, errs.WithDebug(err, debug)
 				}
 				arg.Content = fn.Args[i].Content
+				ex.Bind(arg)
+				continue
+			}
+
+			if arg.VariableType == tokens.ExpressionVariable {
+				debug := arg.Debug
+				arg, err := e.evaluateExpression(arg)
+				if err != nil {
+					return nil, errs.WithDebug(err, debug)
+				}
+
+				arg.Content = fn.Args[i].Content
+
 				ex.Bind(arg)
 				continue
 			}
@@ -219,7 +184,7 @@ func (e *Executer) convertArgument(args []*models.Node) ([]*builtin.Variable, er
 
 // newBlock creates a new block
 func (e *Executer) newBlock(block *models.Node, args []*models.Node) (*builtin.FuncReturn, error) {
-	ex := NewExecuter(ExecuterScopeDefinition, e.runtime, e)
+	ex := NewExecuter(ExecuterScopeDefinition, e.runtime, e).WithName(e.name + ".[" + block.Content + "]")
 	_, err := ex.Execute(block.Children)
 	if err != nil {
 		return nil, errs.WithDebug(err, block.Debug)
@@ -235,6 +200,8 @@ func (e *Executer) newBlock(block *models.Node, args []*models.Node) (*builtin.F
 			return nil, errs.WithDebug(err, block.Debug)
 		}
 	}
+
+	block.VariableType = tokens.DefinitionReference
 
 	return &builtin.FuncReturn{
 		Type:  tokens.DefinitionReference,
