@@ -148,3 +148,43 @@ func (e *Executer) runFuncRef(token *models.Node) (*builtin.FuncReturn, error) {
 		Value: false,
 	}, nil
 }
+
+func (e *Executer) runFuncType(debug *models.Debug, args []*builtin.Variable) (*builtin.FuncReturn, error) {
+	if len(args) != 1 {
+		return nil, errs.WithDebug(fmt.Errorf("type function takes only one argument"), debug)
+	}
+
+	if args[0].Type == tokens.DefinitionReference {
+		ex, ok := args[0].Value.(*Executer)
+		if !ok {
+			return nil, errs.WithDebug(fmt.Errorf("unknown reference for definition"), debug)
+		}
+
+		return &builtin.FuncReturn{
+			Type:  tokens.StringVariable,
+			Value: ex.name,
+		}, nil
+	}
+
+	if args[0].Type != tokens.ReferenceVariable {
+		return &builtin.FuncReturn{
+			Type:  tokens.StringVariable,
+			Value: args[0].Type.String(),
+		}, nil
+	}
+
+	n, err := e.GetVariableValue(args[0].Value.(string))
+	if err != nil {
+		return nil, errs.WithDebug(err, debug)
+	}
+
+	ref, err := e.runFuncRef(n)
+	if err != nil {
+		return nil, errs.WithDebug(err, debug)
+	}
+
+	return &builtin.FuncReturn{
+		Type:  tokens.StringVariable,
+		Value: ref.Value,
+	}, nil
+}

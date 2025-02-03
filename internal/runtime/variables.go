@@ -69,11 +69,13 @@ func (e *Executer) accessUnderlyingVariable(args []string) (*Executer, *models.N
 		return nil, nil, fmt.Errorf("no variable to access")
 	}
 
-	if nsEx, err := e.runtime.GetNamespaceExecuter(args[0]); err == nil {
-		executer = nsEx
-		args = args[1:]
-		if len(args) == 0 {
-			return executer, nil, nil
+	if pkgName, ok := e.packages[args[0]]; ok {
+		if nsEx, err := e.runtime.GetNamespaceExecuter(pkgName); err == nil {
+			executer = nsEx
+			args = args[1:]
+			if len(args) == 0 {
+				return executer, nil, nil
+			}
 		}
 	}
 

@@ -30,6 +30,12 @@ func (e *Executer) executeFn(token *models.Node) (*builtin.FuncReturn, error) {
 		return e.runFuncImport(token.Debug, convArgs)
 	case "ref":
 		return e.runFuncRef(token)
+	case "type":
+		convArgs, err := e.convertArgument(args)
+		if err != nil {
+			return nil, errs.WithDebug(err, token.Debug)
+		}
+		return e.runFuncType(token.Debug, convArgs)
 	}
 
 	if strings.Contains(name, ".") {

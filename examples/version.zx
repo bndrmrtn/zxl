@@ -1,0 +1,3 @@
+use zex as z;
+
+println(z.Version);

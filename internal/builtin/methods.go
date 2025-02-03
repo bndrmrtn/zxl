@@ -12,7 +12,6 @@ func GetBuiltins() map[string]Function {
 		"print":   print,
 		"println": println,
 		"printf":  printf,
-		"type":    getType,
 		"read":    read,
 	}
 }

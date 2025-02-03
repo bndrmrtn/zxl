@@ -47,7 +47,7 @@ func NewExecuter(scope ExecuterScope, r *Runtime, parent *Executer) *Executer {
 }
 
 func (e *Executer) WithName(name string) *Executer {
-	e.name = strings.TrimPrefix(e.name+"."+name, ".")
+	e.name = strings.TrimLeft(e.name+"."+name, ".")
 	return e
 }
 

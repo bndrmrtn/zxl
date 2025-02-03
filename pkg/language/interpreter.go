@@ -2,6 +2,7 @@ package language
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"io"
 	"os"
@@ -15,6 +16,9 @@ import (
 	"github.com/bndrmrtn/zexlang/internal/runtime"
 	"gopkg.in/yaml.v3"
 )
+
+//go:embed source/*.zx
+var sourceFiles embed.FS
 
 // InterpreterMode is the mode of the interpreter
 type InterpreterMode int
@@ -56,8 +60,13 @@ func (ir *Interpreter) Interpret(fileName string, data io.Reader) (*builtin.Func
 		return nil, err
 	}
 
-	// Write debug information to file
-	return runtime.New(runtime.EntryPoint).Execute(nodes)
+	run := runtime.New(runtime.EntryPoint)
+	source, err := ir.source()
+	if err != nil {
+		return nil, err
+	}
+	run.Execute(source)
+	return run.Execute(nodes)
 }
 
 // GetNodes gets the nodes from the given data
@@ -115,6 +124,44 @@ func (ir *Interpreter) getNodes(fileName string, data io.Reader) ([]*models.Node
 	}
 
 	return nodes, nil
+}
+
+func (ir *Interpreter) source() ([]*models.Node, error) {
+	files, err := sourceFiles.ReadDir("source")
+	if err != nil {
+		return nil, err
+	}
+
+	var allNodes []*models.Node
+
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		content, err := sourceFiles.ReadFile("source/" + file.Name())
+		if err != nil {
+			return nil, err
+		}
+
+		// Tokenize the source code with lexer
+		lx := lexer.New("@zex/" + file.Name())
+		ts, err := lx.Parse(bytes.NewReader(content))
+		if err != nil {
+			return nil, err
+		}
+
+		// Build the abstract syntax tree from tokens
+		builder := ast.NewBuilder()
+		nodes, err := builder.Build(ts)
+		if err != nil {
+			return nil, err
+		}
+
+		allNodes = append(allNodes, nodes...)
+	}
+
+	return allNodes, nil
 }
 
 // writeDebug writes debug information to file
