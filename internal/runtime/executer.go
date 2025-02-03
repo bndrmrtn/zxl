@@ -65,7 +65,7 @@ func (e *Executer) Bind(variable *models.Node) {
 }
 
 // Execute executes the given nodes
-func (e *Executer) Execute(ts []*models.Node) ([]*builtin.FuncReturn, error) {
+func (e *Executer) Execute(ts []*models.Node) (*builtin.FuncReturn, error) {
 	for _, token := range ts {
 		switch token.Type {
 		// Handle package imports
@@ -73,10 +73,9 @@ func (e *Executer) Execute(ts []*models.Node) ([]*builtin.FuncReturn, error) {
 			using := token.Content
 			as := token.Value.(string)
 			if _, ok := e.packages[as]; ok {
-				return nil, errs.WithDebug(fmt.Errorf("%w: package '%v' already imported", errs.RuntimeError, as), nil)
+				return nil, errs.WithDebug(fmt.Errorf("%w: package '%v' already imported", errs.RuntimeError, as), token.Debug)
 			}
 			e.packages[as] = using
-			break
 		// Handle function declarations
 		case tokens.Function:
 			e.fns[token.Content] = token
@@ -89,20 +88,17 @@ func (e *Executer) Execute(ts []*models.Node) ([]*builtin.FuncReturn, error) {
 			if err != nil {
 				return nil, err
 			}
-			break
 		// Handle function calls
 		case tokens.FuncCall:
 			_, err := e.executeFn(token)
 			if err != nil {
 				return nil, err
 			}
-			break
 		case tokens.Assign:
 			err := e.handleAssignment(token)
 			if err != nil {
 				return nil, err
 			}
-			break
 		case tokens.If:
 			ret, err := e.handleIf(token)
 			if err != nil {
@@ -111,7 +107,6 @@ func (e *Executer) Execute(ts []*models.Node) ([]*builtin.FuncReturn, error) {
 			if ret != nil {
 				return ret, nil
 			}
-			break
 		case tokens.Return, tokens.EmptyReturn:
 			return e.handleReturn(token)
 		case tokens.While:
@@ -122,13 +117,12 @@ func (e *Executer) Execute(ts []*models.Node) ([]*builtin.FuncReturn, error) {
 			if ret != nil {
 				return ret, nil
 			}
-			break
 		}
 	}
 	return nil, nil
 }
 
-func (e *Executer) ExecuteFn(name string, args []*builtin.Variable) ([]*builtin.FuncReturn, error) {
+func (e *Executer) ExecuteFn(name string, args []*builtin.Variable) (*builtin.FuncReturn, error) {
 	fn, ok := e.fns[name]
 	if !ok {
 		if (e.scope == ExecuterScopeBlock || e.scope == ExecuterScopeFunction) && e.parent != nil {

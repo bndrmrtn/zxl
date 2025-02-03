@@ -17,7 +17,7 @@ func GetBuiltins() map[string]Function {
 	}
 }
 
-func print(args []*Variable) ([]*FuncReturn, error) {
+func print(args []*Variable) (*FuncReturn, error) {
 	var values []any
 
 	for _, arg := range args {
@@ -25,15 +25,13 @@ func print(args []*Variable) ([]*FuncReturn, error) {
 	}
 
 	n, err := fmt.Print(values...)
-	return []*FuncReturn{
-		{
-			Type:  tokens.IntVariable,
-			Value: n,
-		},
+	return &FuncReturn{
+		Type:  tokens.IntVariable,
+		Value: n,
 	}, err
 }
 
-func println(args []*Variable) ([]*FuncReturn, error) {
+func println(args []*Variable) (*FuncReturn, error) {
 	var values []any
 
 	for _, arg := range args {
@@ -41,15 +39,13 @@ func println(args []*Variable) ([]*FuncReturn, error) {
 	}
 
 	n, err := fmt.Println(values...)
-	return []*FuncReturn{
-		{
-			Type:  tokens.IntVariable,
-			Value: n,
-		},
+	return &FuncReturn{
+		Type:  tokens.IntVariable,
+		Value: n,
 	}, err
 }
 
-func printf(args []*Variable) ([]*FuncReturn, error) {
+func printf(args []*Variable) (*FuncReturn, error) {
 	var (
 		format string
 		values []any
@@ -67,28 +63,24 @@ func printf(args []*Variable) ([]*FuncReturn, error) {
 	}
 
 	n, err := fmt.Printf(format, values...)
-	return []*FuncReturn{
-		{
-			Type:  tokens.IntVariable,
-			Value: n,
-		},
+	return &FuncReturn{
+		Type:  tokens.IntVariable,
+		Value: n,
 	}, err
 }
 
-func getType(args []*Variable) ([]*FuncReturn, error) {
+func getType(args []*Variable) (*FuncReturn, error) {
 	if len(args) != 1 {
 		return nil, fmt.Errorf("expected 1 argument, got %d", len(args))
 	}
 
-	return []*FuncReturn{
-		{
-			Type:  tokens.StringVariable,
-			Value: args[0].Type.String(),
-		},
+	return &FuncReturn{
+		Type:  tokens.StringVariable,
+		Value: args[0].Type.String(),
 	}, nil
 }
 
-func read(args []*Variable) ([]*FuncReturn, error) {
+func read(args []*Variable) (*FuncReturn, error) {
 	if len(args) != 1 {
 		return nil, fmt.Errorf("expected 1 arguments, got %d", len(args))
 	}
@@ -100,10 +92,8 @@ func read(args []*Variable) ([]*FuncReturn, error) {
 	var value string
 	fmt.Print(args[0].Value)
 	_, err := fmt.Scan(&value)
-	return []*FuncReturn{
-		{
-			Type:  tokens.StringVariable,
-			Value: value,
-		},
+	return &FuncReturn{
+		Type:  tokens.StringVariable,
+		Value: value,
 	}, err
 }

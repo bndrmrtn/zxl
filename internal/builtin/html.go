@@ -24,7 +24,7 @@ func (hm *HtmlModule) Access(variable string) (*Variable, error) {
 }
 
 // Execute performs the requested HTML function like 'doc', 'head', 'body', etc.
-func (hm *HtmlModule) Execute(fn string, args []*Variable) ([]*FuncReturn, error) {
+func (hm *HtmlModule) Execute(fn string, args []*Variable) (*FuncReturn, error) {
 	switch fn {
 	default:
 		return nil, fmt.Errorf("function %s not exists in html module", fn)
@@ -44,7 +44,7 @@ func (hm *HtmlModule) Execute(fn string, args []*Variable) ([]*FuncReturn, error
 }
 
 // doc generates the entire HTML document by wrapping the provided content.
-func (hm *HtmlModule) doc(args []*Variable) ([]*FuncReturn, error) {
+func (hm *HtmlModule) doc(args []*Variable) (*FuncReturn, error) {
 	var content string
 	// Concatenate all the arguments into one string.
 	for _, arg := range args {
@@ -58,85 +58,72 @@ func (hm *HtmlModule) doc(args []*Variable) ([]*FuncReturn, error) {
 }
 
 // head generates the <head> section of the HTML document.
-func (hm *HtmlModule) head(args []*Variable) ([]*FuncReturn, error) {
+func (hm *HtmlModule) head(args []*Variable) (*FuncReturn, error) {
 	var content string
 	// Concatenate all the arguments into one string.
 	for _, arg := range args {
 		content += fmt.Sprintf("%v", arg.Value)
 	}
-	return []*FuncReturn{
-		{
-			Type:  tokens.StringVariable,
-			Value: fmt.Sprintf("<head>%s</head>", content),
-		},
+	return &FuncReturn{
+		Type:  tokens.StringVariable,
+		Value: fmt.Sprintf("<head>%s</head>", content),
 	}, nil
 }
 
 // body generates the <body> section of the HTML document.
-func (hm *HtmlModule) body(args []*Variable) ([]*FuncReturn, error) {
+func (hm *HtmlModule) body(args []*Variable) (*FuncReturn, error) {
 	var content string
 	// Concatenate all the arguments into one string.
 	for _, arg := range args {
 		content += fmt.Sprintf("%v", arg.Value)
 	}
-	return []*FuncReturn{
-		{
-			Type:  tokens.StringVariable,
-			Value: fmt.Sprintf("<body>%s</body>", content),
-		},
+	return &FuncReturn{
+		Type:  tokens.StringVariable,
+		Value: fmt.Sprintf("<body>%s</body>", content),
 	}, nil
 }
 
 // title generates the <title> tag inside the <head> section.
-func (hm *HtmlModule) title(args []*Variable) ([]*FuncReturn, error) {
+func (hm *HtmlModule) title(args []*Variable) (*FuncReturn, error) {
 	if len(args) != 1 {
 		return nil, fmt.Errorf("title function expects 1 argument, got %d", len(args))
 	}
 	// Ensure the argument is a string.
 	if str, ok := args[0].Value.(string); ok {
-		return []*FuncReturn{
-			{
-				Type:  tokens.StringVariable,
-				Value: fmt.Sprintf("<title>%s</title>", str),
-			},
+		return &FuncReturn{
+			Type:  tokens.StringVariable,
+			Value: fmt.Sprintf("<title>%s</title>", str),
 		}, nil
-	} else {
-		return nil, fmt.Errorf("title function expects a string argument, got %T", args[0].Value)
 	}
+	return nil, fmt.Errorf("title function expects a string argument, got %T", args[0].Value)
 }
 
 // h1 generates the <h1> header tag.
-func (hm *HtmlModule) h1(args []*Variable) ([]*FuncReturn, error) {
+func (hm *HtmlModule) h1(args []*Variable) (*FuncReturn, error) {
 	if len(args) != 1 {
 		return nil, fmt.Errorf("h1 function expects 1 argument, got %d", len(args))
 	}
 	// Ensure the argument is a string.
 	if str, ok := args[0].Value.(string); ok {
-		return []*FuncReturn{
-			{
-				Type:  tokens.StringVariable,
-				Value: fmt.Sprintf("<h1>%s</h1>", str),
-			},
+		return &FuncReturn{
+			Type:  tokens.StringVariable,
+			Value: fmt.Sprintf("<h1>%s</h1>", str),
 		}, nil
-	} else {
-		return nil, fmt.Errorf("h1 function expects a string argument, got %T", args[0].Value)
 	}
+	return nil, fmt.Errorf("h1 function expects a string argument, got %T", args[0].Value)
 }
 
 // p generates the <p> paragraph tag.
-func (hm *HtmlModule) p(args []*Variable) ([]*FuncReturn, error) {
+func (hm *HtmlModule) p(args []*Variable) (*FuncReturn, error) {
 	if len(args) != 1 {
 		return nil, fmt.Errorf("p function expects 1 argument, got %d", len(args))
 	}
 	// Ensure the argument is a string.
 	if str, ok := args[0].Value.(string); ok {
-		return []*FuncReturn{
-			{
-				Type:  tokens.StringVariable,
-				Value: fmt.Sprintf("<p>%s</p>", str),
-			},
+		return &FuncReturn{
+			Type:  tokens.StringVariable,
+			Value: fmt.Sprintf("<p>%s</p>", str),
 		}, nil
-	} else {
-		return nil, fmt.Errorf("p function expects a string argument, got %T", args[0].Value)
 	}
+	return nil, fmt.Errorf("p function expects a string argument, got %T", args[0].Value)
 }

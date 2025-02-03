@@ -1,6 +1,7 @@
-namespace http;
+namespace server;
 use http;
+import("config/config.zx");
 
-http.json();
-http.write('{"x": 5}');
-http.status(200);
+config.default();
+
+http.write("<h1>Hello</h1>");

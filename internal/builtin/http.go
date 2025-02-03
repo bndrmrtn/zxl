@@ -57,7 +57,7 @@ func (hm *HttpModule) Access(variable string) (*Variable, error) {
 }
 
 // Execute runs the function passed as `fn` on the HttpModule
-func (hm *HttpModule) Execute(fn string, args []*Variable) ([]*FuncReturn, error) {
+func (hm *HttpModule) Execute(fn string, args []*Variable) (*FuncReturn, error) {
 	switch fn {
 	case "write":
 		return hm.write(args, false)
@@ -78,7 +78,7 @@ func (hm *HttpModule) Execute(fn string, args []*Variable) ([]*FuncReturn, error
 }
 
 // write sends the specified argument to the ResponseWriter
-func (hm *HttpModule) write(args []*Variable, nl bool) ([]*FuncReturn, error) {
+func (hm *HttpModule) write(args []*Variable, nl bool) (*FuncReturn, error) {
 	if len(args) != 1 {
 		return nil, fmt.Errorf("write function expects 1 argument, got %d", len(args))
 	}
@@ -97,7 +97,7 @@ func (hm *HttpModule) write(args []*Variable, nl bool) ([]*FuncReturn, error) {
 }
 
 // status sets the HTTP status code for the response
-func (hm *HttpModule) status(args []*Variable) ([]*FuncReturn, error) {
+func (hm *HttpModule) status(args []*Variable) (*FuncReturn, error) {
 	if len(args) != 1 {
 		return nil, fmt.Errorf("status function expects 1 argument, got %d", len(args))
 	}
@@ -112,7 +112,7 @@ func (hm *HttpModule) status(args []*Variable) ([]*FuncReturn, error) {
 }
 
 // setHeader sets an HTTP header for the response
-func (hm *HttpModule) setHeader(args []*Variable) ([]*FuncReturn, error) {
+func (hm *HttpModule) setHeader(args []*Variable) (*FuncReturn, error) {
 	if len(args) != 2 {
 		return nil, fmt.Errorf("setHeader function expects 2 arguments, got %d", len(args))
 	}
@@ -132,7 +132,7 @@ func (hm *HttpModule) setHeader(args []*Variable) ([]*FuncReturn, error) {
 }
 
 // getHeader returns the value of an HTTP header
-func (hm *HttpModule) getHeader(args []*Variable) ([]*FuncReturn, error) {
+func (hm *HttpModule) getHeader(args []*Variable) (*FuncReturn, error) {
 	if len(args) != 1 {
 		return nil, fmt.Errorf("getHeader function expects 1 arguments, got %d", len(args))
 	}
@@ -142,11 +142,9 @@ func (hm *HttpModule) getHeader(args []*Variable) ([]*FuncReturn, error) {
 		return nil, fmt.Errorf("header name must be a string, got %T", args[0].Value)
 	}
 
-	return []*FuncReturn{
-		{
-			Type:  tokens.StringVariable,
-			Value: hm.w.Header().Get(headerName),
-		},
+	return &FuncReturn{
+		Type:  tokens.StringVariable,
+		Value: hm.w.Header().Get(headerName),
 	}, nil
 }
 

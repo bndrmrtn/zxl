@@ -1,0 +1,6 @@
+namespace config;
+use http;
+
+fn default() {
+    http.html();
+}

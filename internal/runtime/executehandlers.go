@@ -89,7 +89,7 @@ func (e *Executer) handleAssignment(token *models.Node) error {
 	if token.VariableType == tokens.ReferenceVariable && e.scope == ExecuterScopeBlock {
 		ref, err := e.GetVariableValue(token.Value.(string))
 		if err != nil {
-			return err
+			return errs.WithDebug(err, token.Debug)
 		}
 		token = ref
 	}
@@ -98,17 +98,15 @@ func (e *Executer) handleAssignment(token *models.Node) error {
 	return nil
 }
 
-func (e *Executer) handleReturn(token *models.Node) ([]*builtin.FuncReturn, error) {
+func (e *Executer) handleReturn(token *models.Node) (*builtin.FuncReturn, error) {
 	if token.Type == tokens.EmptyReturn {
 		if e.scope == ExecuterScopeBlock && e.parent != nil {
 			return e.parent.handleReturn(token)
 		}
 
-		return []*builtin.FuncReturn{
-			{
+		return &builtin.FuncReturn{
 				Type:  tokens.EmptyReturnValue,
 				Value: nil,
-			},
 		}, nil
 	}
 
@@ -126,15 +124,13 @@ func (e *Executer) handleReturn(token *models.Node) ([]*builtin.FuncReturn, erro
 		return nil, nil
 	}
 
-	return []*builtin.FuncReturn{
-		{
+	return &builtin.FuncReturn{
 			Type:  value.VariableType,
 			Value: value.Value,
-		},
 	}, nil
 }
 
-func (e *Executer) handleIf(token *models.Node) ([]*builtin.FuncReturn, error) {
+func (e *Executer) handleIf(token *models.Node) (*builtin.FuncReturn, error) {
 	// Evaluate condition
 	condition, err := e.evaluateExpression(&models.Node{
 		Type:         tokens.If,
@@ -178,7 +174,7 @@ func (e *Executer) handleIf(token *models.Node) ([]*builtin.FuncReturn, error) {
 	return nil, nil
 }
 
-func (e *Executer) handleWhile(token *models.Node) ([]*builtin.FuncReturn, error) {
+func (e *Executer) handleWhile(token *models.Node) (*builtin.FuncReturn, error) {
 	ex := NewExecuter(ExecuterScopeBlock, e.runtime, e)
 
 	for {

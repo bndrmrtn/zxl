@@ -17,7 +17,7 @@ import (
 	"github.com/bndrmrtn/zexlang/internal/tokens"
 )
 
-func (e *Executer) runFuncEval(debug *models.Debug, args []*builtin.Variable) ([]*builtin.FuncReturn, error) {
+func (e *Executer) runFuncEval(debug *models.Debug, args []*builtin.Variable) (*builtin.FuncReturn, error) {
 	if len(args) != 1 {
 		return nil, errs.WithDebug(fmt.Errorf("eval function takes only one argument"), debug)
 	}
@@ -41,7 +41,7 @@ func (e *Executer) runFuncEval(debug *models.Debug, args []*builtin.Variable) ([
 	return ex.Execute(nodes)
 }
 
-func (e *Executer) runFuncImport(debug *models.Debug, args []*builtin.Variable) ([]*builtin.FuncReturn, error) {
+func (e *Executer) runFuncImport(debug *models.Debug, args []*builtin.Variable) (*builtin.FuncReturn, error) {
 	if len(args) < 1 {
 		return nil, errs.WithDebug(fmt.Errorf("import function takes minimum one argument"), debug)
 	}
@@ -100,7 +100,7 @@ func (e *Executer) runFuncImport(debug *models.Debug, args []*builtin.Variable) 
 			return nil, errs.WithDebug(err, debug)
 		}
 
-		if len(ret) != 0 {
+		if ret != nil {
 			return ret, nil
 		}
 	}
@@ -108,7 +108,7 @@ func (e *Executer) runFuncImport(debug *models.Debug, args []*builtin.Variable) 
 	return nil, nil
 }
 
-func (e *Executer) runFuncRef(token *models.Node) ([]*builtin.FuncReturn, error) {
+func (e *Executer) runFuncRef(token *models.Node) (*builtin.FuncReturn, error) {
 	if len(token.Args) != 1 {
 		return nil, errs.WithDebug(fmt.Errorf("ref function takes only one argument"), token.Debug)
 	}
@@ -130,10 +130,8 @@ func (e *Executer) runFuncRef(token *models.Node) ([]*builtin.FuncReturn, error)
 		return e.runFuncRef(node)
 	}
 
-	return []*builtin.FuncReturn{
-		{
-			Type:  tokens.StringVariable,
-			Value: fmt.Sprintf("{Type: %s, Value: %v}", n.VariableType, n.Value),
-		},
+	return &builtin.FuncReturn{
+		Type:  tokens.StringVariable,
+		Value: fmt.Sprintf("{Type: %s, Value: %v}", n.VariableType, n.Value),
 	}, nil
 }

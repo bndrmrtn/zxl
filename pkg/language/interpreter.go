@@ -45,7 +45,7 @@ func NewInterpreter(mode InterpreterMode, cache bool) *Interpreter {
 }
 
 // Interpret interprets the given data
-func (ir *Interpreter) Interpret(fileName string, data io.Reader) ([]*builtin.FuncReturn, error) {
+func (ir *Interpreter) Interpret(fileName string, data io.Reader) (*builtin.FuncReturn, error) {
 	if !strings.HasSuffix(fileName, ".zx") {
 		return nil, fmt.Errorf("Zex can only run files that has .zx extesion.")
 	}

@@ -60,7 +60,7 @@ func (e *Executer) GetVariableValue(name string) (*models.Node, error) {
 }
 
 // executeFn executes a function
-func (e *Executer) executeFn(token *models.Node) ([]*builtin.FuncReturn, error) {
+func (e *Executer) executeFn(token *models.Node) (*builtin.FuncReturn, error) {
 	name := token.Content
 	args := token.Args
 
@@ -148,7 +148,7 @@ func (e *Executer) executeFn(token *models.Node) ([]*builtin.FuncReturn, error) 
 }
 
 // executeComplexFuncCall executes a function with a complex name
-func (e *Executer) executeComplexFuncCall(token *models.Node, args []string, fn string, variables []*models.Node) ([]*builtin.FuncReturn, error) {
+func (e *Executer) executeComplexFuncCall(token *models.Node, args []string, fn string, variables []*models.Node) (*builtin.FuncReturn, error) {
 	if fn == "construct" {
 		return nil, errs.WithDebug(fmt.Errorf("construct is a reserved method"), token.Debug)
 	}
@@ -218,7 +218,7 @@ func (e *Executer) convertArgument(args []*models.Node) ([]*builtin.Variable, er
 }
 
 // newBlock creates a new block
-func (e *Executer) newBlock(block *models.Node, args []*models.Node) ([]*builtin.FuncReturn, error) {
+func (e *Executer) newBlock(block *models.Node, args []*models.Node) (*builtin.FuncReturn, error) {
 	ex := NewExecuter(ExecuterScopeDefinition, e.runtime, e)
 	_, err := ex.Execute(block.Children)
 	if err != nil {
@@ -236,11 +236,9 @@ func (e *Executer) newBlock(block *models.Node, args []*models.Node) ([]*builtin
 		}
 	}
 
-	return []*builtin.FuncReturn{
-		{
-			Type:  tokens.DefinitionReference,
-			Value: ex,
-		},
+	return &builtin.FuncReturn{
+		Type:  tokens.DefinitionReference,
+		Value: ex,
 	}, nil
 }
 

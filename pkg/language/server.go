@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/bndrmrtn/zexlang/internal/errs"
 	"github.com/bndrmrtn/zexlang/internal/runtime"
@@ -81,7 +80,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	nodes, err := s.ir.GetNodes(strings.TrimPrefix(filePath, s.root), file)
+	nodes, err := s.ir.GetNodes(filePath, file)
 	if err != nil {
 		s.handleError(err, w)
 		return

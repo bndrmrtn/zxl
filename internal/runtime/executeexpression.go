@@ -52,14 +52,14 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 			if err != nil {
 				return nil, err
 			}
-			if len(ret) != 1 {
+			if ret == nil {
 				return nil, errs.WithDebug(fmt.Errorf("function call in expression must return a single value"), node.Debug)
 			}
 
-			if ret[0].Type == tokens.DefinitionReference {
+			if ret.Type == tokens.DefinitionReference {
 				return &models.Node{
 					VariableType: tokens.DefinitionReference,
-					Value:        ret[0].Value,
+					Value:        ret.Value,
 				}, nil
 			}
 
@@ -73,7 +73,7 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 			}()
 
 			node.Content = sum
-			args[sum] = ret[0].Value
+			args[sum] = ret.Value
 		}
 
 		if node.VariableType == tokens.InlineValue {

@@ -37,7 +37,7 @@ func New(mode RuntimeMode) *Runtime {
 }
 
 // Execute executes the given nodes
-func (r *Runtime) Execute(nodes []*models.Node) ([]*builtin.FuncReturn, error) {
+func (r *Runtime) Execute(nodes []*models.Node) (*builtin.FuncReturn, error) {
 	if len(nodes) == 0 {
 		return nil, nil
 	}
@@ -50,7 +50,7 @@ func (r *Runtime) Execute(nodes []*models.Node) ([]*builtin.FuncReturn, error) {
 }
 
 // Exec executes the given nodes in the given namespace
-func (r *Runtime) Exec(scope ExecuterScope, parent *Executer, namespace string, nodes []*models.Node) ([]*builtin.FuncReturn, error) {
+func (r *Runtime) Exec(scope ExecuterScope, parent *Executer, namespace string, nodes []*models.Node) (*builtin.FuncReturn, error) {
 	ex, ok := r.executers[namespace]
 	if !ok {
 		ex = NewExecuter(scope, r, parent)
