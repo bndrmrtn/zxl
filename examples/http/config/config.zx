@@ -1,0 +1,11 @@
+namespace config;
+
+define Config {
+    let x = 1;
+    let y = 2;
+
+    fn construct(x) {
+    }
+}
+
+return Config(5);

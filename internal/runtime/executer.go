@@ -153,3 +153,25 @@ func (e *Executer) ExecuteFn(name string, args []*builtin.Variable) (*builtin.Fu
 
 	return ex.Execute(fn.Children)
 }
+
+func (e *Executer) String() string {
+	var objects = make([]string, len(e.vars)+len(e.fns)+len(e.blocks))
+
+	for k := range e.vars {
+		objects = append(objects, k)
+	}
+
+	for k := range e.fns {
+		objects = append(objects, k+"()")
+	}
+
+	for k := range e.blocks {
+		objects = append(objects, k+"{}")
+	}
+
+	if len(objects) == 0 {
+		return e.name + "{}"
+	}
+
+	return e.name + "{" + strings.TrimSpace(strings.Join(objects, " ")) + "}"
+}

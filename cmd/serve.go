@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/bndrmrtn/zexlang/pkg/language"
+	"github.com/bndrmrtn/zexlang/pkg/server"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -23,6 +24,7 @@ func init() {
 	serveCmd.Flags().BoolP("debug", "d", false, "Run the program in debug mode")
 	serveCmd.Flags().BoolP("nocolor", "n", false, "Enable or disable colorized output")
 	serveCmd.Flags().StringP("listenAddr", "l", ":3000", "Server listen address")
+	serveCmd.Flags().BoolP("cache", "c", false, "Cache the parsed files for faster execution")
 }
 
 // execRun executes the run command
@@ -34,6 +36,8 @@ func execServe(cmd *cobra.Command, args []string) {
 
 	colors := cmd.Flag("nocolor").Value.String() == "false"
 	debug := cmd.Flag("debug").Value.String() == "true"
+	cache := cmd.Flag("cache").Value.String() == "true"
+	listenAddr := cmd.Flag("listenAddr").Value.String()
 
 	if !colors {
 		color.NoColor = true
@@ -67,7 +71,9 @@ func execServe(cmd *cobra.Command, args []string) {
 	}
 
 	interpreter := language.NewInterpreter(mode, true)
-	if err := interpreter.Serve(args[0], cmd.Flag("listenAddr").Value.String(), colors); err != nil && err != http.ErrServerClosed {
+	httpServer := server.New(interpreter, args[0], cache, colors)
+
+	if err := httpServer.Serve(listenAddr); err != nil && err != http.ErrServerClosed {
 		cmd.PrintErr("Error: " + err.Error())
 		return
 	}

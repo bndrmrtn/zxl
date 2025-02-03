@@ -69,6 +69,8 @@ func (hm *HttpModule) Execute(fn string, args []*Variable) (*FuncReturn, error) 
 		return hm.setHeader(args)
 	case "getHeader":
 		return hm.getHeader(args)
+	case "query":
+		return hm.query(args)
 	case "html", "json", "text":
 		hm.w.Header().Set("Content-Type", hm.getContentType(fn))
 		return nil, nil
@@ -159,4 +161,20 @@ func (hm *HttpModule) getContentType(fn string) string {
 	default:
 		return "text/plain"
 	}
+}
+
+func (hm *HttpModule) query(args []*Variable) (*FuncReturn, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf("query function expects 1 argument, got %d", len(args))
+	}
+
+	queryKey, ok := args[0].Value.(string)
+	if !ok {
+		return nil, fmt.Errorf("query key must be a string, got %T", args[0].Value)
+	}
+
+	return &FuncReturn{
+		Type:  tokens.StringVariable,
+		Value: hm.r.URL.Query().Get(queryKey),
+	}, nil
 }

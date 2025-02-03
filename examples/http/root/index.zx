@@ -1,0 +1,5 @@
+namespace root;
+use http;
+
+let config = import("../config/config.zx");
+http.write(config);

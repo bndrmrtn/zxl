@@ -77,11 +77,6 @@ func (ir *Interpreter) GetNodes(fileName string, data io.Reader) ([]*models.Node
 	return ir.getNodes(fileName, data)
 }
 
-func (ir *Interpreter) Serve(dir string, addr string, colors bool) error {
-	server := NewServer(ir, dir, colors)
-	return server.Serve(addr)
-}
-
 // getNodes gets the nodes from the given data
 func (ir *Interpreter) getNodes(fileName string, data io.Reader) ([]*models.Node, error) {
 	b, err := io.ReadAll(data)
