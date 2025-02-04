@@ -1,5 +1,8 @@
 namespace root;
 use http;
 
+let query = http.query("hello");
+
+let num = 15;
 let config = import("../config/config.zx");
 http.write(config);

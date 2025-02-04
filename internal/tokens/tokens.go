@@ -67,6 +67,11 @@ const (
 	Then
 	ElseIf
 	Else
+
+	NewLine TokenType = iota + 100000000
+	SingleLineComment
+	MultiLineComment
+	WhiteSpace
 )
 
 func (t TokenType) IsOperator() bool {
@@ -186,6 +191,16 @@ func (t TokenType) String() string {
 		return "else if"
 	case Else:
 		return "else"
+	case NewLine:
+		return "new line"
+	case SingleLineComment:
+		return "single line comment"
+	case MultiLineComment:
+		return "multi line comment"
+	case WhiteSpace:
+		return "white space"
+	case For:
+		return "for"
 	default:
 		return "unkown"
 	}

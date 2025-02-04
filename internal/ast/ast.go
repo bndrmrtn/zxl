@@ -25,6 +25,8 @@ func (b *Builder) Build(ts []*models.Token) ([]*models.Node, error) {
 		nodes []*models.Node
 	)
 
+	ts = b.clean(ts)
+
 	if len(ts) == 0 {
 		return nil, nil
 	}
@@ -86,14 +88,27 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 		return b.parseReturn(ts, inx)
 	case tokens.If:
 		return b.parseIf(ts, inx)
-	case tokens.Semicolon:
-		*inx++
-		return nil, nil
 	case tokens.Use:
 		return b.parseUse(ts, inx)
 	case tokens.While:
 		return b.parseWhile(ts, inx)
+	case tokens.Semicolon:
+		*inx++
+		return nil, nil
 	default:
 		return nil, errs.WithDebug(fmt.Errorf("%w: invalid token '%v'", errs.SyntaxError, token.Value), token.Debug)
 	}
+}
+
+func (b *Builder) clean(ts []*models.Token) []*models.Token {
+	cleaned := make([]*models.Token, 0, len(ts))
+	for _, t := range ts {
+		switch t.Type {
+		default:
+			cleaned = append(cleaned, t)
+		case tokens.NewLine, tokens.SingleLineComment, tokens.MultiLineComment, tokens.WhiteSpace:
+			continue
+		}
+	}
+	return cleaned
 }

@@ -19,7 +19,7 @@ func (b *Builder) parseLetConst(ts []*models.Token, inx *int) (*models.Node, err
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 	}
 	if ts[*inx].Type != tokens.Identifier {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s' 3", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
 	node.Content = ts[*inx].Value

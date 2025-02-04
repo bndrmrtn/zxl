@@ -64,24 +64,35 @@ func (de DebugError) getNear() string {
 }
 
 // HttpError returns the error message with debug information for HTTP
-func (de DebugError) HttpError() string {
+func (de DebugError) HttpError() *HtmlError {
 	if de.debug == nil {
-		return fmt.Sprintf("<p>%s</p>", de.err.Error())
+		return nil
 	}
 
-	redBold := "<span style=\"color: #fb2c36; font-weight: bold;\">" + de.err.Error() + "</span>"
+	htmlErr := NewHtmlError(&de)
+	return htmlErr
+}
 
-	near := ""
-	if de.debug.Near != "" {
-		near = fmt.Sprintf("<pre style=\"background:#1e2939;padding:5px;color: #f2f2f2;\"><span style=\"font-weight:bold\">near:</span><br>%s</pre>", de.debug.Near)
+func (de DebugError) GetLine() int {
+	if de.debug == nil {
+		return 1
 	}
 
-	return fmt.Sprintf(`
-		<div style="font-family: Arial, sans-serif; margin: 20px">
-			<h1 style="color: #615fff; font-weight: bold;">Zex - %s</h1>
-			<p>%s</p>
-			<p>at <strong>%s:%d:%d</strong></p>
-			%s
-		</div>
-	`, version.Version, redBold, de.debug.File, de.debug.Line, de.debug.Column, near)
+	return de.debug.Line
+}
+
+func (de DebugError) GetColumn() int {
+	if de.debug == nil {
+		return 1
+	}
+
+	return de.debug.Column
+}
+
+func (de DebugError) GetFile() string {
+	if de.debug == nil {
+		return ""
+	}
+
+	return de.debug.File
 }

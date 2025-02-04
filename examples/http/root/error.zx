@@ -1,0 +1,4 @@
+const x = "Hello, World!";
+
+// will produce an error
+x = 5;

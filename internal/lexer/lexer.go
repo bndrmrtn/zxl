@@ -39,8 +39,8 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 	var (
 		pos     int
 		line    int = 1
-		col     int
-		fileLen = len(s)
+		col     int = 1
+		fileLen     = len(s)
 		parsed  []*models.Token
 	)
 
@@ -48,29 +48,79 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 		switch s[pos] {
 		// Handle new lines
 		case '\n':
+			// Add the new line token for debugging purposes
+			parsed = append(parsed, &models.Token{
+				Type:  tokens.NewLine,
+				Value: "\n",
+				Debug: &models.Debug{
+					Line:   line,
+					Column: col,
+					File:   lx.filename,
+					Near:   lx.near(s, pos, fileLen),
+				},
+			})
 			line++
-			col = 0
+			col = 1
 		// Handle single line comments
 		case '/':
 			if pos+1 < len(s) && s[pos+1] == '/' {
 				// Skip the entire comment line
 				pos += 2
+
+				var sb strings.Builder
+				sb.WriteString("//")
+
 				for pos < len(s) && s[pos] != '\n' {
+					sb.WriteByte(s[pos])
 					pos++
 				}
+
+				// Add the single line comment token for debugging purposes
+				sb.WriteByte('\n')
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.SingleLineComment,
+					Value: sb.String(),
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
+				})
+				sb.Reset()
 				// New line reached
 				line++
-				col = 0
+				col = 1
 			} else if pos+1 < len(s) && s[pos+1] == '*' {
 				pos += 2
+
+				var sb strings.Builder
+				sb.WriteString("/*")
+
 				for pos < len(s) {
 					if s[pos] == '*' && pos+1 < len(s) && s[pos+1] == '/' {
 						pos += 2
+
+						// Add the multi line comment token for debugging purposes
+						sb.WriteString("*/")
+						parsed = append(parsed, &models.Token{
+							Type:  tokens.MultiLineComment,
+							Value: sb.String(),
+							Debug: &models.Debug{
+								Line:   line,
+								Column: col,
+								File:   lx.filename,
+								Near:   lx.near(s, pos, fileLen),
+							},
+						})
+						sb.Reset()
 						break
 					} else if s[pos] == '\n' {
+						sb.WriteByte('\n')
 						line++
-						col = 0
+						col = 1
 					} else {
+						sb.WriteByte(s[pos])
 						pos++
 					}
 				}
@@ -82,6 +132,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Line:   line,
 						Column: col,
 						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
 					},
 				})
 				col++
@@ -145,6 +196,17 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 			})
 			pos--
 		case ' ', '\t':
+			// Whitespace token for debugging purposes
+			parsed = append(parsed, &models.Token{
+				Type:  tokens.WhiteSpace,
+				Value: string(s[pos]),
+				Debug: &models.Debug{
+					Line:   line,
+					Column: col,
+					File:   lx.filename,
+					Near:   lx.near(s, pos, fileLen),
+				},
+			})
 			col++
 		case ';', ':', ',', '.', '(', ')', '{', '}', '[', ']':
 			ch := s[pos]
@@ -158,6 +220,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					Near:   lx.near(s, pos, fileLen),
 				},
 			})
+			col++
 		case '=':
 			if pos+1 < len(s) && s[pos+1] == '=' {
 				parsed = append(parsed, &models.Token{
@@ -244,6 +307,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Line:   line,
 						Column: col,
 						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
 					},
 				})
 				pos++
@@ -255,6 +319,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Line:   line,
 						Column: col,
 						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
 					},
 				})
 			}
@@ -267,6 +332,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Line:   line,
 						Column: col,
 						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
 					},
 				})
 				pos++
@@ -278,6 +344,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Line:   line,
 						Column: col,
 						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
 					},
 				})
 			}
@@ -290,6 +357,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Line:   line,
 						Column: col,
 						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
 					},
 				})
 				pos++
@@ -301,6 +369,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Line:   line,
 						Column: col,
 						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
 					},
 				})
 			}
@@ -359,13 +428,17 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				})
 				pos--
 			} else {
-				// Invalid token
-				return nil, errs.WithDebug(fmt.Errorf("%w: unexpected character '%c'", errs.SyntaxError, s[pos]), &models.Debug{
-					Line:   line,
-					Column: col,
-					File:   lx.filename,
-					Near:   lx.near(s, pos, fileLen),
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.Unkown,
+					Value: string(s[pos]),
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
 				})
+				col++
 			}
 		}
 		pos++

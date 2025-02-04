@@ -1,13 +1,17 @@
 package server
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/bndrmrtn/zexlang/internal/errs"
+	"github.com/bndrmrtn/zexlang/internal/lexer"
+	"github.com/bndrmrtn/zexlang/pkg/prettycode"
 )
 
 // getExecutablePath gets the executable path
@@ -39,9 +43,35 @@ func (s *Server) handleError(err error, w http.ResponseWriter) {
 	if errors.As(err, &de) {
 		w.Header().Add("Content-Type", "text/html")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(de.HttpError()))
+		htmlErr := de.HttpError()
+		w.Write([]byte(s.makePrettyCode(htmlErr)))
 		return
 	}
 
 	http.Error(w, err.Error(), http.StatusInternalServerError)
+}
+
+func (s *Server) makePrettyCode(htmlErr *errs.HtmlError) string {
+	lx := lexer.New("")
+	ts, err := lx.Parse(bytes.NewReader(htmlErr.Code))
+	if err != nil {
+		fmt.Println(err)
+		return htmlErr.Error()
+	}
+
+	pretty := prettycode.New(ts)
+	code := pretty.HighlightHtml()
+	hlCodeParts := strings.Split(code, "\n")
+	codeParts := strings.Split(string(htmlErr.Code), "\n")
+	errLine := htmlErr.Debug().GetLine()
+
+	if len(hlCodeParts) < errLine {
+		return htmlErr.Error()
+	}
+
+	hlCodeParts[errLine-1] = "<span style=\"color:#fb2c36;text-decoration:line-through\">" + codeParts[errLine-1] + "</span>"
+	htmlErr.Code = []byte(strings.Join(hlCodeParts, "\n"))
+
+	htmlErr.Debug()
+	return htmlErr.Error()
 }

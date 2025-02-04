@@ -92,7 +92,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Get the executable path
 	zxPath, err := s.getExecutablePath(path)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		s.handleError(err, w)
 		return
 	}
 
