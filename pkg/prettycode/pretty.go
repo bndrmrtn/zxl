@@ -8,16 +8,19 @@ import (
 	"github.com/bndrmrtn/zexlang/internal/tokens"
 )
 
+// PrettyCode is a struct that holds the tokens of the code
 type PrettyCode struct {
 	tokens []*models.Token
 }
 
+// New creates a new PrettyCode struct
 func New(ts []*models.Token) *PrettyCode {
 	return &PrettyCode{
 		tokens: ts,
 	}
 }
 
+// HighlightHtml highlights the code with html tags
 func (p *PrettyCode) HighlightHtml() string {
 	var sb strings.Builder
 	defer sb.Reset()
@@ -31,6 +34,7 @@ func (p *PrettyCode) HighlightHtml() string {
 	return sb.String()
 }
 
+// highlightToken highlights the token with the given mode
 func (p *PrettyCode) highlightToken(mode Mode, token *models.Token, next *models.Token) string {
 	token.Value = html.EscapeString(token.Value)
 	switch token.Type {
@@ -50,7 +54,7 @@ func (p *PrettyCode) highlightToken(mode Mode, token *models.Token, next *models
 		return p.highlightIdentifier(mode, token.Value)
 	case tokens.String:
 		return p.highlightString(mode, token.Value)
-	case tokens.Number:
+	case tokens.Number, tokens.Bool, tokens.Nil:
 		return p.highlightNumber(mode, token.Value)
 	case tokens.LeftParenthesis, tokens.RightParenthesis,
 		tokens.LeftBrace, tokens.RightBrace,
@@ -69,6 +73,7 @@ func (p *PrettyCode) highlightToken(mode Mode, token *models.Token, next *models
 	}
 }
 
+// nextToken returns the next token in the list
 func (p *PrettyCode) nextToken(i int) *models.Token {
 	var next *models.Token
 

@@ -1,0 +1,39 @@
+use http;
+
+define HtmlFactory {
+    fn h1(text) {
+        return "<h1>" + text + "</h1>";
+    }
+
+    fn h2(text) {
+        return "<h2>" + text + "</h2>";
+    }
+
+    fn p(text) {
+        return "<p>" + text + "</p>";
+    }
+
+    fn div(text) {
+        return "<div>" + text + "</div>";
+    }
+
+    fn span(text) {
+        return "<span>" + text + "</span>";
+    }
+
+    fn a(text, href) {
+        return &"<a href=\"" + href + "\">" + text + "</a>";
+    }
+
+    fn img(src, alt) {
+        return "<img src=\"" + src + "\" alt=\"" + alt + "\">";
+    }
+
+    fn br() {
+        return "<br>";
+    }
+}
+
+let html = HtmlFactory();
+
+http.write(html.h1("Hello, world!"));

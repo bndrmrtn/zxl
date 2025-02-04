@@ -1,8 +1,14 @@
 namespace root;
 use http;
+use html;
 
-let query = http.query("hello");
+// set the content type to html
+http.html();
 
-let num = 15;
 let config = import("../config/config.zx");
-http.write(config);
+
+if config.showMessage {
+    let name = http.query("name");
+    name = html.escape(name);
+    http.write("Hello, " + name + "!");
+}

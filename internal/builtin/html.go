@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"fmt"
+	"html"
 
 	"github.com/bndrmrtn/zexlang/internal/tokens"
 )
@@ -40,6 +41,8 @@ func (hm *HtmlModule) Execute(fn string, args []*Variable) (*FuncReturn, error) 
 		return hm.h1(args)
 	case "p":
 		return hm.p(args)
+	case "escape":
+		return hm.escape(args)
 	}
 }
 
@@ -126,4 +129,19 @@ func (hm *HtmlModule) p(args []*Variable) (*FuncReturn, error) {
 		}, nil
 	}
 	return nil, fmt.Errorf("p function expects a string argument, got %T", args[0].Value)
+}
+
+// escape
+func (hm *HtmlModule) escape(args []*Variable) (*FuncReturn, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf("escape function expects 1 argument, got %d", len(args))
+	}
+	// Ensure the argument is a string.
+	if str, ok := args[0].Value.(string); ok {
+		return &FuncReturn{
+			Type:  tokens.StringVariable,
+			Value: html.EscapeString(fmt.Sprintf("%s", str)),
+		}, nil
+	}
+	return nil, fmt.Errorf("escape function expects a string argument, got %T", args[0].Value)
 }

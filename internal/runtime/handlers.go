@@ -25,7 +25,7 @@ func (e *Executer) handleLetConst(token *models.Node) error {
 	if token.VariableType == tokens.ExpressionVariable {
 		v, err := e.evaluateExpression(token)
 		if err != nil {
-			return err
+			return errs.WithDebug(err, token.Debug)
 		}
 
 		// Required for the variable to be accessible in the future without re-evaluating
@@ -85,7 +85,7 @@ func (e *Executer) handleAssignment(token *models.Node) error {
 	if token.VariableType == tokens.ExpressionVariable {
 		value, err := e.evaluateExpression(token)
 		if err != nil {
-			return err
+			return errs.WithDebug(err, token.Debug)
 		}
 		token.Value = value.Value
 		token.Type = value.Type
@@ -144,9 +144,10 @@ func (e *Executer) handleIf(token *models.Node) (*builtin.FuncReturn, error) {
 		Type:         tokens.If,
 		VariableType: tokens.ExpressionVariable,
 		Children:     token.Args,
+		Debug:        token.Debug,
 	})
 	if err != nil {
-		return nil, err
+		return nil, errs.WithDebug(err, token.Debug)
 	}
 
 	// Check if condition is a boolean
@@ -192,6 +193,7 @@ func (e *Executer) handleWhile(token *models.Node) (*builtin.FuncReturn, error) 
 			Type:         tokens.While,
 			VariableType: tokens.ExpressionVariable,
 			Children:     token.Args,
+			Debug:        token.Debug,
 		})
 		if err != nil {
 			return nil, err

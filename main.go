@@ -3,6 +3,7 @@
 //
 // Zex is built in Go and is designed to be a simple.
 // Created by Martin Binder
+// Website: https://mrtn.vip
 package main
 
 import (
@@ -13,11 +14,13 @@ import (
 	"github.com/fatih/color"
 )
 
+// main is the entry point of the ZexLang program
 func main() {
-	// Execute the command
+	// Recover from a panic if the program is not in debug mode
 	if os.Getenv("DEBUG") != "true" {
 		defer fatal()
 	}
+	// Execute the command
 	cmd.Execute()
 }
 

@@ -54,7 +54,7 @@ func (ex *Executer) evaluateExpression(n *models.Node) (*models.Node, error) {
 		if node.VariableType == tokens.FunctionCallVariable {
 			ret, err := ex.executeFn(node)
 			if err != nil {
-				return nil, err
+				return nil, errs.WithDebug(err, n.Debug)
 			}
 			if ret == nil {
 				return nil, errs.WithDebug(fmt.Errorf("function call in expression must return a single value"), node.Debug)

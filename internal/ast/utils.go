@@ -26,7 +26,7 @@ func (b *Builder) getType(t *models.Token) (tokens.VariableType, error) {
 		return tokens.StringVariable, nil
 	case tokens.Bool:
 		return tokens.BoolVariable, nil
-	case tokens.Identifier:
+	case tokens.Identifier, tokens.Nil:
 		if t.Value == "nil" {
 			return tokens.NilVariable, nil
 		}

@@ -1,11 +1,11 @@
 namespace config;
 
 define Config {
-    let x = 1;
-    let y = 2;
+    let showMessage = false;
 
-    fn construct(x) {
+    fn construct(showMessage) {
+        this.showMessage = showMessage;
     }
 }
 
-return Config(5);
+return Config(true);

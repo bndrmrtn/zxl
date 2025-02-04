@@ -44,6 +44,10 @@ func (s *Server) handleError(err error, w http.ResponseWriter) {
 		w.Header().Add("Content-Type", "text/html")
 		w.WriteHeader(http.StatusInternalServerError)
 		htmlErr := de.HttpError()
+		if htmlErr == nil {
+			w.Write([]byte(de.Error()))
+			return
+		}
 		w.Write([]byte(s.makePrettyCode(htmlErr)))
 		return
 	}

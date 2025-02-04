@@ -52,7 +52,11 @@ func (e *Executer) GetVariableValue(name string) (*models.Node, error) {
 	}
 
 	if v.VariableType == tokens.ExpressionVariable {
-		return e.evaluateExpression(v)
+		n, err := e.evaluateExpression(v)
+		if err != nil {
+			return nil, errs.WithDebug(err, v.Debug)
+		}
+		return n, nil
 	}
 
 	return v, nil

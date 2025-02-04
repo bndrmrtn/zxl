@@ -156,10 +156,11 @@ func (e *Executer) convertArgument(args []*models.Node) ([]*builtin.Variable, er
 	for _, arg := range args {
 		if arg.VariableType == tokens.ReferenceVariable {
 			var err error
+			debug := arg.Debug
 
 			arg, err = e.GetVariableValue(arg.Content)
 			if err != nil {
-				return nil, err
+				return nil, errs.WithDebug(err, debug)
 			}
 		}
 
@@ -168,9 +169,10 @@ func (e *Executer) convertArgument(args []*models.Node) ([]*builtin.Variable, er
 		}
 
 		if arg.VariableType == tokens.ExpressionVariable {
+			debug := arg.Debug
 			arg, err := e.evaluateExpression(arg)
 			if err != nil {
-				return nil, err
+				return nil, errs.WithDebug(err, debug)
 			}
 			convArgs = append(convArgs, &builtin.Variable{
 				Type:  arg.VariableType,
