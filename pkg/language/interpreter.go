@@ -9,11 +9,11 @@ import (
 	"strings"
 
 	"github.com/bndrmrtn/zexlang/internal/ast"
-	"github.com/bndrmrtn/zexlang/internal/builtin"
 	"github.com/bndrmrtn/zexlang/internal/cache"
+	"github.com/bndrmrtn/zexlang/internal/lang"
 	"github.com/bndrmrtn/zexlang/internal/lexer"
 	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/runtime"
+	"github.com/bndrmrtn/zexlang/internal/runtimev2"
 	"gopkg.in/yaml.v3"
 )
 
@@ -49,7 +49,7 @@ func NewInterpreter(mode InterpreterMode, cache bool) *Interpreter {
 }
 
 // Interpret interprets the given data
-func (ir *Interpreter) Interpret(fileName string, data io.Reader) (*builtin.FuncReturn, error) {
+func (ir *Interpreter) Interpret(fileName string, data io.Reader) (lang.Object, error) {
 	if !strings.HasSuffix(fileName, ".zx") {
 		return nil, fmt.Errorf("Zex can only run files that has .zx extesion.")
 	}
@@ -60,7 +60,7 @@ func (ir *Interpreter) Interpret(fileName string, data io.Reader) (*builtin.Func
 		return nil, err
 	}
 
-	run := runtime.New(runtime.EntryPoint)
+	run := runtimev2.New()
 	source, err := ir.source()
 	if err != nil {
 		return nil, err

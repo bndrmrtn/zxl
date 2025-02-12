@@ -1,43 +1,32 @@
-package runtime
+package runtimev2
 
 import (
 	"fmt"
 
 	"github.com/bndrmrtn/zexlang/internal/builtin"
+	"github.com/bndrmrtn/zexlang/internal/lang"
 	"github.com/bndrmrtn/zexlang/internal/models"
 	"github.com/bndrmrtn/zexlang/internal/tokens"
 )
 
 // RuntimeMode is the runtime mode
 type Runtime struct {
-	// mode is the runtime mode
-	mode RuntimeMode
-
-	// funcs is a map of function names to functions
-	funcs map[string]builtin.Function
-	// variables is a map of variable names to variables
-	variables map[string]*builtin.Variable
-
-	// pkgs is a map of package names to packages
-	pkgs map[string]builtin.Package
+	functions map[string]lang.Method
 
 	// executers is a map of namespace names to exec
 	executers map[string]*Executer
 }
 
 // New creates a new runtime
-func New(mode RuntimeMode) *Runtime {
+func New() *Runtime {
 	return &Runtime{
-		mode:      mode,
-		funcs:     builtin.GetBuiltins(),
-		variables: make(map[string]*builtin.Variable),
-		pkgs:      make(map[string]builtin.Package),
+		functions: builtin.Methods,
 		executers: make(map[string]*Executer),
 	}
 }
 
 // Execute executes the given nodes
-func (r *Runtime) Execute(nodes []*models.Node) (*builtin.FuncReturn, error) {
+func (r *Runtime) Execute(nodes []*models.Node) (lang.Object, error) {
 	if len(nodes) == 0 {
 		return nil, nil
 	}
@@ -52,7 +41,7 @@ func (r *Runtime) Execute(nodes []*models.Node) (*builtin.FuncReturn, error) {
 }
 
 // Exec executes the given nodes in the given namespace
-func (r *Runtime) Exec(scope ExecuterScope, parent *Executer, namespace string, nodes []*models.Node) (*builtin.FuncReturn, error) {
+func (r *Runtime) Exec(scope ExecuterScope, parent *Executer, namespace string, nodes []*models.Node) (lang.Object, error) {
 	ex, ok := r.executers[namespace]
 	if !ok {
 		ex = NewExecuter(scope, r, parent).WithName(namespace)
@@ -68,9 +57,4 @@ func (r *Runtime) GetNamespaceExecuter(namespace string) (*Executer, error) {
 		return nil, fmt.Errorf("namespace %v not found", namespace)
 	}
 	return ex, nil
-}
-
-// BindModule binds the given package to the given name
-func (r *Runtime) BindModule(name string, pkg builtin.Package) {
-	r.pkgs[name] = pkg
 }

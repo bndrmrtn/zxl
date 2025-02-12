@@ -4,3 +4,4 @@ let y = 3.14;
 let z = "Hello, World!";
 let a = true;
 let b = false;
+let c = nil;

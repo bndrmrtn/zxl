@@ -1,0 +1,7 @@
+let hi = 5;
+
+fn main(hi) {
+    println(hi);
+}
+
+main(hi);

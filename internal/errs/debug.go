@@ -16,7 +16,9 @@ func WithDebug(err error, debug *models.Debug) error {
 	// Check if the error is already a DebugError
 	var de DebugError
 	if errors.As(err, &de) {
-		return de
+		if de.debug != nil {
+			return de
+		}
 	}
 
 	// If not, create a new DebugError

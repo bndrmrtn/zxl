@@ -24,6 +24,8 @@ type Node struct {
 	Children []*Node `yaml:"children,omitempty"`
 	// Args represents the arguments of the node
 	Args []*Node `yaml:"args,omitempty"`
+	// ObjectAccessors represents the object accessors of the node like x[0]
+	ObjectAccessors []*Node `yaml:"objectAccessors,omitempty"`
 
 	// Map is a key value store for the node
 	Map map[string]any `yaml:"map,omitempty"`
@@ -54,4 +56,18 @@ func (n *Node) String() string {
 func (n *Node) Copy() *Node {
 	cp := *n
 	return &cp
+}
+
+func (n *Node) Assign(node *Node) {
+	n.Type = node.Type
+	n.VariableType = node.VariableType
+	n.Content = node.Content
+	n.Value = node.Value
+	n.Reference = node.Reference
+	n.Children = node.Children
+	n.Args = node.Args
+	n.ObjectAccessors = node.ObjectAccessors
+	n.Map = node.Map
+	n.Flags = node.Flags
+	n.Debug = node.Debug
 }

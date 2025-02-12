@@ -59,7 +59,6 @@ func (s *Server) makePrettyCode(htmlErr *errs.HtmlError) string {
 	lx := lexer.New("")
 	ts, err := lx.Parse(bytes.NewReader(htmlErr.Code))
 	if err != nil {
-		fmt.Println(err)
 		return htmlErr.Error()
 	}
 

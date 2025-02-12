@@ -16,6 +16,7 @@ const (
 	DefinitionBlock
 	DefinitionReference
 	EmptyReturnValue
+	ListVariable
 )
 
 func (v VariableType) String() string {
@@ -42,6 +43,8 @@ func (v VariableType) String() string {
 		return "definition"
 	case EmptyReturnValue:
 		return "return(empty)"
+	case ListVariable:
+		return "list"
 	default:
 		return "unknown"
 	}

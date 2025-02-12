@@ -1,0 +1,27 @@
+use http;
+
+define Person {
+    let name;
+
+    fn construct(name) {
+        this.name = name;
+    }
+}
+
+let people = [
+    Person("Alice"),
+    Person("Bob"),
+    Person("Charlie"),
+    Person("David"),
+    Person("Eve"),
+];
+
+let inx = 0;
+
+while inx < len(people) {
+    let person = people[inx];
+    http.write("<h1>Hello, ");
+    http.write(person.name);
+    http.write("!</h1>");
+    inx = inx + 1;
+}

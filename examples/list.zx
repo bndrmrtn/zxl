@@ -1,0 +1,10 @@
+let ints = [1, 2, 3, 4, 5];
+let inx = 0;
+
+let intsLen = len(ints);
+
+while inx < intsLen {
+    let int = ints[inx];
+    println(int);
+    inx = inx + 1;
+}

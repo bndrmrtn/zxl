@@ -3,96 +3,58 @@ package builtin
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zexlang/internal/tokens"
+	"github.com/bndrmrtn/zexlang/internal/lang"
 )
 
-// GetBuiltins returns the built-in functions
-func GetBuiltins() map[string]Function {
-	return map[string]Function{
-		"print":   print,
-		"println": println,
-		"printf":  printf,
-		"read":    read,
-	}
+var Methods = map[string]lang.Method{
+	"print":         &Print{},
+	"println":       &Print{true},
+	"type":          Type{},
+	"zx_langbridge": LangBridge{},
 }
 
-func print(args []*Variable) (*FuncReturn, error) {
-	var values []any
-
-	for _, arg := range args {
-		values = append(values, arg.Value)
-	}
-
-	n, err := fmt.Print(values...)
-	return &FuncReturn{
-		Type:  tokens.IntVariable,
-		Value: n,
-	}, err
+type Print struct {
+	newLine bool
 }
 
-func println(args []*Variable) (*FuncReturn, error) {
-	var values []any
-
-	for _, arg := range args {
-		values = append(values, arg.Value)
-	}
-
-	n, err := fmt.Println(values...)
-	return &FuncReturn{
-		Type:  tokens.IntVariable,
-		Value: n,
-	}, err
+func (p *Print) Args() []string {
+	return []string{"value"}
 }
 
-func printf(args []*Variable) (*FuncReturn, error) {
-	var (
-		format string
-		values []any
-	)
-
-	for i, arg := range args {
-		if i == 0 {
-			if arg.Type != tokens.StringVariable {
-				return nil, fmt.Errorf("expected string, got %v", arg.Type)
-			}
-			format = arg.Value.(string)
-		} else {
-			values = append(values, arg.Value)
-		}
+func (p *Print) Execute(args []lang.Object) (lang.Object, error) {
+	if p.newLine {
+		fmt.Println(args[0].Value())
+	} else {
+		fmt.Print(args[0].Value())
 	}
-
-	n, err := fmt.Printf(format, values...)
-	return &FuncReturn{
-		Type:  tokens.IntVariable,
-		Value: n,
-	}, err
+	return nil, nil
 }
 
-func getType(args []*Variable) (*FuncReturn, error) {
-	if len(args) != 1 {
-		return nil, fmt.Errorf("expected 1 argument, got %d", len(args))
-	}
+type LangBridge struct{}
 
-	return &FuncReturn{
-		Type:  tokens.StringVariable,
-		Value: args[0].Type.String(),
-	}, nil
+func (l LangBridge) Args() []string {
+	return []string{"value", "args"}
 }
 
-func read(args []*Variable) (*FuncReturn, error) {
-	if len(args) != 1 {
-		return nil, fmt.Errorf("expected 1 arguments, got %d", len(args))
+func (l LangBridge) Execute(args []lang.Object) (lang.Object, error) {
+	if args[0].Type() != lang.TString {
+		return nil, fmt.Errorf("expected string, got %v", args[0].Type())
 	}
 
-	if args[0].Type != tokens.StringVariable {
-		return nil, fmt.Errorf("expected string argument, got %v", args[0].Type)
+	if args[1].Type() != lang.TList {
+		return nil, fmt.Errorf("expected list, got %v", args[1].Type())
 	}
 
-	var value string
-	fmt.Print(args[0].Value)
-	_, err := fmt.Scan(&value)
-	return &FuncReturn{
-		Type:  tokens.StringVariable,
-		Value: value,
-	}, err
+	fmt.Println("calling", args[0].Value())
+	return nil, nil
+}
+
+type Type struct{}
+
+func (t Type) Args() []string {
+	return []string{"value"}
+}
+
+func (t Type) Execute(args []lang.Object) (lang.Object, error) {
+	return lang.NewString("type", string(args[0].Type()), nil), nil
 }

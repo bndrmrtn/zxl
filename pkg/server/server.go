@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/runtime"
+	"github.com/bndrmrtn/zexlang/internal/runtimev2"
 	"github.com/bndrmrtn/zexlang/internal/version"
 	"github.com/bndrmrtn/zexlang/pkg/language"
 	"github.com/fatih/color"
@@ -120,23 +120,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.executeNodes(nodes, w, r)
 }
 
-func (s *Server) executeNodes(nodes []*models.Node, w http.ResponseWriter, r *http.Request) {
+func (s *Server) executeNodes(nodes []*models.Node, w http.ResponseWriter, _ *http.Request) {
 	// Execute the nodes
-	run := runtime.New(runtime.EntryPoint)
-	httpModule := runtime.NewHttpModule(w, r)
-	htmlModule := runtime.NewHtmlModule(httpModule)
-
-	// Bind the web modules
-	run.BindModule("http", httpModule)
-	run.BindModule("html", htmlModule)
+	run := runtimev2.New()
 
 	// Execute the nodes
 	if _, err := run.Execute(nodes); err != nil {
 		s.handleError(err, w)
 		return
 	}
-
-	// Write the response
-	w.WriteHeader(httpModule.StatusCode)
-	w.Write(httpModule.Body.Bytes())
 }

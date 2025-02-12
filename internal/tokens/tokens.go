@@ -29,6 +29,8 @@ const (
 	Nil
 	Function
 	FuncArg
+	List
+	ListValue
 	Definiton
 
 	Addition TokenType = iota + 10000
@@ -201,6 +203,10 @@ func (t TokenType) String() string {
 		return "white space"
 	case For:
 		return "for"
+	case List:
+		return "list"
+	case ListValue:
+		return "list value"
 	default:
 		return "unkown"
 	}
