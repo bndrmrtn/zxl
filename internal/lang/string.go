@@ -1,6 +1,8 @@
 package lang
 
-import "github.com/bndrmrtn/zexlang/internal/models"
+import (
+	"github.com/bndrmrtn/zexlang/internal/models"
+)
 
 // String represents a string object
 type String struct {
@@ -19,10 +21,6 @@ func NewString(name, s string, debug *models.Debug) Object {
 
 func (s *String) Type() ObjType {
 	return TString
-}
-
-func (s *String) Name() string {
-	return s.name
 }
 
 func (s *String) Value() any {
@@ -45,6 +43,14 @@ func (s *String) Variables() []string {
 	return []string{"length"}
 }
 
-func (s *String) Debug() *models.Debug {
-	return s.debug
+func (s *String) SetVariable(_ string, _ Object) error {
+	return notImplemented
+}
+
+func (s *String) String() string {
+	return s.value
+}
+
+func (s *String) Copy() Object {
+	return NewString(s.name, s.value, s.debug)
 }

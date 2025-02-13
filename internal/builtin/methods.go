@@ -23,9 +23,9 @@ func (p *Print) Args() []string {
 
 func (p *Print) Execute(args []lang.Object) (lang.Object, error) {
 	if p.newLine {
-		fmt.Println(args[0].Value())
+		fmt.Println(args[0].String())
 	} else {
-		fmt.Print(args[0].Value())
+		fmt.Print(args[0].String())
 	}
 	return nil, nil
 }

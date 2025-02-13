@@ -1,6 +1,11 @@
 package lang
 
-import "github.com/bndrmrtn/zexlang/internal/models"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/bndrmrtn/zexlang/internal/models"
+)
 
 // List represents a list object
 type List struct {
@@ -44,5 +49,41 @@ func (l *List) Method(name string) Method {
 }
 
 func (l *List) Methods() []string {
-	return []string{"append", "len"}
+	return []string{"append"}
+}
+
+func (l *List) Variable(_ string) Object {
+	return nil
+}
+
+func (l *List) Variables() []string {
+	return []string{"length"}
+}
+
+func (l *List) SetVariable(_ string, _ Object) error {
+	return notImplemented
+}
+
+func (l *List) String() string {
+	sb := strings.Builder{}
+	defer sb.Reset()
+
+	for i, v := range l.value {
+		sb.WriteString(v.String())
+		if i < len(l.value)-1 {
+			sb.WriteString(", ")
+		}
+	}
+
+	return fmt.Sprintf("[%s]", sb.String())
+}
+
+func (l *List) Copy() Object {
+	var value []Object
+
+	for _, v := range l.value {
+		value = append(value, v.Copy())
+	}
+
+	return NewList(l.name, value, l.debug)
 }

@@ -13,7 +13,7 @@ import (
 func (e *Executer) createMethodFromNode(n *models.Node) (string, lang.Method, error) {
 	name := n.Content
 
-	argsLen := len(n.Children)
+	argsLen := len(n.Children) - 1
 	args := make([]string, argsLen, argsLen)
 
 	for i, arg := range n.Args {
@@ -47,16 +47,48 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 		obj = lang.NewString(name, s, n.Debug)
 	case tokens.IntVariable:
 		i, ok := n.Value.(int)
-		if !ok {
-			return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not a number", errs.ValueError), n.Debug)
+		if ok {
+			obj = lang.NewInteger(name, i, n.Debug)
+			break
 		}
-		obj = lang.NewInteger(name, i, n.Debug)
+
+		f, ok := n.Value.(float64)
+		if ok {
+			obj = lang.NewFloat(name, f, n.Debug)
+			break
+		}
+
+		return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not a number", errs.ValueError), n.Debug)
 	case tokens.ListVariable:
 		li, err := e.createListFromNode(n)
 		if err != nil {
 			return "", nil, errs.WithDebug(err, n.Debug)
 		}
 		obj = li
+	case tokens.InlineValue:
+		typ := e.getVariableTypeFromType(n)
+		n.VariableType = typ
+		return e.createObjectFromNode(n)
+	case tokens.ExpressionVariable:
+		expr, err := e.evaluateExpression(n)
+		if err != nil {
+			return "", nil, errs.WithDebug(err, n.Debug)
+		}
+		obj = expr
+	case tokens.ReferenceVariable:
+		ref, err := e.GetVariable(name)
+		if err != nil {
+			return "", nil, errs.WithDebug(err, n.Debug)
+		}
+		obj = ref
+	}
+
+	if n.ObjectAccessors != nil {
+		accessed, err := e.accessObject(obj, n.ObjectAccessors)
+		if err != nil {
+			return "", nil, errs.WithDebug(err, n.Debug)
+		}
+		obj = accessed
 	}
 
 	// if the object is a constant, make it immutable
@@ -92,6 +124,7 @@ func (e *Executer) callFunctionFromNode(n *models.Node) (lang.Object, error) {
 			if err != nil {
 				return nil, errs.WithDebug(err, child.Debug)
 			}
+			obj = obj.Copy()
 			obj.Rename(expectedArgNames[i])
 			args = append(args, obj)
 			continue
@@ -101,6 +134,7 @@ func (e *Executer) callFunctionFromNode(n *models.Node) (lang.Object, error) {
 		if err != nil {
 			return nil, errs.WithDebug(err, child.Debug)
 		}
+		obj = obj.Copy()
 		obj.Rename(expectedArgNames[i])
 		args = append(args, obj)
 	}
@@ -112,6 +146,7 @@ func (e *Executer) callFunctionFromNode(n *models.Node) (lang.Object, error) {
 	return r, nil
 }
 
+// assignObjectFromNode assigns an object from a node
 func (e *Executer) assignObjectFromNode(n *models.Node) error {
 	name := n.Content
 
@@ -139,4 +174,83 @@ func (e *Executer) createListFromNode(n *models.Node) (lang.Object, error) {
 	}
 
 	return lang.NewList(name, li, n.Debug), nil
+}
+
+// accessObject accesses an object
+func (e *Executer) accessObject(obj lang.Object, accessors []*models.Node) (lang.Object, error) {
+	if obj.Type() != lang.TList && obj.Type() != lang.TDefinition {
+		return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
+	}
+
+	var access []any
+
+	for _, accessor := range accessors {
+		if accessor.VariableType == tokens.ReferenceVariable {
+			obj, err := e.GetVariable(accessor.Content)
+			if err != nil {
+				return nil, errs.WithDebug(err, accessor.Debug)
+			}
+			access = append(access, obj.Value())
+		} else {
+			access = append(access, accessor.Value)
+		}
+	}
+
+	if obj.Type() == lang.TList {
+		li, ok := obj.Value().([]lang.Object)
+		if !ok {
+			return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
+		}
+
+		var value any = li
+		for _, a := range access {
+			i, ok := a.(int)
+			if !ok {
+				return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
+			}
+
+			v, ok := value.([]lang.Object)
+			if !ok {
+				return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
+			}
+
+			if i < 0 || i >= len(v) {
+				return nil, errs.WithDebug(fmt.Errorf("%w: %v, length: %d", errs.IndexOutOfRange, i, len(v)), accessors[0].Debug)
+			}
+
+			value = v[i]
+		}
+
+		if v, ok := value.(lang.Object); ok {
+			value = v.Value()
+		}
+
+		_, ob, err := e.createObjectFromNode(&models.Node{
+			VariableType: tokens.InlineValue,
+			Type:         e.getTypeFromValue(value),
+			Content:      obj.Name(),
+			Value:        value,
+			Debug:        obj.Debug(),
+		})
+		if err != nil {
+			return nil, errs.WithDebug(err, obj.Debug())
+		}
+
+		return ob, nil
+	}
+
+	return obj, nil
+}
+
+// createDefinitionFromNode creates a definition from a node
+func (e *Executer) createObjectFromDefinitionNode(n *models.Node) (string, lang.Object, error) {
+	name := n.Content
+
+	ex := NewExecuter(ExecuterScopeDefinition, e.runtime, e).WithName(e.name + ".[" + name + "]")
+	_, err := ex.Execute(n.Children)
+	if err != nil {
+		return "", nil, errs.WithDebug(err, n.Debug)
+	}
+
+	return name, lang.NewDefinition(name, name, n.Debug, ex), nil
 }

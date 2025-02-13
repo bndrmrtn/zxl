@@ -81,8 +81,14 @@ func (b *Builder) parseLetConst(ts []*models.Token, inx *int) (*models.Node, err
 		if err != nil {
 			return nil, err
 		}
-		node.VariableType = tokens.ExpressionVariable
-		node.Children = children
+
+		if len(children) == 1 && children[0].Type == tokens.List {
+			node.VariableType = tokens.ListVariable
+			node.Children = children[0].Children
+		} else {
+			node.Children = children
+			node.VariableType = tokens.ExpressionVariable
+		}
 	}
 
 	return node, nil
@@ -508,8 +514,14 @@ func (b *Builder) parseInlineValue(ts []*models.Token, inx *int) (*models.Node, 
 		if err != nil {
 			return nil, err
 		}
-		node.VariableType = tokens.ExpressionVariable
-		node.Children = children
+
+		if len(children) == 1 && children[0].Type == tokens.List {
+			node.VariableType = tokens.ListVariable
+			node.Children = children[0].Children
+		} else {
+			node.VariableType = tokens.ExpressionVariable
+			node.Children = children
+		}
 	}
 
 	return node, nil

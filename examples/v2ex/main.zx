@@ -1,7 +1,15 @@
-let hi = 5;
+define Helloer {
+  fn construct() {
+    println("Hello, World!");
+  }
 
-fn main(hi) {
-    println(hi);
+  fn sayHello() {
+    println("Hello, SAY!");
+  }
 }
 
-main(hi);
+let h = Helloer();
+
+h.sayHello();
+
+println(h);

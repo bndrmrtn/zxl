@@ -1,6 +1,8 @@
 package lang
 
 import (
+	"strconv"
+
 	"github.com/bndrmrtn/zexlang/internal/models"
 )
 
@@ -34,4 +36,24 @@ func (i *Integer) Method(name string) Method {
 
 func (i *Integer) Methods() []string {
 	return []string{"toString"}
+}
+
+func (i *Integer) Variable(_ string) Object {
+	return nil
+}
+
+func (i *Integer) Variables() []string {
+	return []string{"length"}
+}
+
+func (i *Integer) SetVariable(_ string, _ Object) error {
+	return notImplemented
+}
+
+func (i *Integer) String() string {
+	return strconv.Itoa(i.value)
+}
+
+func (i *Integer) Copy() Object {
+	return NewInteger(i.name, i.value, i.debug)
 }

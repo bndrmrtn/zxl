@@ -1,21 +1,51 @@
 package lang
 
-import "github.com/bndrmrtn/zexlang/internal/models"
+import (
+	"fmt"
+
+	"github.com/bndrmrtn/zexlang/internal/models"
+	"github.com/bndrmrtn/zexlang/internal/tokens"
+)
 
 // ObjType is the type of the object
 type ObjType string
 
 const (
-	TString     ObjType = "string"
-	TInt        ObjType = "int"
-	TFloat      ObjType = "float"
-	TBool       ObjType = "bool"
-	TList       ObjType = "list"
-	TNothing    ObjType = "nothing"
+	TString     ObjType = "<String>"
+	TInt        ObjType = "<Integer>"
+	TFloat      ObjType = "<Float>"
+	TBool       ObjType = "<Bool>"
+	TList       ObjType = "<List>"
+	TNothing    ObjType = ""
 	TNil        ObjType = "nil"
-	TDefinition ObjType = "definition"
-	TFunction   ObjType = "function"
+	TDefinition ObjType = "<Definition>"
+	TFunction   ObjType = "<function>"
 )
+
+var notImplemented = fmt.Errorf("not implemented")
+
+func (o ObjType) TokenType() tokens.TokenType {
+	switch o {
+	default:
+		return tokens.Unkown
+	case TString:
+		return tokens.String
+	case TInt, TFloat:
+		return tokens.Number
+	case TBool:
+		return tokens.Bool
+	case TList:
+		return tokens.List
+	case TDefinition:
+		return tokens.Define
+	case TFunction:
+		return tokens.Function
+	case TNil:
+		return tokens.Nil
+	case TNothing:
+		return tokens.EmptyReturn
+	}
+}
 
 // Object represents an object in the language
 type Object interface {
@@ -39,19 +69,20 @@ type Object interface {
 	Methods() []string
 
 	// Variable returns a variable by name
-	// Variable(name string) Object
+	Variable(name string) Object
 	// Variables returns the variable names of the object
-	// Variables() []string
-
-	// Get returns an underlying object by key
-	// Get(key string) (Object, bool)
-	// Set sets an underlying object by key
-	// Set(key string, value Object) bool
-	// GetUnderlying returns the underlying objects
-	// GetUnderlying() []string
+	Variables() []string
+	// SetVariable sets a variable by name
+	SetVariable(name string, object Object) error
 
 	// Debug returns the debug information of the object
 	Debug() *models.Debug
+
+	// String returns the string representation of the object
+	String() string
+
+	// Copy returns a copy of the object
+	Copy() Object
 }
 
 // Method represents a method in the language

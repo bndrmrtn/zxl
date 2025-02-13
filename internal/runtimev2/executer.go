@@ -8,7 +8,6 @@ import (
 	"github.com/bndrmrtn/zexlang/internal/errs"
 	"github.com/bndrmrtn/zexlang/internal/lang"
 	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/tokens"
 )
 
 // Executer represents a node executer in the runtime
@@ -61,44 +60,6 @@ func (e *Executer) BindObject(name string, object lang.Object) {
 	e.objects[name] = object
 }
 
-// GetMethod gets a method by name
-func (e *Executer) GetMethod(name string) (lang.Method, error) {
-	ex := e
-
-	ex.mu.RLock()
-	defer ex.mu.RUnlock()
-
-	if method, ok := e.functions[name]; ok {
-		return method, nil
-	}
-
-	if ex.parent != nil && (ex.scope == ExecuterScopeBlock || ex.scope == ExecuterScopeFunction || ex.scope == ExecuterScopeDefinition) {
-		return ex.parent.GetMethod(name)
-	}
-
-	if fn, ok := ex.runtime.functions[name]; ok {
-		return fn, nil
-	}
-
-	return nil, errs.WithDebug(fmt.Errorf("%w: '%s()'", errs.CannotAccessFunction, name), nil)
-}
-
-// GetVariable gets a variable by name
-func (e *Executer) GetVariable(name string) (lang.Object, error) {
-	e.mu.RLock()
-	defer e.mu.RUnlock()
-
-	if obj, ok := e.objects[name]; ok {
-		return obj, nil
-	}
-
-	if e.parent != nil && e.scope == ExecuterScopeBlock {
-		return e.parent.GetVariable(name)
-	}
-
-	return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessVariable, name), nil)
-}
-
 func (e *Executer) AssignVariable(name string, object lang.Object) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -112,6 +73,10 @@ func (e *Executer) AssignVariable(name string, object lang.Object) error {
 
 	if !e.objects[name].IsMutable() {
 		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotReassignConstant, name), nil)
+	}
+
+	if e.objects[name].Type() == lang.TDefinition {
+		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotReassignDefinition, name), nil)
 	}
 
 	e.objects[name] = object
@@ -132,47 +97,15 @@ func (e *Executer) Execute(nodes []*models.Node) (lang.Object, error) {
 	return nil, nil
 }
 
-// executeNode executes a node
-func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
-	switch node.Type {
-	case tokens.Use:
-		using := node.Content
-		as := node.Value.(string)
-		if _, ok := e.usedNamespaces[as]; ok {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s' as '%s'", errs.CannotReUseNamespace, using, as), node.Debug)
-		}
-		e.usedNamespaces[as] = using
-	case tokens.Function:
-		name, method, err := e.createMethodFromNode(node)
-		if err != nil {
-			return nil, err
-		}
-		if _, ok := e.functions[name]; ok {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s(...)'", errs.CannotRedecareFunction, name), node.Debug)
-		}
-
-		e.mu.Lock()
-		e.functions[name] = method
-		e.mu.Unlock()
-	case tokens.Let, tokens.Const:
-		name, object, err := e.createObjectFromNode(node)
-		if err != nil {
-			return nil, err
-		}
-		if _, ok := e.objects[name]; ok {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotRedeclareVariable, name), node.Debug)
-		}
-		e.mu.Lock()
-		e.objects[name] = object
-		e.mu.Unlock()
-	case tokens.FuncCall:
-		_, err := e.callFunctionFromNode(node)
-		if err != nil {
-			return nil, errs.WithDebug(err, node.Debug)
-		}
-	case tokens.Assign:
-		err := e.assignObjectFromNode(node)
-		return nil, errs.WithDebug(err, node.Debug)
+func (e *Executer) Copy() lang.Executer {
+	return &Executer{
+		name:           e.name,
+		scope:          e.scope,
+		runtime:        e.runtime,
+		parent:         e.parent,
+		functions:      e.functions,
+		objects:        e.objects,
+		mu:             sync.RWMutex{},
+		usedNamespaces: e.usedNamespaces,
 	}
-	return nil, nil
 }
