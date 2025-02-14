@@ -35,7 +35,7 @@ func (lx *Lexer) Parse(r io.Reader) ([]*models.Token, error) {
 // parse reads the content of the string and returns the tokens
 func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 	// Fix Carriage Return error on Windows PCs
-	s = strings.ReplaceAll(s, "\r", "\n")
+	s = strings.ReplaceAll(s, "\r", "")
 	var (
 		pos     int
 		line    int = 1
