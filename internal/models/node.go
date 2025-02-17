@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zexlang/internal/tokens"
+	"github.com/bndrmrtn/zxl/internal/tokens"
 )
 
 // Node represents a node in the AST

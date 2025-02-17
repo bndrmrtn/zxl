@@ -8,7 +8,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/bndrmrtn/zexlang/internal/version"
+	"github.com/bndrmrtn/zxl/internal/version"
 )
 
 //go:embed assets/*

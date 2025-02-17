@@ -5,9 +5,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/bndrmrtn/zexlang/internal/errs"
-	"github.com/bndrmrtn/zexlang/internal/lang"
-	"github.com/bndrmrtn/zexlang/internal/models"
+	"github.com/bndrmrtn/zxl/internal/errs"
+	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/internal/models"
 )
 
 // Executer represents a node executer in the runtime
@@ -60,22 +60,45 @@ func (e *Executer) BindObject(name string, object lang.Object) {
 	e.objects[name] = object
 }
 
+// BindMethod binds a method to the executer
+func (e *Executer) BindMethod(name string, fn lang.Method) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	e.functions[name] = fn
+}
+
 func (e *Executer) AssignVariable(name string, object lang.Object) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
-	if _, ok := e.objects[name]; !ok {
+	if strings.Contains(name, ".") {
+		names := strings.Split(name, ".")
+		first := names[0]
+		middle := names[1 : len(names)-1]
+		last := names[len(names)-1]
+
+		if first == "this" {
+			if e.parent != nil && e.parent.scope == ExecuterScopeDefinition {
+				return e.parent.AssignVariable(strings.Join(append(middle, last), "."), object)
+			}
+			return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.ThisNotInMethod, name), nil)
+		}
+	}
+
+	obj, ok := e.objects[name]
+	if !ok {
 		if e.parent != nil && e.scope == ExecuterScopeBlock {
 			return e.parent.AssignVariable(name, object)
 		}
 		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.VariableNotDeclared, name), nil)
 	}
 
-	if !e.objects[name].IsMutable() {
+	if !obj.IsMutable() {
 		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotReassignConstant, name), nil)
 	}
 
-	if e.objects[name].Type() == lang.TDefinition {
+	if obj.Type() == lang.TDefinition {
 		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotReassignDefinition, name), nil)
 	}
 
@@ -90,9 +113,7 @@ func (e *Executer) Execute(nodes []*models.Node) (lang.Object, error) {
 		if err != nil {
 			return nil, err
 		}
-		if ret == lang.NilObject {
-			return nil, nil
-		}
+
 		if ret != nil {
 			return ret, nil
 		}
@@ -101,6 +122,7 @@ func (e *Executer) Execute(nodes []*models.Node) (lang.Object, error) {
 	return nil, nil
 }
 
+// Copy creates a copy of the executer
 func (e *Executer) Copy() lang.Executer {
 	return &Executer{
 		name:           e.name,
@@ -112,4 +134,32 @@ func (e *Executer) Copy() lang.Executer {
 		mu:             sync.RWMutex{},
 		usedNamespaces: e.usedNamespaces,
 	}
+}
+
+func (e *Executer) GetNamespaceExecuter(namespace string) (*Executer, error) {
+	nses := e.getUsedNamespaces()
+	if nses == nil {
+		return nil, errs.WithDebug(errs.CannotAccessNamespace, nil)
+	}
+
+	ns, ok := nses[namespace]
+	if !ok {
+		return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessNamespace, namespace), nil)
+	}
+
+	exec, err := e.runtime.GetNamespaceExecuter(ns)
+	if err != nil {
+		return nil, errs.WithDebug(fmt.Errorf("%w: %w", errs.CannotAccessNamespace, err), nil)
+	}
+
+	return exec, nil
+}
+
+func (e *Executer) getUsedNamespaces() map[string]string {
+	ns := e.usedNamespaces
+	if ns != nil {
+		return ns
+	}
+
+	return e.parent.getUsedNamespaces()
 }

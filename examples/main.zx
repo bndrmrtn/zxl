@@ -1,8 +1,0 @@
-fn doSmth(x) {
-    println(x);
-}
-
-let world = "World!";
-let complex = "Hello, " + world;
-
-doSmth(complex);

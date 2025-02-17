@@ -8,12 +8,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bndrmrtn/zexlang/internal/ast"
-	"github.com/bndrmrtn/zexlang/internal/cache"
-	"github.com/bndrmrtn/zexlang/internal/lang"
-	"github.com/bndrmrtn/zexlang/internal/lexer"
-	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/runtimev2"
+	"github.com/bndrmrtn/zxl/internal/ast"
+	"github.com/bndrmrtn/zxl/internal/cache"
+	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/internal/lexer"
+	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/runtimev2"
 	"gopkg.in/yaml.v3"
 )
 

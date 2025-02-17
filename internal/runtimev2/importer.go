@@ -6,12 +6,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bndrmrtn/zexlang/internal/ast"
-	"github.com/bndrmrtn/zexlang/internal/cache"
-	"github.com/bndrmrtn/zexlang/internal/errs"
-	"github.com/bndrmrtn/zexlang/internal/lang"
-	"github.com/bndrmrtn/zexlang/internal/lexer"
-	"github.com/bndrmrtn/zexlang/internal/models"
+	"github.com/bndrmrtn/zxl/internal/ast"
+	"github.com/bndrmrtn/zxl/internal/cache"
+	"github.com/bndrmrtn/zxl/internal/errs"
+	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/internal/lexer"
+	"github.com/bndrmrtn/zxl/internal/models"
 )
 
 func (r *Runtime) importer(filename string, dg *models.Debug) (lang.Object, error) {

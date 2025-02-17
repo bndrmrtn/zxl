@@ -4,8 +4,8 @@ import (
 	"html"
 	"strings"
 
-	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/tokens"
+	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/tokens"
 )
 
 // PrettyCode is a struct that holds the tokens of the code

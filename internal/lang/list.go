@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bndrmrtn/zexlang/internal/models"
+	"github.com/bndrmrtn/zxl/internal/models"
 )
 
 // List represents a list object
 type List struct {
 	Base
 
-	value []Object
+	value  []Object
+	length int
 }
 
 func GetListValue(l Object) []Object {
@@ -28,7 +29,8 @@ func NewList(name string, li []Object, debug *models.Debug) Object {
 			name:  name,
 			debug: debug,
 		},
-		value: li,
+		value:  li,
+		length: -1,
 	}
 }
 
@@ -45,19 +47,40 @@ func (l *List) Value() any {
 }
 
 func (l *List) Method(name string) Method {
-	return nil
+	switch {
+	default:
+		return nil
+	case name == "append":
+		return NewFunction([]string{"item"}, func(args []Object) (Object, error) {
+			if len(l.value) == -1 {
+				l.length = len(l.value)
+			}
+			l.value = append(l.value, args[0])
+			return nil, nil
+		}, l.debug)
+	}
 }
 
 func (l *List) Methods() []string {
 	return []string{"append"}
 }
 
-func (l *List) Variable(_ string) Object {
-	return nil
+func (l *List) Variable(variable string) Object {
+	switch variable {
+	default:
+		return nil
+	case "length":
+		if l.length == -1 {
+			l.length = len(l.value)
+		}
+		return NewInteger("length", l.length, l.debug)
+	case "$addr":
+		return addr(l)
+	}
 }
 
 func (l *List) Variables() []string {
-	return []string{"length"}
+	return []string{"length", "$addr"}
 }
 
 func (l *List) SetVariable(_ string, _ Object) error {

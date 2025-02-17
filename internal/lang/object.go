@@ -3,8 +3,8 @@ package lang
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/tokens"
+	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/tokens"
 )
 
 // ObjType is the type of the object
@@ -91,4 +91,14 @@ type Method interface {
 	Args() []string
 	// Execute executes the method with the given arguments
 	Execute(args []Object) (Object, error)
+}
+
+// Module represents a module in the language
+type Module interface {
+	// Namespace returns the namespace of the module
+	Namespace() string
+	// Objects returns the objects of the module
+	Objects() map[string]Object
+	// Methods returns the methods of the module
+	Methods() map[string]Method
 }

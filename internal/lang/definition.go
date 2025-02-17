@@ -2,8 +2,9 @@ package lang
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/bndrmrtn/zexlang/internal/models"
+	"github.com/bndrmrtn/zxl/internal/models"
 )
 
 // Executer represents a node executer in the runtime
@@ -24,7 +25,7 @@ type Definition struct {
 
 func NewDefinition(defName, name string, debug *models.Debug, ex Executer) Object {
 	return &Definition{
-		defName: defName,
+		defName: strings.TrimLeft(defName, "."),
 		Base:    NewBase(name, debug),
 		Ex:      ex,
 	}
@@ -44,7 +45,14 @@ func (d *Definition) Value() any {
 
 func (d *Definition) Method(name string) Method {
 	if name == "$init" {
-		return NewFunction([]string{}, func(args []Object) (Object, error) {
+		construct, err := d.Ex.GetMethod("construct")
+		if err != nil {
+			return NewFunction(nil, func(args []Object) (Object, error) {
+				return d.Copy(), nil
+			}, d.debug)
+		}
+
+		return NewFunction(construct.Args(), func(args []Object) (Object, error) {
 			obj := d.Copy().(*Definition)
 
 			construct, err := d.Ex.GetMethod("construct")
@@ -67,7 +75,7 @@ func (d *Definition) Methods() []string {
 
 func (d *Definition) Variable(variable string) Object {
 	if variable == "$addr" {
-		return NewString("addr", fmt.Sprintf("%p", d), d.debug)
+		return addr(d)
 	}
 
 	obj, _ := d.Ex.GetVariable(variable)

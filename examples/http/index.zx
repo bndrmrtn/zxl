@@ -1,0 +1,32 @@
+use http;
+
+http.html();
+
+let users = [
+    ["Martin", 19],
+    ["Johanna", 19],
+];
+
+
+http.write("<h1>Users</h1>");
+http.write("<table>");
+http.write("<tr>");
+
+let i = 0;
+while i < users.length {
+
+    http.write("<tr>");
+    http.write("<td>");
+    http.write(users[i][0]);
+    http.write("</td>");
+    http.write("<td>");
+    http.write(users[i][1]);
+    http.write("</td>");
+    http.write("</tr>");
+
+
+    i = i + 1;
+}
+
+http.write("</tr>");
+http.write("</table>");

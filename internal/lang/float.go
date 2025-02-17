@@ -3,7 +3,7 @@ package lang
 import (
 	"strconv"
 
-	"github.com/bndrmrtn/zexlang/internal/models"
+	"github.com/bndrmrtn/zxl/internal/models"
 )
 
 // Float represents a float object
@@ -40,12 +40,17 @@ func (f *Float) Methods() []string {
 	return []string{"toString"}
 }
 
-func (f *Float) Variable(_ string) Object {
-	return nil
+func (f *Float) Variable(name string) Object {
+	switch name {
+	default:
+		return nil
+	case "$addr":
+		return addr(f)
+	}
 }
 
 func (f *Float) Variables() []string {
-	return []string{"length"}
+	return []string{"$addr"}
 }
 
 func (f *Float) SetVariable(_ string, _ Object) error {

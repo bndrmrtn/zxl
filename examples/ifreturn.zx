@@ -1,8 +1,0 @@
-let x = true;
-
-if x {
-    println("True");
-    return;
-}
-
-println("False");

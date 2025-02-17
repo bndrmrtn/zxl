@@ -1,9 +1,0 @@
-namespace server;
-use http;
-import("config/config.zx");
-
-config.default();
-
-http.write(<zex>
-    Hello, World!
-</zex>);

@@ -1,0 +1,11 @@
+fn sayHello(name) {
+	println("Hello, " + name + "!");
+}
+
+sayHello("Martin");
+
+fn getMessage() {
+	return "Hello, World!";
+}
+
+println(getMessage());

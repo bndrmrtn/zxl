@@ -9,8 +9,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime/debug"
 
-	"github.com/bndrmrtn/zexlang/cmd"
+	"github.com/bndrmrtn/zxl/cmd"
 	"github.com/fatih/color"
 )
 
@@ -28,6 +29,6 @@ func main() {
 func fatal() {
 	if r := recover(); r != nil {
 		f := color.New(color.FgRed, color.Bold).SprintFunc()
-		fmt.Printf("%s: %v\n", f("Fatal error"), r)
+		fmt.Printf("%s: %v\nStack trace: %s\n", f("Fatal error"), r, debug.Stack())
 	}
 }

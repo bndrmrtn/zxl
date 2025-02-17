@@ -1,6 +1,6 @@
 package lang
 
-import "github.com/bndrmrtn/zexlang/internal/models"
+import "github.com/bndrmrtn/zxl/internal/models"
 
 // Base is the base object
 type Base struct {

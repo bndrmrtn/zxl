@@ -3,10 +3,11 @@ package runtimev2
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zexlang/internal/builtin"
-	"github.com/bndrmrtn/zexlang/internal/lang"
-	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/tokens"
+	"github.com/bndrmrtn/zxl/internal/builtin"
+	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/modules"
+	"github.com/bndrmrtn/zxl/internal/tokens"
 )
 
 // RuntimeMode is the runtime mode
@@ -23,6 +24,7 @@ func New() *Runtime {
 		executers: make(map[string]*Executer),
 	}
 	r.functions = builtin.GetMethods(r.importer)
+	r.BindModule(modules.NewRandModule())
 	return r
 }
 
@@ -58,4 +60,23 @@ func (r *Runtime) GetNamespaceExecuter(namespace string) (*Executer, error) {
 		return nil, fmt.Errorf("namespace %v not found", namespace)
 	}
 	return ex, nil
+}
+
+// BindModule binds the given package to the given name
+func (r *Runtime) BindModule(module lang.Module) {
+	namespace := module.Namespace()
+
+	ex, ok := r.executers[namespace]
+	if !ok {
+		ex = NewExecuter(ExecuterScopeGlobal, r, nil).WithName(namespace)
+		r.executers[namespace] = ex
+	}
+
+	for name, object := range module.Objects() {
+		ex.BindObject(name, object)
+	}
+
+	for name, method := range module.Methods() {
+		ex.BindMethod(name, method)
+	}
 }

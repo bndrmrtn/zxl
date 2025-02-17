@@ -1,9 +1,0 @@
-namespace main;
-
-// works with namespace "ok"
-import("fn.zx");
-
-// so we can call the function from the imported namespace
-ok.block.myOkFn();
-
-println(ok.block.myVar); // prints: Hi

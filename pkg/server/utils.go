@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bndrmrtn/zexlang/internal/errs"
-	"github.com/bndrmrtn/zexlang/internal/lexer"
-	"github.com/bndrmrtn/zexlang/pkg/prettycode"
+	"github.com/bndrmrtn/zxl/internal/errs"
+	"github.com/bndrmrtn/zxl/internal/lexer"
+	"github.com/bndrmrtn/zxl/pkg/prettycode"
 )
 
 // getExecutablePath gets the executable path

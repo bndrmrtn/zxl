@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/bndrmrtn/zexlang/pkg/language"
-	"github.com/bndrmrtn/zexlang/pkg/server"
+	"github.com/bndrmrtn/zxl/pkg/language"
+	"github.com/bndrmrtn/zxl/pkg/server"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -14,7 +14,7 @@ import (
 var serveCmd = &cobra.Command{
 	Use:     "serve folder",
 	Aliases: []string{"server"},
-	Short:   "Start an HTTP server to serve Zex (.zx) files from a directory",
+	Short:   "Start an HTTP server to serve Zx (.zx) files from a directory",
 	Run:     execServe,
 }
 

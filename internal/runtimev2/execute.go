@@ -3,10 +3,10 @@ package runtimev2
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zexlang/internal/errs"
-	"github.com/bndrmrtn/zexlang/internal/lang"
-	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/tokens"
+	"github.com/bndrmrtn/zxl/internal/errs"
+	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/tokens"
 )
 
 // executeNode executes a node
@@ -49,7 +49,9 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 		}
 	case tokens.Assign:
 		err := e.assignObjectFromNode(node)
-		return nil, errs.WithDebug(err, node.Debug)
+		if err != nil {
+			return nil, errs.WithDebug(err, node.Debug)
+		}
 	case tokens.Define:
 		name, object, err := e.createObjectFromDefinitionNode(node)
 		if err != nil {
@@ -61,10 +63,12 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 		e.mu.Lock()
 		e.objects[name] = object
 		e.mu.Unlock()
-	case tokens.EmptyReturn:
-		return lang.NilObject, nil
-	case tokens.Return:
+	case tokens.Return, tokens.EmptyReturn:
 		return e.handleReturn(node)
+	case tokens.If:
+		return e.handleIf(node)
+	case tokens.While:
+		return e.handleWhile(node)
 	}
 	return nil, nil
 }

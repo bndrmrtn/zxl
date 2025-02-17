@@ -3,9 +3,9 @@ package ast
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zexlang/internal/errs"
-	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/tokens"
+	"github.com/bndrmrtn/zxl/internal/errs"
+	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/tokens"
 )
 
 func (b *Builder) parseLetConst(ts []*models.Token, inx *int) (*models.Node, error) {
@@ -1153,4 +1153,76 @@ func (b *Builder) parseObjectAccess(ts []*models.Token, inx *int, node *models.N
 	}
 
 	return node, nil
+}
+
+func (b *Builder) parseParenthesis(ts []*models.Token, inx *int) (*models.Node, error) {
+	token := ts[*inx]
+	*inx++
+
+	if *inx >= len(ts) {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got 'EOF'", errs.SyntaxError), token.Debug)
+	}
+
+	var (
+		children   []*models.Token
+		parenCount = 1
+	)
+
+	for {
+		if *inx >= len(ts) {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected ')', but got 'EOF'", errs.SyntaxError), ts[*inx-1].Debug)
+		}
+
+		if ts[*inx].Type == tokens.RightParenthesis {
+			parenCount--
+			if parenCount == 0 {
+				break
+			}
+		}
+
+		if ts[*inx].Type == tokens.LeftParenthesis {
+			parenCount++
+		}
+
+		if ts[*inx].Type == tokens.Comma && parenCount == 1 {
+			*inx++
+			break
+		}
+
+		children = append(children, ts[*inx])
+		*inx++
+	}
+
+	if *inx >= len(ts) {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected ')', but got 'EOF'", errs.SyntaxError), token.Debug)
+	}
+
+	if ts[*inx].Type != tokens.RightParenthesis {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected ')', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	}
+
+	*inx++
+
+	if *inx >= len(ts) {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got 'EOF'", errs.SyntaxError), token.Debug)
+	}
+
+	children = append(children, SemiColonToken)
+
+	nodes, err := b.Build(children)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(nodes) == 1 && nodes[0].Type != tokens.FuncCall {
+		return nodes[0], nil
+	}
+
+	return &models.Node{
+		Type:         tokens.LeftParenthesis,
+		VariableType: tokens.ExpressionVariable,
+		Content:      "expression",
+		Children:     nodes,
+		Debug:        token.Debug,
+	}, nil
 }

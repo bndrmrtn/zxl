@@ -1,0 +1,4 @@
+use rand;
+
+let b = rand.bool();
+println(b);

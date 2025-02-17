@@ -1,5 +1,0 @@
-define User {}
-
-let x = User();
-
-println(type(x));

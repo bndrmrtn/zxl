@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bndrmrtn/zexlang/internal/errs"
-	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/tokens"
+	"github.com/bndrmrtn/zxl/internal/errs"
+	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/tokens"
 )
 
 // Builder is the AST builder
@@ -94,6 +94,8 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 		return b.parseWhile(ts, inx)
 	case tokens.LeftBracket:
 		return b.parseList(ts, inx)
+	case tokens.LeftParenthesis:
+		return b.parseParenthesis(ts, inx)
 	case tokens.Semicolon:
 		*inx++
 		return nil, nil

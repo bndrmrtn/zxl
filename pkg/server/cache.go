@@ -3,7 +3,7 @@ package server
 import (
 	"time"
 
-	"github.com/bndrmrtn/zexlang/internal/models"
+	"github.com/bndrmrtn/zxl/internal/models"
 )
 
 // CacheDuration is the duration of the cache

@@ -3,8 +3,8 @@ package builtin
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zexlang/internal/lang"
-	"github.com/bndrmrtn/zexlang/internal/models"
+	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/internal/models"
 )
 
 type ImportFunc func(file string, d *models.Debug) (lang.Object, error)

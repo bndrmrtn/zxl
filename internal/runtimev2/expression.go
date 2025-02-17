@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/Knetic/govaluate"
-	"github.com/bndrmrtn/zexlang/internal/errs"
-	"github.com/bndrmrtn/zexlang/internal/lang"
-	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/tokens"
+	"github.com/bndrmrtn/zxl/internal/errs"
+	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/tokens"
 )
 
 // evaluateExpression evaluates an expression node
@@ -71,11 +71,25 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 		}
 
 		if variableType == tokens.InlineValue {
-			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(node.Content)))
+			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(fmt.Sprint(node.Value))))
 			sum = sum[:10]
 
 			expressionList = append(expressionList, sum)
 			args[sum] = node.Value
+			continue
+		}
+
+		if variableType == tokens.ExpressionVariable {
+			obj, err := e.evaluateExpression(node)
+			if err != nil {
+				return nil, errs.WithDebug(err, n.Debug)
+			}
+
+			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(fmt.Sprint(node.Value))))
+			sum = sum[:10]
+
+			expressionList = append(expressionList, sum)
+			args[sum] = obj.Value()
 			continue
 		}
 	}

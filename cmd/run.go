@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/bndrmrtn/zexlang/pkg/language"
+	"github.com/bndrmrtn/zxl/pkg/language"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -12,7 +12,7 @@ import (
 var runCmd = &cobra.Command{
 	Use:     "run file.zx",
 	Aliases: []string{"r", "exec"},
-	Short:   "Interpret and execute Zex (.zx) files",
+	Short:   "Interpret and execute Zx (.zx) files",
 	Run:     execRun,
 }
 

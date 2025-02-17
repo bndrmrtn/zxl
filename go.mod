@@ -1,4 +1,4 @@
-module github.com/bndrmrtn/zexlang
+module github.com/bndrmrtn/zxl
 
 go 1.23.4
 

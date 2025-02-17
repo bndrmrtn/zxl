@@ -3,21 +3,21 @@ package runtimev2
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zexlang/internal/errs"
-	"github.com/bndrmrtn/zexlang/internal/lang"
-	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/tokens"
+	"github.com/bndrmrtn/zxl/internal/errs"
+	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/tokens"
 )
 
 // createMethodFromNode creates a method from a node
 func (e *Executer) createMethodFromNode(n *models.Node) (string, lang.Method, error) {
 	name := n.Content
 
-	argsLen := len(n.Children) - 1
+	argsLen := len(n.Args)
 	var args []string
 
 	if argsLen > 0 {
-		args = make([]string, 0, argsLen)
+		args = make([]string, argsLen)
 	}
 
 	for i, arg := range n.Args {
@@ -43,6 +43,8 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 	var obj lang.Object
 
 	switch n.VariableType {
+	default:
+		return "", nil, fmt.Errorf("unknown variable type: '%s'", n.VariableType)
 	case tokens.StringVariable:
 		s, ok := n.Value.(string)
 		if !ok {
@@ -51,18 +53,16 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 		obj = lang.NewString(name, s, n.Debug)
 	case tokens.IntVariable:
 		i, ok := n.Value.(int)
-		if ok {
-			obj = lang.NewInteger(name, i, n.Debug)
-			break
+		if !ok {
+			return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not an integer", errs.ValueError), n.Debug)
 		}
-
+		obj = lang.NewInteger(name, i, n.Debug)
+	case tokens.FloatVariable:
 		f, ok := n.Value.(float64)
-		if ok {
-			obj = lang.NewFloat(name, f, n.Debug)
-			break
+		if !ok {
+			return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not a float", errs.ValueError), n.Debug)
 		}
-
-		return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not a number", errs.ValueError), n.Debug)
+		obj = lang.NewFloat(name, f, n.Debug)
 	case tokens.ListVariable:
 		li, err := e.createListFromNode(n)
 		if err != nil {
@@ -80,11 +80,25 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 		}
 		obj = expr
 	case tokens.ReferenceVariable:
-		ref, err := e.GetVariable(name)
+		// ERR: Maybe this should be a reference to a variable, not a reference to a value
+		refName := n.Content
+		if refVal, ok := n.Value.(string); ok {
+			refName = refVal
+		}
+
+		ref, err := e.GetVariable(refName)
 		if err != nil {
 			return "", nil, errs.WithDebug(err, n.Debug)
 		}
 		obj = ref
+	case tokens.BoolVariable:
+		b, ok := n.Value.(bool)
+		if !ok {
+			return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not boolean", errs.ValueError), n.Debug)
+		}
+		obj = lang.NewBool(name, b, n.Debug)
+	case tokens.NilVariable:
+		obj = lang.NewNil(name, n.Debug)
 	}
 
 	if n.ObjectAccessors != nil {
@@ -128,8 +142,10 @@ func (e *Executer) callFunctionFromNode(n *models.Node) (lang.Object, error) {
 			if err != nil {
 				return nil, errs.WithDebug(err, child.Debug)
 			}
-			obj = obj.Copy()
-			obj.Rename(expectedArgNames[i])
+			if obj.Type() != lang.TNil {
+				obj = obj.Copy()
+				obj.Rename(expectedArgNames[i])
+			}
 			args = append(args, obj)
 			continue
 		}
@@ -210,7 +226,17 @@ func (e *Executer) accessObject(obj lang.Object, accessors []*models.Node) (lang
 		for _, a := range access {
 			i, ok := a.(int)
 			if !ok {
-				return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
+				fmt.Println("a", a)
+				s, ok := a.(string)
+				if !ok {
+					return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
+				}
+
+				ob, err := e.GetVariable(s)
+				if err != nil || ob.Type() != lang.TInt {
+					return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
+				}
+				i = ob.Value().(int)
 			}
 
 			v, ok := value.([]lang.Object)
@@ -256,5 +282,5 @@ func (e *Executer) createObjectFromDefinitionNode(n *models.Node) (string, lang.
 		return "", nil, errs.WithDebug(err, n.Debug)
 	}
 
-	return name, lang.NewDefinition(e.name+"."+name+"{}", name, n.Debug, ex), nil
+	return name, lang.NewDefinition(e.name+"."+name, name, n.Debug, ex), nil
 }

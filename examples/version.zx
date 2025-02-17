@@ -1,5 +1,0 @@
-use zex as z;
-
-println(z.Version);
-
-z.Version = "v0.3.0";

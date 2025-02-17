@@ -1,9 +1,0 @@
-let x = 5 * 5 + 2;
-
-if x == 25 {
-    println("x is 25");
-} else if x == 26 {
-    println("x is not 25");
-} else {
-    println("x is not 25 or 26");
-}

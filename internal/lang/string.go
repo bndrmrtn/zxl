@@ -1,21 +1,23 @@
 package lang
 
 import (
-	"github.com/bndrmrtn/zexlang/internal/models"
+	"github.com/bndrmrtn/zxl/internal/models"
 )
 
 // String represents a string object
 type String struct {
 	Base
 
-	value string
+	value  string
+	length int
 }
 
 // NewString creates a new string object
 func NewString(name, s string, debug *models.Debug) Object {
 	return &String{
-		Base:  NewBase(name, debug),
-		value: s,
+		Base:   NewBase(name, debug),
+		value:  s,
+		length: -1,
 	}
 }
 
@@ -35,12 +37,22 @@ func (s *String) Methods() []string {
 	return []string{"split"}
 }
 
-func (s *String) Variable(_ string) Object {
-	return nil
+func (s *String) Variable(variable string) Object {
+	switch variable {
+	default:
+		return nil
+	case "length":
+		if s.length == -1 {
+			s.length = len(s.value)
+		}
+		return NewInteger("length", s.length, s.debug)
+	case "$addr":
+		return addr(s)
+	}
 }
 
 func (s *String) Variables() []string {
-	return []string{"length"}
+	return []string{"length", "$addr"}
 }
 
 func (s *String) SetVariable(_ string, _ Object) error {

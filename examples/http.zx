@@ -1,3 +1,0 @@
-use http;
-
-http.write("Hello");

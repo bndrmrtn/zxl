@@ -1,4 +1,4 @@
-# Zex (/ziː.ɛks/) Language
+# Zx (/ziː.ɛks/) Language
 
 Zex is a simple programming language
 that is designed to be easy to use and understand.
@@ -19,7 +19,7 @@ Zex is built in Go as a learning project and is not intended to be used in produ
 To install Zex, you need to have Go installed on your system.
 
 ```bash
-go install github.com/bndrmrtn/zexlang@latest
+go install github.com/bndrmrtn/zxl@latest
 ```
 
 ## Usage
@@ -41,7 +41,7 @@ zexlang run <file> --cache --debug
 #### Basic Hello World program:
 
 ```zex
-println("Hello, World!")
+println("Hello, World!");
 ```
 
 #### Define a variable and print it:

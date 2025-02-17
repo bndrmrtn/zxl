@@ -1,9 +1,0 @@
-namespace xy;
-
-define x {
-
-}
-
-let z = x();
-
-println(ref(z));

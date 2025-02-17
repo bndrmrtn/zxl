@@ -1,7 +1,0 @@
-fn greet(name) {
-    return "Hello, " + name + "!";
-}
-
-let name = read("Name: ");
-let x = greet(name);
-println(x);

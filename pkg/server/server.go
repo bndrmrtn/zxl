@@ -8,10 +8,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bndrmrtn/zexlang/internal/models"
-	"github.com/bndrmrtn/zexlang/internal/runtimev2"
-	"github.com/bndrmrtn/zexlang/internal/version"
-	"github.com/bndrmrtn/zexlang/pkg/language"
+	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/modules"
+	"github.com/bndrmrtn/zxl/internal/runtimev2"
+	"github.com/bndrmrtn/zxl/internal/version"
+	"github.com/bndrmrtn/zxl/pkg/language"
 	"github.com/fatih/color"
 )
 
@@ -120,13 +121,20 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.executeNodes(nodes, w, r)
 }
 
-func (s *Server) executeNodes(nodes []*models.Node, w http.ResponseWriter, _ *http.Request) {
+func (s *Server) executeNodes(nodes []*models.Node, w http.ResponseWriter, r *http.Request) {
 	// Execute the nodes
 	run := runtimev2.New()
+
+	httpModule := modules.NewHttpModule(w, r)
+	run.BindModule(httpModule)
 
 	// Execute the nodes
 	if _, err := run.Execute(nodes); err != nil {
 		s.handleError(err, w)
 		return
 	}
+
+	// Write the response
+	w.WriteHeader(httpModule.Code)
+	w.Write(httpModule.Body.Bytes())
 }

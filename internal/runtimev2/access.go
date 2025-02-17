@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bndrmrtn/zexlang/internal/errs"
-	"github.com/bndrmrtn/zexlang/internal/lang"
+	"github.com/bndrmrtn/zxl/internal/errs"
+	"github.com/bndrmrtn/zxl/internal/lang"
 )
 
 // GetMethod gets a method by name
@@ -19,14 +19,25 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 		middle := names[1 : len(names)-1]
 		last := names[len(names)-1]
 
-		exec, err := e.runtime.GetNamespaceExecuter(first)
+		if first == "this" {
+			if e.parent != nil && e.parent.scope == ExecuterScopeDefinition {
+				return e.parent.GetMethod(strings.Join(append(middle, last), "."))
+			}
+			return nil, errs.WithDebug(fmt.Errorf("%w: '%s()'", errs.ThisNotInMethod, name), nil)
+		}
+
+		exec, err := e.GetNamespaceExecuter(first)
 		if err == nil {
-			return e.accessNamespace(exec, name, middle, last)
+			ob, err := e.accessNamespace(exec, name, middle, last)
+			if ob != nil || err != nil {
+				return ob, err
+			}
 		}
 
 		if obj, err := e.GetVariable(first); err == nil {
-			if obj.Type() == lang.TDefinition {
-				return e.accessDefinition(obj, name, middle, last)
+			ob, err := e.accessDefinition(obj, name, middle, last)
+			if ob != nil || err != nil {
+				return ob, err
 			}
 		}
 	}
@@ -63,14 +74,25 @@ func (e *Executer) GetVariable(name string) (lang.Object, error) {
 		middle := names[1 : len(names)-1]
 		last := names[len(names)-1]
 
+		if first == "this" {
+			if e.parent != nil && e.parent.scope == ExecuterScopeDefinition {
+				return e.parent.GetVariable(strings.Join(append(middle, last), "."))
+			}
+			return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.ThisNotInMethod, name), nil)
+		}
+
 		exec, err := e.runtime.GetNamespaceExecuter(first)
 		if err == nil {
-			return e.accessObjNamespace(exec, name, middle, last)
+			ob, err := e.accessObjNamespace(exec, name, middle, last)
+			if ob != nil || err != nil {
+				return ob, err
+			}
 		}
 
 		if obj, err := e.GetVariable(first); err == nil {
-			if obj.Type() == lang.TDefinition {
-				return e.accessObjDefinition(obj, name, middle, last)
+			ob, err := e.accessObjDefinition(obj, name, middle, last)
+			if ob != nil || err != nil {
+				return ob, err
 			}
 		}
 	}
@@ -79,7 +101,7 @@ func (e *Executer) GetVariable(name string) (lang.Object, error) {
 		return obj, nil
 	}
 
-	if e.parent != nil && e.scope == ExecuterScopeBlock {
+	if e.parent != nil && (e.scope == ExecuterScopeBlock || e.scope == ExecuterScopeFunction) {
 		return e.parent.GetVariable(name)
 	}
 
@@ -118,9 +140,8 @@ func (e *Executer) accessNamespace(exec *Executer, name string, middle []string,
 
 // accessDefinition accesses a method in a definition
 func (e *Executer) accessDefinition(def lang.Object, name string, middle []string, last string) (lang.Method, error) {
-	var obj lang.Object = def
+	var obj = def
 
-	// Middle elemek feldolgozása
 	for _, part := range middle {
 		obj = obj.Variable(part)
 		if obj == nil {
