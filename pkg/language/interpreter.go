@@ -51,7 +51,7 @@ func NewInterpreter(mode InterpreterMode, cache bool) *Interpreter {
 // Interpret interprets the given data
 func (ir *Interpreter) Interpret(fileName string, data io.Reader) (lang.Object, error) {
 	if !strings.HasSuffix(fileName, ".zx") {
-		return nil, fmt.Errorf("Zex can only run files that has .zx extesion.")
+		return nil, fmt.Errorf("Zx can only run files that has .zx extesion.")
 	}
 
 	// Get the nodes from the given data
@@ -72,7 +72,7 @@ func (ir *Interpreter) Interpret(fileName string, data io.Reader) (lang.Object, 
 // GetNodes gets the nodes from the given data
 func (ir *Interpreter) GetNodes(fileName string, data io.Reader) ([]*models.Node, error) {
 	if !strings.HasSuffix(fileName, ".zx") {
-		return nil, fmt.Errorf("Zex can only run files that has .zx extesion.")
+		return nil, fmt.Errorf("Zx can only run files that has .zx extesion.")
 	}
 	return ir.getNodes(fileName, data)
 }
@@ -140,7 +140,7 @@ func (ir *Interpreter) source() ([]*models.Node, error) {
 		}
 
 		// Tokenize the source code with lexer
-		lx := lexer.New("@zex/" + file.Name())
+		lx := lexer.New("@zx/" + file.Name())
 		ts, err := lx.Parse(bytes.NewReader(content))
 		if err != nil {
 			return nil, err

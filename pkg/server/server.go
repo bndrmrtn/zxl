@@ -49,7 +49,7 @@ func New(ir *language.Interpreter, root string, cache, colors bool) *Server {
 func (s *Server) Serve(addr string) error {
 	blue := color.New(color.FgBlue, color.Bold)
 
-	fmt.Printf("%s\n", blue.Sprint("Zex Web - ", version.Version))
+	fmt.Printf("%s\n", blue.Sprint("Zx Web - ", version.Version))
 	color.New(color.FgYellow).Printf("Server listening on %s\n", addr)
 	color.New(color.FgRed).Printf("Press Ctrl+C to quit\n\n")
 
@@ -70,7 +70,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	// Set the version header
-	w.Header().Add("X-Zex-Version", version.Version)
+	w.Header().Add("X-Zx-Version", version.Version)
 
 	// Serve files if they exist
 	path := filepath.Join(s.root, r.URL.Path[1:])

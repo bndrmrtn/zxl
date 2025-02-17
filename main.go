@@ -1,7 +1,7 @@
-// ZexLang is a simple templating programming language
+// ZxLang is a simple templating programming language
 // that is designed to be easy to use and understand.
 //
-// Zex is built in Go and is designed to be a simple.
+// Zx is built in Go and is designed to be a simple.
 // Created by Martin Binder
 // Website: https://mrtn.vip
 package main
@@ -15,7 +15,7 @@ import (
 	"github.com/fatih/color"
 )
 
-// main is the entry point of the ZexLang program
+// main is the entry point of the ZxLang program
 func main() {
 	// Recover from a panic if the program is not in debug mode
 	if os.Getenv("DEBUG") != "true" {

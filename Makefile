@@ -1,10 +1,10 @@
 .PHONY: build run
 
 build:
-	@go build -o bin/zexlang
+	@go build -o bin/zxlang
 
 run: build
-	@DEBUG=false ./bin/zexlang run examples/$(file).zx --debug
+	@DEBUG=false ./bin/zxlang run examples/$(file).zx --debug
 
 serve: build
-	@DEBUG=true ./bin/zexlang serve examples/$(folder) --listenAddr=:3030
+	@DEBUG=true ./bin/zxlang serve examples/$(folder) --listenAddr=:3030

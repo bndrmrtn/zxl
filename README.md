@@ -1,22 +1,22 @@
 # Zx (/ziː.ɛks/) Language
 
-Zex is a simple programming language
+Zx is a simple programming language
 that is designed to be easy to use and understand.
 
 ## About
 
-Zex is a weakly-typed, interpreted language that is designed to be easy to use and understand.
-Zex is built in Go as a learning project and is not intended to be used in production.
+Zx is a weakly-typed, interpreted language that is designed to be easy to use and understand.
+Zx is built in Go as a learning project and is not intended to be used in production.
 
 ## Features
 
 - Weakly-typed
 - Interpreted
-- Zex Blocks
+- Zx Blocks
 
 ## Installation
 
-To install Zex, you need to have Go installed on your system.
+To install Zx, you need to have Go installed on your system.
 
 ```bash
 go install github.com/bndrmrtn/zxl@latest
@@ -24,36 +24,36 @@ go install github.com/bndrmrtn/zxl@latest
 
 ## Usage
 
-To run a Zex program, you can use the `zexlang` command.
+To run a Zx program, you can use the `zxl` command.
 
 ```bash
-zexlang run <file>
+zxl run <file>
 ```
 
 Flags can be used to cache or debug the program.
 
 ```bash
-zexlang run <file> --cache --debug
+zxl run <file> --cache --debug
 ```
 
 ## Examples
 
 #### Basic Hello World program:
 
-```zex
+```zxl
 println("Hello, World!");
 ```
 
 #### Define a variable and print it:
 
-```zex
+```zxl
 let x = 10;
 println(x);
 ```
 
 #### Define a function and call it:
 
-```zex
+```zxl
 fn add(a, b) {
   return a + b;
 }
@@ -65,7 +65,7 @@ println(result);
 #### Define a block and use it:
 (this is currently not working as intended, but it is the intended syntax)
 
-```zex
+```zxl
 define MyBlock {
   let x = 10;
 
@@ -81,7 +81,7 @@ println(block.x);
 ### Using namespaces:
 
 File `main.zx`:
-```zex
+```zxl
 namespace main;
 
 import("other.zx");
@@ -89,7 +89,7 @@ other.printHello();
 ```
 
 File `other.zx`:
-```zex
+```zxl
 namespace other;
 
 fn printHello() {

@@ -40,7 +40,7 @@ func (de DebugError) Error() string {
 	redBold := color.New(color.FgRed, color.Bold).SprintFunc()
 	near := de.getNear()
 
-	return fmt.Sprintf("%s\n%s\nat %s:%d:%d\n%s", color.New(color.FgBlue, color.Bold).Sprint("Zex - ", version.Version), redBold(de.err.Error()), de.debug.File, de.debug.Line, de.debug.Column, near)
+	return fmt.Sprintf("%s\n%s\nat %s:%d:%d\n%s", color.New(color.FgBlue, color.Bold).Sprint("Zx - ", version.Version), redBold(de.err.Error()), de.debug.File, de.debug.Line, de.debug.Column, near)
 }
 
 func (de DebugError) getNear() string {
