@@ -61,6 +61,10 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 		e.mu.Lock()
 		e.objects[name] = object
 		e.mu.Unlock()
+	case tokens.EmptyReturn:
+		return lang.NilObject, nil
+	case tokens.Return:
+		return e.handleReturn(node)
 	}
 	return nil, nil
 }

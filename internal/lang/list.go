@@ -61,7 +61,7 @@ func (l *List) Variables() []string {
 }
 
 func (l *List) SetVariable(_ string, _ Object) error {
-	return notImplemented
+	return errNotImplemented
 }
 
 func (l *List) String() string {

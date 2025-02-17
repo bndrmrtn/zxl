@@ -17,10 +17,9 @@ h.sayHello();
 println(h);
 println(type(h));
 
+return;
+
 import("other.zx");
 
-let s = other.Sayer();
-
-println(type(s));
-
-s.say();
+let acc = other.val;
+println(acc.$addr);

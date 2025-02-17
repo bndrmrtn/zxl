@@ -90,9 +90,13 @@ func (e *Executer) Execute(nodes []*models.Node) (lang.Object, error) {
 		if err != nil {
 			return nil, err
 		}
+		if ret == lang.NilObject {
+			return nil, nil
+		}
 		if ret != nil {
 			return ret, nil
 		}
+
 	}
 	return nil, nil
 }

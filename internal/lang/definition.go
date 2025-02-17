@@ -65,8 +65,13 @@ func (d *Definition) Methods() []string {
 	return []string{"split"}
 }
 
-func (d *Definition) Variable(_ string) Object {
-	return nil
+func (d *Definition) Variable(variable string) Object {
+	if variable == "$addr" {
+		return NewString("addr", fmt.Sprintf("%p", d), d.debug)
+	}
+
+	obj, _ := d.Ex.GetVariable(variable)
+	return obj
 }
 
 func (d *Definition) Variables() []string {
@@ -74,7 +79,7 @@ func (d *Definition) Variables() []string {
 }
 
 func (d *Definition) SetVariable(_ string, _ Object) error {
-	return notImplemented
+	return errNotImplemented
 }
 
 func (d *Definition) String() string {

@@ -47,7 +47,7 @@ func (i *Integer) Variables() []string {
 }
 
 func (i *Integer) SetVariable(_ string, _ Object) error {
-	return notImplemented
+	return errNotImplemented
 }
 
 func (i *Integer) String() string {

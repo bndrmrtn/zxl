@@ -49,7 +49,7 @@ func (f *Float) Variables() []string {
 }
 
 func (f *Float) SetVariable(_ string, _ Object) error {
-	return notImplemented
+	return errNotImplemented
 }
 
 func (f *Float) String() string {

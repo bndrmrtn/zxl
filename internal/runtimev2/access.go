@@ -10,9 +10,8 @@ import (
 
 // GetMethod gets a method by name
 func (e *Executer) GetMethod(name string) (lang.Method, error) {
-	ex := e
-	ex.mu.RLock()
-	defer ex.mu.RUnlock()
+	e.mu.RLock()
+	defer e.mu.RUnlock()
 
 	if strings.Contains(name, ".") {
 		names := strings.Split(name, ".")
@@ -20,12 +19,12 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 		middle := names[1 : len(names)-1]
 		last := names[len(names)-1]
 
-		exec, err := ex.runtime.GetNamespaceExecuter(first)
+		exec, err := e.runtime.GetNamespaceExecuter(first)
 		if err == nil {
 			return e.accessNamespace(exec, name, middle, last)
 		}
 
-		if obj, err := ex.GetVariable(first); err == nil {
+		if obj, err := e.GetVariable(first); err == nil {
 			if obj.Type() == lang.TDefinition {
 				return e.accessDefinition(obj, name, middle, last)
 			}
@@ -36,17 +35,17 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 		return method, nil
 	}
 
-	if obj, ok := ex.objects[name]; ok {
+	if obj, ok := e.objects[name]; ok {
 		if obj.Type() == lang.TDefinition {
 			return obj.Method("$init"), nil
 		}
 	}
 
-	if ex.parent != nil && (ex.scope == ExecuterScopeBlock || ex.scope == ExecuterScopeFunction || ex.scope == ExecuterScopeDefinition) {
-		return ex.parent.GetMethod(name)
+	if e.parent != nil && (e.scope == ExecuterScopeBlock || e.scope == ExecuterScopeFunction || e.scope == ExecuterScopeDefinition) {
+		return e.parent.GetMethod(name)
 	}
 
-	if fn, ok := ex.runtime.functions[name]; ok {
+	if fn, ok := e.runtime.functions[name]; ok {
 		return fn, nil
 	}
 
@@ -57,6 +56,24 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 func (e *Executer) GetVariable(name string) (lang.Object, error) {
 	e.mu.RLock()
 	defer e.mu.RUnlock()
+
+	if strings.Contains(name, ".") {
+		names := strings.Split(name, ".")
+		first := names[0]
+		middle := names[1 : len(names)-1]
+		last := names[len(names)-1]
+
+		exec, err := e.runtime.GetNamespaceExecuter(first)
+		if err == nil {
+			return e.accessObjNamespace(exec, name, middle, last)
+		}
+
+		if obj, err := e.GetVariable(first); err == nil {
+			if obj.Type() == lang.TDefinition {
+				return e.accessObjDefinition(obj, name, middle, last)
+			}
+		}
+	}
 
 	if obj, ok := e.objects[name]; ok {
 		return obj, nil
@@ -117,4 +134,52 @@ func (e *Executer) accessDefinition(def lang.Object, name string, middle []strin
 	}
 
 	return method, nil
+}
+
+// accessObjNamespace accesses an object in a namespace
+func (e *Executer) accessObjNamespace(exec *Executer, name string, middle []string, last string) (lang.Object, error) {
+	if len(middle) == 0 {
+		return exec.GetVariable(last)
+	}
+
+	first := middle[0]
+	middle = middle[1:]
+
+	obj, err := exec.GetVariable(first)
+	if err != nil {
+		return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessVariable, name), nil)
+	}
+
+	for _, part := range middle {
+		obj = obj.Variable(part)
+		if obj == nil {
+			return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessVariable, name), nil)
+		}
+	}
+
+	obj = obj.Variable(last)
+	if obj == nil {
+		return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessVariable, name), nil)
+	}
+
+	return obj, nil
+}
+
+// accessObjDefinition accesses an object in a definition
+func (e *Executer) accessObjDefinition(def lang.Object, name string, middle []string, last string) (lang.Object, error) {
+	obj := def
+
+	for _, part := range middle {
+		obj = obj.Variable(part)
+		if obj == nil {
+			return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessVariable, name), nil)
+		}
+	}
+
+	obj = obj.Variable(last)
+	if obj == nil {
+		return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessVariable, name), nil)
+	}
+
+	return obj, nil
 }

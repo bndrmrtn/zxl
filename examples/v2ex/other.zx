@@ -1,9 +1,11 @@
 namespace other;
 
-define Sayer {
-    fn construct() {}
+define Store {
+    let value = "hello";
     
-    fn say() {
-        println("SAY: Hi");
+    fn x() {
+        println("x");
     }
 }
+
+let val = Store();

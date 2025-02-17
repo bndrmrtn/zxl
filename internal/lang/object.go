@@ -22,7 +22,7 @@ const (
 	TFunction   ObjType = "<function>"
 )
 
-var notImplemented = fmt.Errorf("not implemented")
+var errNotImplemented = fmt.Errorf("not implemented")
 
 func (o ObjType) TokenType() tokens.TokenType {
 	switch o {
