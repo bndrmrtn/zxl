@@ -1,0 +1,9 @@
+namespace other;
+
+define Sayer {
+    fn construct() {}
+    
+    fn say() {
+        println("SAY: Hi");
+    }
+}

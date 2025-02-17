@@ -8,5 +8,5 @@ type Debug struct {
 	// File represents the file of the node
 	File string `yaml:"file"`
 	// Near represents the code near the node
-	Near string `yaml:"near,omitempty"`
+	Near string `yaml:"-"`
 }

@@ -34,6 +34,10 @@ func (d *Definition) Type() ObjType {
 	return TDefinition
 }
 
+func (d *Definition) TypeString() string {
+	return d.defName
+}
+
 func (d *Definition) Value() any {
 	return d
 }

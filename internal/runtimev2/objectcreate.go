@@ -14,7 +14,11 @@ func (e *Executer) createMethodFromNode(n *models.Node) (string, lang.Method, er
 	name := n.Content
 
 	argsLen := len(n.Children) - 1
-	args := make([]string, argsLen, argsLen)
+	var args []string
+
+	if argsLen > 0 {
+		args = make([]string, 0, argsLen)
+	}
 
 	for i, arg := range n.Args {
 		args[i] = arg.Content
@@ -163,7 +167,7 @@ func (e *Executer) createListFromNode(n *models.Node) (lang.Object, error) {
 	name := n.Content
 
 	childrens := len(n.Children)
-	li := make([]lang.Object, childrens, childrens)
+	li := make([]lang.Object, childrens)
 
 	for i, child := range n.Children {
 		_, obj, err := e.createObjectFromNode(child)
@@ -252,5 +256,5 @@ func (e *Executer) createObjectFromDefinitionNode(n *models.Node) (string, lang.
 		return "", nil, errs.WithDebug(err, n.Debug)
 	}
 
-	return name, lang.NewDefinition(name, name, n.Debug, ex), nil
+	return name, lang.NewDefinition(e.name+"."+name+"{}", name, n.Debug, ex), nil
 }

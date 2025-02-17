@@ -1,3 +1,5 @@
+namespace main;
+
 define Helloer {
   fn construct() {
     println("Hello, World!");
@@ -13,3 +15,12 @@ let h = Helloer();
 h.sayHello();
 
 println(h);
+println(type(h));
+
+import("other.zx");
+
+let s = other.Sayer();
+
+println(type(s));
+
+s.say();

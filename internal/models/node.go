@@ -34,7 +34,7 @@ type Node struct {
 	Flags []string `yaml:"flags,omitempty"`
 
 	// Debug represents the debug information of the node
-	Debug *Debug `yaml:"-"`
+	Debug *Debug `yaml:"debug"`
 }
 
 func (n *Node) String() string {

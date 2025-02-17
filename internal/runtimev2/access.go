@@ -71,6 +71,10 @@ func (e *Executer) GetVariable(name string) (lang.Object, error) {
 
 // accessNamespace accesses a method in a namespace
 func (e *Executer) accessNamespace(exec *Executer, name string, middle []string, last string) (lang.Method, error) {
+	if len(middle) == 0 {
+		return exec.GetMethod(last)
+	}
+
 	first := middle[0]
 	middle = middle[1:]
 

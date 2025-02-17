@@ -19,10 +19,11 @@ type Runtime struct {
 
 // New creates a new runtime
 func New() *Runtime {
-	return &Runtime{
-		functions: builtin.Methods,
+	r := &Runtime{
 		executers: make(map[string]*Executer),
 	}
+	r.functions = builtin.GetMethods(r.importer)
+	return r
 }
 
 // Execute executes the given nodes

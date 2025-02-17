@@ -4,13 +4,19 @@ import (
 	"fmt"
 
 	"github.com/bndrmrtn/zexlang/internal/lang"
+	"github.com/bndrmrtn/zexlang/internal/models"
 )
 
-var Methods = map[string]lang.Method{
-	"print":         &Print{},
-	"println":       &Print{true},
-	"type":          Type{},
-	"zx_langbridge": LangBridge{},
+type ImportFunc func(file string, d *models.Debug) (lang.Object, error)
+
+func GetMethods(importer ImportFunc) map[string]lang.Method {
+	return map[string]lang.Method{
+		"print":         &Print{},
+		"println":       &Print{true},
+		"type":          Type{},
+		"import":        &Import{importer},
+		"zx_langbridge": LangBridge{},
+	}
 }
 
 type Print struct {
@@ -56,5 +62,28 @@ func (t Type) Args() []string {
 }
 
 func (t Type) Execute(args []lang.Object) (lang.Object, error) {
-	return lang.NewString("type", string(args[0].Type()), nil), nil
+	obj := args[0]
+	if def, ok := obj.(*lang.Definition); ok {
+		return lang.NewString("type", string(def.TypeString()), def.Debug()), nil
+	}
+
+	return lang.NewString("type", string(obj.Type()), obj.Debug()), nil
+}
+
+type Import struct {
+	importer ImportFunc
+}
+
+func (*Import) Args() []string {
+	return []string{"file"}
+}
+
+func (i *Import) Execute(args []lang.Object) (lang.Object, error) {
+	obj := args[0]
+	if obj.Type() != lang.TString {
+		return nil, fmt.Errorf("expected string, got %v", obj.Type())
+	}
+
+	file := obj.Value().(string)
+	return i.importer(file, obj.Debug())
 }

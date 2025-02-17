@@ -259,6 +259,7 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 			VariableType: tokens.ReferenceVariable,
 			Reference:    true,
 			Content:      node.Content,
+			Debug:        node.Debug,
 		}, nil
 	}
 
@@ -268,6 +269,7 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 			VariableType: tokens.ReferenceVariable,
 			Reference:    true,
 			Content:      node.Content,
+			Debug:        node.Debug,
 		}, nil
 	}
 
@@ -472,7 +474,7 @@ func (b *Builder) parseInlineValue(ts []*models.Token, inx *int) (*models.Node, 
 			VariableType: tokens.InlineValue,
 			Content:      "inlineValue",
 			Value:        b.getValue(token),
-			Debug:        ts[*inx].Debug,
+			Debug:        token.Debug,
 		}, nil
 	}
 
@@ -564,6 +566,7 @@ func (b *Builder) parseReturn(ts []*models.Token, inx *int) (*models.Node, error
 		Type:         ts[*inx].Type,
 		VariableType: tokens.ExpressionVariable,
 		Content:      "return",
+		Debug:        ts[*inx].Debug,
 	}
 
 	*inx++
@@ -812,6 +815,7 @@ func (b *Builder) parseFuncCallArg(ts []*models.Token, inx *int) (*models.Node, 
 		Content:      "argument",
 		VariableType: tokens.ExpressionVariable,
 		Children:     nodes,
+		Debug:        ts[*inx-1].Debug,
 	}, nil
 }
 
@@ -1078,6 +1082,7 @@ func (b *Builder) parseListValue(ts []*models.Token, inx *int) (*models.Node, bo
 		Content:      "listValue",
 		VariableType: tokens.ExpressionVariable,
 		Children:     nodes,
+		Debug:        ts[*inx-1].Debug,
 	}, bracketCount == 0, nil
 }
 
