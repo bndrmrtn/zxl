@@ -21,6 +21,7 @@ const (
 	FuncCall
 	EmptyReturn
 	For
+	In
 	While
 
 	Number TokenType = iota + 1000
@@ -67,7 +68,6 @@ const (
 
 	If TokenType = iota + 10000000
 	Then
-	ElseIf
 	Else
 
 	NewLine TokenType = iota + 100000000
@@ -189,10 +189,10 @@ func (t TokenType) String() string {
 		return "@"
 	case If:
 		return "if"
-	case ElseIf:
-		return "else if"
 	case Else:
 		return "else"
+	case In:
+		return "in"
 	case NewLine:
 		return "new line"
 	case SingleLineComment:

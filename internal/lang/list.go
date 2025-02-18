@@ -26,8 +26,9 @@ func GetListValue(l Object) []Object {
 func NewList(name string, li []Object, debug *models.Debug) Object {
 	return &List{
 		Base: Base{
-			name:  name,
-			debug: debug,
+			name:    name,
+			debug:   debug,
+			mutable: true,
 		},
 		value:  li,
 		length: -1,

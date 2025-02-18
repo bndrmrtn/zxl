@@ -27,3 +27,7 @@ println(li.$addr == li2.$addr); // true
 
 // since li2 is a reference to li, modifying li2 will also modify li
 li2.append(4);
+
+let li3 = cp(li);
+print("Li3: ");
+println(li3);

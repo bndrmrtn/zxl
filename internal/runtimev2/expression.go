@@ -47,6 +47,12 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 			sum = sum[:10]
 
 			expressionList = append(expressionList, sum)
+
+			if obj.Type() == lang.TList {
+				args[sum] = obj
+				continue
+			}
+
 			args[sum] = obj.Value()
 			continue
 		}
@@ -66,6 +72,12 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 			sum = sum[:10]
 
 			expressionList = append(expressionList, sum)
+
+			if obj.Type() == lang.TList {
+				args[sum] = obj
+				continue
+			}
+
 			args[sum] = obj.Value()
 			continue
 		}
@@ -89,6 +101,12 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 			sum = sum[:10]
 
 			expressionList = append(expressionList, sum)
+
+			if obj.Type() == lang.TList {
+				args[sum] = obj
+				continue
+			}
+
 			args[sum] = obj.Value()
 			continue
 		}
@@ -101,8 +119,8 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 	// Handle the case where the expression is a single object
 	if len(expressionList) == 1 && len(args) == 1 {
 		expression := expressionList[0]
-		if _, ok := args[expression]; ok {
-			if v, ok := args[expression].(lang.Object); ok {
+		if obj, ok := args[expression]; ok {
+			if v, ok := obj.(lang.Object); ok {
 				v = v.Copy()
 				v.Rename(variableName)
 				return v, nil

@@ -31,7 +31,8 @@ func (e *Executer) createMethodFromNode(n *models.Node) (string, lang.Method, er
 			ex.BindObject(arg.Name(), arg)
 		}
 
-		return ex.Execute(n.Children)
+		r, err := ex.Execute(n.Children)
+		return r, err
 	}, n.Debug)
 
 	return name, method, nil
@@ -226,7 +227,6 @@ func (e *Executer) accessObject(obj lang.Object, accessors []*models.Node) (lang
 		for _, a := range access {
 			i, ok := a.(int)
 			if !ok {
-				fmt.Println("a", a)
 				s, ok := a.(string)
 				if !ok {
 					return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)

@@ -508,12 +508,12 @@ func (lx *Lexer) getIdentType(s string) tokens.TokenType {
 		return tokens.If
 	case "else":
 		return tokens.Else
-	case "elseif":
-		return tokens.ElseIf
 	case "for":
 		return tokens.For
 	case "while":
 		return tokens.While
+	case "in":
+		return tokens.In
 	default:
 		return tokens.Identifier
 	}

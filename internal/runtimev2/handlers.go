@@ -2,6 +2,7 @@ package runtimev2
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/internal/lang"
@@ -25,15 +26,15 @@ func (e *Executer) handleReturn(node *models.Node) (lang.Object, error) {
 		return nil, err
 	}
 
+	if value != nil {
+		return value, nil
+	}
+
 	if e.scope == ExecuterScopeBlock && e.parent != nil {
 		return e.parent.handleReturn(node)
 	}
 
-	if value == nil {
-		return nil, nil
-	}
-
-	return value, nil
+	return nil, nil
 }
 
 // handleIf handles if tokens
@@ -85,7 +86,6 @@ func (e *Executer) handleWhile(node *models.Node) (lang.Object, error) {
 	ex := NewExecuter(ExecuterScopeBlock, e.runtime, e).WithName(e.name)
 
 	for {
-
 		// Evaluate condition
 		condition, err := e.evaluateExpression(&models.Node{
 			Type:         tokens.While,
@@ -109,6 +109,70 @@ func (e *Executer) handleWhile(node *models.Node) (lang.Object, error) {
 		ret, err := ex.Execute(node.Children)
 		if ret != nil || err != nil {
 			return ret, err
+		}
+	}
+
+	return nil, nil
+}
+
+func (e *Executer) handleFor(node *models.Node) (lang.Object, error) {
+	ex := NewExecuter(ExecuterScopeBlock, e.runtime, e).WithName(e.name)
+
+	if len(node.Args) != 2 {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected 1 identifier and 1 iterable expression", errs.ValueError), node.Debug)
+	}
+
+	// stage 1: setting up the iterator and iterable
+
+	// make sure the variable is a let, not a reference
+	node.Args[0].Type = tokens.Let
+	node.Args[0].VariableType = tokens.NilVariable
+	node.Args[0].Reference = false
+	name, iterator, err := e.createObjectFromNode(node.Args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	// add the iterator as the current executer's variable list
+	ex.mu.Lock()
+	ex.objects[name] = iterator
+	ex.mu.Unlock()
+
+	_, iterable, err := e.createObjectFromNode(&models.Node{
+		VariableType: tokens.ExpressionVariable,
+		Children: []*models.Node{
+			node.Args[1],
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	switch iterable.Type() {
+	default:
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected iterable value or expression, got '%s'", errs.ValueError, iterable.Type()), node.Debug)
+	case lang.TList:
+		for _, item := range iterable.Value().([]lang.Object) {
+			ex.mu.Lock()
+			ex.objects[name] = item
+			ex.mu.Unlock()
+
+			ret, err := ex.Execute(node.Children)
+			if ret != nil || err != nil {
+				return ret, err
+			}
+		}
+	case lang.TString:
+		str := strings.Split(iterable.Value().(string), "")
+		for _, item := range str {
+			ex.mu.Lock()
+			ex.objects[name] = lang.NewString(name, string(item), nil)
+			ex.mu.Unlock()
+
+			ret, err := ex.Execute(node.Children)
+			if ret != nil || err != nil {
+				return ret, err
+			}
 		}
 	}
 

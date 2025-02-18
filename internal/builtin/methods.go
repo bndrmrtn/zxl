@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/bndrmrtn/zxl/internal/lang"
@@ -11,11 +12,11 @@ type ImportFunc func(file string, d *models.Debug) (lang.Object, error)
 
 func GetMethods(importer ImportFunc) map[string]lang.Method {
 	return map[string]lang.Method{
-		"print":         &Print{},
-		"println":       &Print{true},
-		"type":          Type{},
-		"import":        &Import{importer},
-		"zx_langbridge": LangBridge{},
+		"print":   &Print{},
+		"println": &Print{true},
+		"type":    lang.NewFunction([]string{"value"}, fnType, nil),
+		"import":  &Import{importer},
+		"range":   lang.NewFunction([]string{"range"}, fnRange, nil),
 	}
 }
 
@@ -36,40 +37,6 @@ func (p *Print) Execute(args []lang.Object) (lang.Object, error) {
 	return nil, nil
 }
 
-type LangBridge struct{}
-
-func (l LangBridge) Args() []string {
-	return []string{"value", "args"}
-}
-
-func (l LangBridge) Execute(args []lang.Object) (lang.Object, error) {
-	if args[0].Type() != lang.TString {
-		return nil, fmt.Errorf("expected string, got %v", args[0].Type())
-	}
-
-	if args[1].Type() != lang.TList {
-		return nil, fmt.Errorf("expected list, got %v", args[1].Type())
-	}
-
-	fmt.Println("calling", args[0].Value())
-	return nil, nil
-}
-
-type Type struct{}
-
-func (t Type) Args() []string {
-	return []string{"value"}
-}
-
-func (t Type) Execute(args []lang.Object) (lang.Object, error) {
-	obj := args[0]
-	if def, ok := obj.(*lang.Definition); ok {
-		return lang.NewString("type", string(def.TypeString()), def.Debug()), nil
-	}
-
-	return lang.NewString("type", string(obj.Type()), obj.Debug()), nil
-}
-
 type Import struct {
 	importer ImportFunc
 }
@@ -86,4 +53,84 @@ func (i *Import) Execute(args []lang.Object) (lang.Object, error) {
 
 	file := obj.Value().(string)
 	return i.importer(file, obj.Debug())
+}
+
+// Functions
+
+// fnType returns the type of the given object.
+func fnType(args []lang.Object) (lang.Object, error) {
+	obj := args[0]
+	if def, ok := obj.(*lang.Definition); ok {
+		return lang.NewString("type", string(def.TypeString()), def.Debug()), nil
+	}
+
+	return lang.NewString("type", string(obj.Type()), obj.Debug()), nil
+}
+
+// fnRange returns a range object.
+func fnRange(arguments []lang.Object) (lang.Object, error) {
+	var start, stop, step int
+
+	args, err := rangeArgs(arguments)
+	if err != nil {
+		return nil, err
+	}
+
+	switch len(args) {
+	case 1:
+		stop, _ = args[0].Value().(int)
+		start, step = 0, 1
+	case 2:
+		start, _ = args[0].Value().(int)
+		stop, _ = args[1].Value().(int)
+		step = 1
+	case 3:
+		start, _ = args[0].Value().(int)
+		stop, _ = args[1].Value().(int)
+		step, _ = args[2].Value().(int)
+	default:
+		return nil, errors.New("invalid number of arguments")
+	}
+
+	if step == 0 {
+		return nil, errors.New("step cannot be zero")
+	}
+
+	var result []lang.Object
+	if step > 0 {
+		for i := start; i < stop; i += step {
+			result = append(result, lang.NewInteger("range", i, nil))
+		}
+	} else {
+		for i := start; i > stop; i += step {
+			result = append(result, lang.NewInteger("range", i, nil))
+		}
+	}
+
+	return lang.NewList("range", result, nil), nil
+}
+
+// rangeArgs parses the arguments for the range function.
+func rangeArgs(args []lang.Object) ([]lang.Object, error) {
+
+	if args[0].Type() == lang.TInt {
+		return args, nil
+	}
+
+	if args[0].Type() == lang.TList {
+		li := args[0].Value().([]lang.Object)
+		if len(li) > 3 || len(li) < 1 {
+			return nil, fmt.Errorf("expected list to have 1, 2 or 3 elements, got %v", len(li))
+		}
+
+		for _, arg := range li {
+			if arg.Type() != lang.TInt {
+				return nil, fmt.Errorf("expected list values to be <Int>, got %v", arg.Type())
+			}
+		}
+
+		return li, nil
+	}
+
+	return nil, fmt.Errorf("expected <Int> or <List> [start, stop?, step?], got %v", args[0].Type())
 }

@@ -12,6 +12,8 @@ import (
 // executeNode executes a node
 func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 	switch node.Type {
+	default:
+		return nil, errs.WithDebug(fmt.Errorf("unhandled node type: %s", node.Type), node.Debug)
 	case tokens.Use:
 		using := node.Content
 		as := node.Value.(string)
@@ -69,6 +71,9 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 		return e.handleIf(node)
 	case tokens.While:
 		return e.handleWhile(node)
+	case tokens.For:
+		return e.handleFor(node)
 	}
+
 	return nil, nil
 }
