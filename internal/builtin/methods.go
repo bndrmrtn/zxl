@@ -14,9 +14,10 @@ func GetMethods(importer ImportFunc) map[string]lang.Method {
 	return map[string]lang.Method{
 		"print":   &Print{},
 		"println": &Print{true},
-		"type":    lang.NewFunction([]string{"value"}, fnType, nil),
 		"import":  &Import{importer},
+		"type":    lang.NewFunction([]string{"value"}, fnType, nil),
 		"range":   lang.NewFunction([]string{"range"}, fnRange, nil),
+		"read":    lang.NewFunction([]string{"text"}, fnRead, nil),
 	}
 }
 
@@ -133,4 +134,21 @@ func rangeArgs(args []lang.Object) ([]lang.Object, error) {
 	}
 
 	return nil, fmt.Errorf("expected <Int> or <List> [start, stop?, step?], got %v", args[0].Type())
+}
+
+func fnRead(args []lang.Object) (lang.Object, error) {
+	if len(args) != 1 {
+		return nil, errors.New("expected 1 argument")
+	}
+
+	if args[0].Type() != lang.TString {
+		return nil, fmt.Errorf("expected <String>, got %v", args[0].Type())
+	}
+
+	input := args[0].Value().(string)
+
+	fmt.Print(input)
+	var value string
+	fmt.Scanln(&value)
+	return lang.NewString("read", value, nil), nil
 }

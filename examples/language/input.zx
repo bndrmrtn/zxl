@@ -1,0 +1,3 @@
+let userInput = read("Enter text: ");
+
+println("Input is: " + userInput);

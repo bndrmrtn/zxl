@@ -91,7 +91,7 @@ func (d *Definition) SetVariable(_ string, _ Object) error {
 }
 
 func (d *Definition) String() string {
-	return fmt.Sprintf("<%s %v>", d.defName, &d)
+	return fmt.Sprintf("<%s %s>", d.defName, addr(d))
 }
 
 func (d *Definition) Copy() Object {

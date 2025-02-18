@@ -63,7 +63,6 @@ println(result);
 ```
 
 #### Define a block and use it:
-(this is currently not working as intended, but it is the intended syntax)
 
 ```zxl
 define MyBlock {
@@ -94,6 +93,40 @@ namespace other;
 
 fn printHello() {
   println("Hello from other.zx!");
+}
+```
+
+### Loops
+
+```zxl
+for i in range(10) {
+  println(i);
+}
+
+for i in range([10, 20]) {
+  println(i);
+}
+
+for i in range([10, 20, 2]) {
+  println(i);
+}
+
+for letter in "Hello" {
+  println(letter);
+}
+
+for i in 7 {
+  println(i);
+}
+
+for i in [5, 6, 7] {
+  println(i);
+}
+
+let i = 0;
+while i < 10 {
+  println(i);
+  i = i + 1;
 }
 ```
 

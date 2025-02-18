@@ -25,6 +25,7 @@ func New() *Runtime {
 	}
 	r.functions = builtin.GetMethods(r.importer)
 	r.BindModule(modules.NewRandModule())
+	r.BindModule(modules.NewIOModule())
 	return r
 }
 

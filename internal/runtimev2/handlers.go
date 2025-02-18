@@ -166,7 +166,18 @@ func (e *Executer) handleFor(node *models.Node) (lang.Object, error) {
 		str := strings.Split(iterable.Value().(string), "")
 		for _, item := range str {
 			ex.mu.Lock()
-			ex.objects[name] = lang.NewString(name, string(item), nil)
+			ex.objects[name] = lang.NewString(name, string(item), node.Debug)
+			ex.mu.Unlock()
+
+			ret, err := ex.Execute(node.Children)
+			if ret != nil || err != nil {
+				return ret, err
+			}
+		}
+	case lang.TInt:
+		for item := 0; item < iterable.Value().(int); item++ {
+			ex.mu.Lock()
+			ex.objects[name] = lang.NewInteger(name, item, node.Debug)
 			ex.mu.Unlock()
 
 			ret, err := ex.Execute(node.Children)

@@ -1,5 +1,26 @@
 let li = [5, 8, 9];
 
+println("li keys:");
 for i in range(li.length) {
-    println(li[i]);
+    println(i);
+}
+
+println("li values:");
+for i in li {
+    println(i);
+}
+
+println("numbers:");
+for i in 5 {
+    println(i);
+}
+
+println("range:");
+for i in range([0, 10, 3]) {
+    println(i);
+}
+
+println("strings:");
+for letter in "hello" {
+    println(letter);
 }

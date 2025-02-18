@@ -1,0 +1,9 @@
+use io;
+
+let file = io.open("lists.zx");
+
+println("Type: " + type(file));
+println("First line:");
+print(file.readLine());
+
+file.close();

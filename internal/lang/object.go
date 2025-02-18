@@ -20,6 +20,7 @@ const (
 	TNil        ObjType = "nil"
 	TDefinition ObjType = "<Definition>"
 	TFunction   ObjType = "<function>"
+	TIOStream   ObjType = "<IOStream>"
 )
 
 var errNotImplemented = fmt.Errorf("not implemented")
