@@ -74,7 +74,7 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 			Content: token.Value,
 			Debug:   token.Debug,
 		}, nil
-	case tokens.String, tokens.Number, tokens.Bool, tokens.Nil:
+	case tokens.String, tokens.Number, tokens.Bool, tokens.Nil, tokens.TemplateLiteral:
 		return b.parseInlineValue(ts, inx)
 	case tokens.Let, tokens.Const:
 		return b.parseLetConst(ts, inx)

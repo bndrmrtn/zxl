@@ -3,7 +3,6 @@ package cmd
 import (
 	"os"
 
-	"github.com/bndrmrtn/zxl/internal/lexer"
 	"github.com/bndrmrtn/zxl/pkg/prettycode"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -56,16 +55,14 @@ func execHighlight(cmd *cobra.Command, args []string) {
 	}
 	defer file.Close()
 
-	lx := lexer.New(args[0])
-	tokens, err := lx.Parse(file)
+	pretty, err := prettycode.New(file)
 	if err != nil {
 		cmd.PrintErr(err)
 		return
 	}
 
-	pretty := prettycode.New(tokens)
 	html := pretty.HighlightHtml()
-	if err := os.WriteFile(args[0]+".html", []byte(html), os.ModePerm); err != nil {
+	if err := os.WriteFile(args[0]+".html", []byte("<pre><code>"+html+"</code></pre>"), os.ModePerm); err != nil {
 		cmd.PrintErr(err)
 		return
 	}

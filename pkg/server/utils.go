@@ -62,7 +62,7 @@ func (s *Server) makePrettyCode(htmlErr *errs.HtmlError) string {
 		return htmlErr.Error()
 	}
 
-	pretty := prettycode.New(ts)
+	pretty := prettycode.NewToken(ts)
 	code := pretty.HighlightHtml()
 	hlCodeParts := strings.Split(code, "\n")
 	codeParts := strings.Split(string(htmlErr.Code), "\n")

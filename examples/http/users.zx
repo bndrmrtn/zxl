@@ -1,0 +1,29 @@
+namespace httpserver;
+
+use http;
+
+const users = [
+    ["Martin", 19],
+    ["Johanna", 19]
+];
+
+let parts = "";
+
+for user in users {
+    parts = parts + <>
+        <tr>
+            <td>{{ user[0] }}</td>
+            <td>{{ user[1] }}</td>
+        </tr>
+    </>;
+}
+
+http.write(<>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+        </tr>
+        {{ parts }}
+    </table>
+</>);

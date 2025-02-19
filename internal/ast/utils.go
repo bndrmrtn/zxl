@@ -31,6 +31,8 @@ func (b *Builder) getType(t *models.Token) (tokens.VariableType, error) {
 			return tokens.NilVariable, nil
 		}
 		return tokens.ReferenceVariable, nil
+	case tokens.TemplateLiteral:
+		return tokens.TemplateVariable, nil
 	default:
 		return 0, errs.WithDebug(fmt.Errorf("%w: unknown type", errs.SyntaxError), t.Debug)
 	}

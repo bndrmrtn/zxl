@@ -324,7 +324,32 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				})
 			}
 		case '<':
-			if pos+1 < len(s) && s[pos+1] == '=' {
+			if pos+1 < len(s) && s[pos+1] == '>' {
+				var str strings.Builder
+				pos += 2
+				for pos < len(s)-2 && !(s[pos] == '<' && (s[pos+1] == '/' && s[pos+2] == '>')) {
+					str.WriteByte(s[pos])
+					pos++
+					col++
+
+					if s[pos] == '\n' {
+						line++
+						col = 0
+					}
+				}
+				line--
+				pos += 2
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.TemplateLiteral,
+					Value: str.String(),
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
+				})
+			} else if pos+1 < len(s) && s[pos+1] == '=' {
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.LessOrEqual,
 					Value: "<=",

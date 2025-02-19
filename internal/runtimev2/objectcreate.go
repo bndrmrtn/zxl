@@ -6,6 +6,7 @@ import (
 	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/tmpl"
 	"github.com/bndrmrtn/zxl/internal/tokens"
 )
 
@@ -52,6 +53,23 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 			return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not string", errs.ValueError), n.Debug)
 		}
 		obj = lang.NewString(name, s, n.Debug)
+	case tokens.TemplateVariable:
+		str, ok := n.Value.(string)
+		if !ok {
+			return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not a template", errs.ValueError), n.Debug)
+		}
+
+		template, err := tmpl.NewTemplate(str)
+		if err != nil {
+			return "", nil, errs.WithDebug(err, n.Debug)
+		}
+
+		str, err = e.parseTemplate(template)
+		if err != nil {
+			return "", nil, errs.WithDebug(err, n.Debug)
+		}
+
+		obj = lang.NewString(name, str, n.Debug)
 	case tokens.IntVariable:
 		i, ok := n.Value.(int)
 		if !ok {
@@ -102,7 +120,7 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 		obj = lang.NewNil(name, n.Debug)
 	}
 
-	if n.ObjectAccessors != nil {
+	if len(n.ObjectAccessors) > 0 {
 		accessed, err := e.accessObject(obj, n.ObjectAccessors)
 		if err != nil {
 			return "", nil, errs.WithDebug(err, n.Debug)
@@ -202,81 +220,6 @@ func (e *Executer) createListFromNode(n *models.Node) (lang.Object, error) {
 	return lang.NewList(name, li, n.Debug), nil
 }
 
-// accessObject accesses an object
-func (e *Executer) accessObject(obj lang.Object, accessors []*models.Node) (lang.Object, error) {
-	if obj.Type() != lang.TList && obj.Type() != lang.TDefinition {
-		return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
-	}
-
-	var access []any
-
-	for _, accessor := range accessors {
-		if accessor.VariableType == tokens.ReferenceVariable {
-			obj, err := e.GetVariable(accessor.Content)
-			if err != nil {
-				return nil, errs.WithDebug(err, accessor.Debug)
-			}
-			access = append(access, obj.Value())
-		} else {
-			access = append(access, accessor.Value)
-		}
-	}
-
-	if obj.Type() == lang.TList {
-		li, ok := obj.Value().([]lang.Object)
-		if !ok {
-			return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
-		}
-
-		var value any = li
-		for _, a := range access {
-			i, ok := a.(int)
-			if !ok {
-				s, ok := a.(string)
-				if !ok {
-					return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
-				}
-
-				ob, err := e.GetVariable(s)
-				if err != nil || ob.Type() != lang.TInt {
-					return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
-				}
-				i = ob.Value().(int)
-			}
-
-			v, ok := value.([]lang.Object)
-			if !ok {
-				return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
-			}
-
-			if i < 0 || i >= len(v) {
-				return nil, errs.WithDebug(fmt.Errorf("%w: %v, length: %d", errs.IndexOutOfRange, i, len(v)), accessors[0].Debug)
-			}
-
-			value = v[i]
-		}
-
-		if v, ok := value.(lang.Object); ok {
-			value = v.Value()
-		}
-
-		_, ob, err := e.createObjectFromNode(&models.Node{
-			VariableType: tokens.InlineValue,
-			Type:         e.getTypeFromValue(value),
-			Content:      obj.Name(),
-			Value:        value,
-			Debug:        obj.Debug(),
-		})
-		if err != nil {
-			return nil, errs.WithDebug(err, obj.Debug())
-		}
-
-		return ob, nil
-	}
-
-	return obj, nil
-}
-
 // createDefinitionFromNode creates a definition from a node
 func (e *Executer) createObjectFromDefinitionNode(n *models.Node) (string, lang.Object, error) {
 	name := n.Content
@@ -334,4 +277,21 @@ func (e *Executer) getObjectValueByNodes(obj lang.Object, nodes []*models.Node) 
 	}
 
 	return obj, nil
+}
+
+func (e *Executer) parseTemplate(template []tmpl.Part) (string, error) {
+	var result string
+	for _, part := range template {
+		if part.Static {
+			result += part.Content
+		} else {
+			_, ob, err := e.createObjectFromNode(part.Node)
+			if err != nil {
+				return "", err
+			}
+			result += ob.String()
+		}
+	}
+
+	return result, nil
 }

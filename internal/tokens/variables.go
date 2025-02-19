@@ -8,6 +8,7 @@ const (
 	IntVariable
 	FloatVariable
 	StringVariable
+	TemplateVariable
 	BoolVariable
 	FunctionCallVariable
 	ExpressionVariable

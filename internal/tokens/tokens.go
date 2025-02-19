@@ -33,6 +33,7 @@ const (
 	List
 	ListValue
 	Definiton
+	TemplateLiteral
 
 	Addition TokenType = iota + 10000
 	Subtraction
@@ -207,6 +208,8 @@ func (t TokenType) String() string {
 		return "list"
 	case ListValue:
 		return "list value"
+	case TemplateLiteral:
+		return "<></>"
 	default:
 		return "unkown"
 	}

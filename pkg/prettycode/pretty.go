@@ -2,8 +2,10 @@ package prettycode
 
 import (
 	"html"
+	"io"
 	"strings"
 
+	"github.com/bndrmrtn/zxl/internal/lexer"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/tokens"
 )
@@ -13,8 +15,21 @@ type PrettyCode struct {
 	tokens []*models.Token
 }
 
-// New creates a new PrettyCode struct
-func New(ts []*models.Token) *PrettyCode {
+func New(r io.Reader) (*PrettyCode, error) {
+	lx := lexer.New("snippet")
+
+	ts, err := lx.Parse(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PrettyCode{
+		tokens: ts,
+	}, nil
+}
+
+// NewToken creates a new PrettyCode struct from tokens
+func NewToken(ts []*models.Token) *PrettyCode {
 	return &PrettyCode{
 		tokens: ts,
 	}
@@ -42,7 +57,7 @@ func (p *PrettyCode) highlightToken(mode Mode, token *models.Token, next *models
 		tokens.Function, tokens.Define, tokens.Return,
 		tokens.Namespace, tokens.Use, tokens.As, tokens.From,
 		tokens.While, tokens.For,
-		tokens.If, tokens.Else:
+		tokens.If, tokens.Else, tokens.In:
 		return p.highlightKeyword(mode, token.Value)
 	case tokens.Identifier:
 		if next != nil && next.Type == tokens.LeftParenthesis {

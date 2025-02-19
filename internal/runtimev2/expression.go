@@ -9,6 +9,7 @@ import (
 	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/tmpl"
 	"github.com/bndrmrtn/zxl/internal/tokens"
 )
 
@@ -43,7 +44,15 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 				return nil, errs.WithDebug(err, n.Debug)
 			}
 
-			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(node.Content)))
+			if len(node.ObjectAccessors) > 0 {
+				acc, err := e.accessObject(obj, node.ObjectAccessors)
+				if err != nil {
+					return nil, errs.WithDebug(err, n.Debug)
+				}
+				obj = acc
+			}
+
+			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(fmt.Sprintf("%v::%v", node.Content, obj.Value()))))
 			sum = sum[:10]
 
 			expressionList = append(expressionList, sum)
@@ -68,6 +77,14 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 				return nil, errs.WithDebug(fmt.Errorf("%w: function call value used but nothing is returned", errs.RuntimeError), n.Debug)
 			}
 
+			if len(node.ObjectAccessors) > 0 {
+				acc, err := e.accessObject(obj, node.ObjectAccessors)
+				if err != nil {
+					return nil, errs.WithDebug(err, n.Debug)
+				}
+				obj = acc
+			}
+
 			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(node.Content)))
 			sum = sum[:10]
 
@@ -85,6 +102,21 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 		if variableType == tokens.InlineValue {
 			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(fmt.Sprint(node.Value))))
 			sum = sum[:10]
+
+			if node.Type == tokens.TemplateLiteral {
+				rawTmpl, err := tmpl.NewTemplate(node.Value.(string))
+				if err != nil {
+					return nil, errs.WithDebug(err, n.Debug)
+				}
+				s, err := e.parseTemplate(rawTmpl)
+				if err != nil {
+					return nil, errs.WithDebug(err, n.Debug)
+				}
+
+				expressionList = append(expressionList, sum)
+				args[sum] = s
+				continue
+			}
 
 			expressionList = append(expressionList, sum)
 			args[sum] = node.Value
@@ -184,6 +216,8 @@ func (e *Executer) getVariableTypeFromType(n *models.Node) tokens.VariableType {
 		return tokens.IntVariable
 	case tokens.Bool:
 		return tokens.BoolVariable
+	case tokens.TemplateLiteral:
+		return tokens.TemplateVariable
 	default:
 		return tokens.NilVariable
 	}

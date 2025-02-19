@@ -24,7 +24,7 @@ type Cache struct {
 
 // Store stores the cache information to file
 func Store(file string, data []byte, nodes []*models.Node) {
-	fileName := strings.ReplaceAll(file, "/", "$") + "bin"
+	fileName := strings.ReplaceAll(strings.ReplaceAll(file, "\\", "$"), "/", "$") + "bin"
 
 	if info, err := os.Stat(CacheDirectory); err != nil || !info.IsDir() {
 		// Create cache directory if it does not exist
@@ -52,7 +52,7 @@ func Store(file string, data []byte, nodes []*models.Node) {
 
 // Get gets the cache information from file
 func Get(file string, data []byte) ([]*models.Node, bool) {
-	fileName := strings.ReplaceAll(file, "/", "$") + "bin"
+	fileName := strings.ReplaceAll(strings.ReplaceAll(file, "\\", "$"), "/", "$") + "bin"
 	hash := fmt.Sprintf("%x", md5.Sum(data))
 
 	f, err := os.Open(filepath.Join(CacheDirectory, fileName))

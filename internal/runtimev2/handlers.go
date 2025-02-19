@@ -128,15 +128,10 @@ func (e *Executer) handleFor(node *models.Node) (lang.Object, error) {
 	node.Args[0].Type = tokens.Let
 	node.Args[0].VariableType = tokens.NilVariable
 	node.Args[0].Reference = false
-	name, iterator, err := e.createObjectFromNode(node.Args[0])
+	name, _, err := e.createObjectFromNode(node.Args[0])
 	if err != nil {
 		return nil, err
 	}
-
-	// add the iterator as the current executer's variable list
-	ex.mu.Lock()
-	ex.objects[name] = iterator
-	ex.mu.Unlock()
 
 	_, iterable, err := e.createObjectFromNode(&models.Node{
 		VariableType: tokens.ExpressionVariable,
@@ -153,11 +148,12 @@ func (e *Executer) handleFor(node *models.Node) (lang.Object, error) {
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected iterable value or expression, got '%s'", errs.ValueError, iterable.Type()), node.Debug)
 	case lang.TList:
 		for _, item := range iterable.Value().([]lang.Object) {
-			ex.mu.Lock()
-			ex.objects[name] = item
-			ex.mu.Unlock()
+			exec := NewExecuter(ExecuterScopeBlock, ex.runtime, ex)
+			exec.mu.Lock()
+			exec.objects[name] = item
+			exec.mu.Unlock()
 
-			ret, err := ex.Execute(node.Children)
+			ret, err := exec.Execute(node.Children)
 			if ret != nil || err != nil {
 				return ret, err
 			}
@@ -165,22 +161,24 @@ func (e *Executer) handleFor(node *models.Node) (lang.Object, error) {
 	case lang.TString:
 		str := strings.Split(iterable.Value().(string), "")
 		for _, item := range str {
-			ex.mu.Lock()
-			ex.objects[name] = lang.NewString(name, string(item), node.Debug)
-			ex.mu.Unlock()
+			exec := NewExecuter(ExecuterScopeBlock, ex.runtime, ex)
+			exec.mu.Lock()
+			exec.objects[name] = lang.NewString(name, string(item), node.Debug)
+			exec.mu.Unlock()
 
-			ret, err := ex.Execute(node.Children)
+			ret, err := exec.Execute(node.Children)
 			if ret != nil || err != nil {
 				return ret, err
 			}
 		}
 	case lang.TInt:
 		for item := 0; item < iterable.Value().(int); item++ {
-			ex.mu.Lock()
-			ex.objects[name] = lang.NewInteger(name, item, node.Debug)
-			ex.mu.Unlock()
+			exec := NewExecuter(ExecuterScopeBlock, ex.runtime, ex)
+			exec.mu.Lock()
+			exec.objects[name] = lang.NewInteger(name, item, node.Debug)
+			exec.mu.Unlock()
 
-			ret, err := ex.Execute(node.Children)
+			ret, err := exec.Execute(node.Children)
 			if ret != nil || err != nil {
 				return ret, err
 			}
