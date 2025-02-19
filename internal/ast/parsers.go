@@ -448,6 +448,30 @@ func (b *Builder) parseFunctionCall(ts []*models.Token, inx *int, node *models.N
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got 'EOF'", errs.SyntaxError), node.Debug)
 	}
 
+	var funcCallTokens []*models.Token
+
+	if ts[*inx].Type == tokens.Dot {
+		*inx++
+		if *inx >= len(ts) {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got 'EOF'", errs.SyntaxError), node.Debug)
+		}
+
+		for {
+			if ts[*inx].Type == tokens.Semicolon {
+				break
+			}
+
+			funcCallTokens = append(funcCallTokens, ts[*inx])
+			*inx++
+		}
+	}
+
+	funcCallTokens = append(funcCallTokens, SemiColonToken)
+	funcCallChild, err := b.Build(funcCallTokens)
+	if err != nil {
+		return nil, err
+	}
+
 	if ts[*inx].Type != tokens.Semicolon {
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
@@ -456,6 +480,7 @@ func (b *Builder) parseFunctionCall(ts []*models.Token, inx *int, node *models.N
 	node.Args = args
 	node.Type = tokens.FuncCall
 	node.VariableType = tokens.FunctionCallVariable
+	node.Children = funcCallChild
 
 	return node, nil
 }

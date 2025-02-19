@@ -164,6 +164,11 @@ func (e *Executer) callFunctionFromNode(n *models.Node) (lang.Object, error) {
 	if err != nil {
 		return nil, errs.WithDebug(err, n.Debug)
 	}
+
+	if len(n.Children) > 0 {
+		return e.getObjectValueByNodes(r, n.Children)
+	}
+
 	return r, nil
 }
 
@@ -283,4 +288,54 @@ func (e *Executer) createObjectFromDefinitionNode(n *models.Node) (string, lang.
 	}
 
 	return name, lang.NewDefinition(e.name+"."+name, name, n.Debug, ex), nil
+}
+
+func (e *Executer) getObjectValueByNodes(obj lang.Object, nodes []*models.Node) (lang.Object, error) {
+	if obj.Type() != lang.TDefinition {
+		return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), nodes[0].Debug)
+	}
+
+	for _, node := range nodes {
+		if node.Type != tokens.FuncCall && node.Type != tokens.Identifier {
+			return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), node.Debug)
+		}
+
+		if node.Type == tokens.FuncCall {
+			m := obj.Method(node.Content)
+			if m == nil {
+				return nil, errs.WithDebug(fmt.Errorf("%w: method '%s()' not found", errs.RuntimeError, node.Content), node.Debug)
+			}
+
+			if len(node.Args) != len(m.Args()) {
+				return nil, errs.WithDebug(fmt.Errorf("%w: '%s' expects %d arguments, got %d", errs.InvalidArguments, node.Content, len(m.Args()), len(node.Args)), node.Debug)
+			}
+
+			args := make([]lang.Object, len(node.Args))
+			for i, arg := range node.Args {
+				_, o, err := e.createObjectFromNode(arg)
+				if err != nil {
+					return nil, errs.WithDebug(err, arg.Debug)
+				}
+				args[i] = o
+			}
+
+			r, err := m.Execute(args)
+			if err != nil {
+				return nil, errs.WithDebug(err, node.Debug)
+			}
+
+			obj = r
+		}
+
+		if node.Type == tokens.Identifier {
+			m := obj.Variable(node.Content)
+			if m == nil {
+				return nil, errs.WithDebug(fmt.Errorf("%w: variable '%s' not found", errs.RuntimeError, node.Content), node.Debug)
+			}
+
+			obj = m
+		}
+	}
+
+	return obj, nil
 }

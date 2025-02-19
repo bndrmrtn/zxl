@@ -1,0 +1,5 @@
+namespace config;
+
+define Config {}
+
+return Config();

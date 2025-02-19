@@ -1,32 +1,13 @@
-use http;
+use http as h;
 
-http.html();
+let config = import("config.zx");
 
-let users = [
-    ["Martin", 19],
-    ["Johanna", 19],
-];
+h.write(type(config));
 
+h.html();
 
-http.write("<h1>Users</h1>");
-http.write("<table>");
-http.write("<tr>");
+let users = ["John", "Jane"];
 
-let i = 0;
-while i < users.length {
-
-    http.write("<tr>");
-    http.write("<td>");
-    http.write(users[i][0]);
-    http.write("</td>");
-    http.write("<td>");
-    http.write(users[i][1]);
-    http.write("</td>");
-    http.write("</tr>");
-
-
-    i = i + 1;
+for user in users {
+    h.write("<h1>Hello, " + user + "!</h1>\n");
 }
-
-http.write("</tr>");
-http.write("</table>");
