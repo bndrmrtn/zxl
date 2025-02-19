@@ -291,10 +291,6 @@ func (e *Executer) createObjectFromDefinitionNode(n *models.Node) (string, lang.
 }
 
 func (e *Executer) getObjectValueByNodes(obj lang.Object, nodes []*models.Node) (lang.Object, error) {
-	if obj.Type() != lang.TDefinition {
-		return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), nodes[0].Debug)
-	}
-
 	for _, node := range nodes {
 		if node.Type != tokens.FuncCall && node.Type != tokens.Identifier {
 			return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), node.Debug)

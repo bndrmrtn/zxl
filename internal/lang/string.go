@@ -35,7 +35,7 @@ func (s *String) Value() any {
 func (s *String) Method(name string) Method {
 	switch name {
 	case "split":
-		return NewFunction(nil, func(args []Object) (Object, error) {
+		return NewFunction([]string{"separator"}, func(args []Object) (Object, error) {
 			if len(args) != 1 {
 				return nil, fmt.Errorf("wrong number of arguments for split: expected 1, got %d", len(args))
 			}
