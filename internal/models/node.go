@@ -14,12 +14,12 @@ type Node struct {
 	VariableType tokens.VariableType `yaml:"variableType"`
 
 	// Content represents the content of the node
-	Content string `yaml:"content"`
+	Content string `yaml:"content,omitempty"`
 	// Value represents the value of the node
-	Value any `yaml:"value"`
+	Value any `yaml:"value,omitempty"`
 
 	// Reference is a bool to determine if the node is a reference
-	Reference bool `yaml:"reference"`
+	Reference bool `yaml:"reference,omitempty"`
 	// Children represents the children of the node
 	Children []*Node `yaml:"children,omitempty"`
 	// Args represents the arguments of the node
@@ -34,7 +34,7 @@ type Node struct {
 	Flags []string `yaml:"flags,omitempty"`
 
 	// Debug represents the debug information of the node
-	Debug *Debug `yaml:"debug"`
+	Debug *Debug `yaml:"debug,omitempty"`
 }
 
 func (n *Node) String() string {
@@ -53,21 +53,17 @@ func (n *Node) String() string {
 	)
 }
 
-func (n *Node) Copy() *Node {
-	cp := *n
-	return &cp
-}
+func (n *Node) ValueString() string {
+	switch n.VariableType {
+	case tokens.StringVariable:
+		return fmt.Sprintf("%q", n.Value)
+	case tokens.BoolVariable:
+		return fmt.Sprintf("%t", n.Value)
+	case tokens.IntVariable:
+		return fmt.Sprintf("%d", n.Value)
+	case tokens.FloatVariable:
+		return fmt.Sprintf("%f", n.Value)
+	}
 
-func (n *Node) Assign(node *Node) {
-	n.Type = node.Type
-	n.VariableType = node.VariableType
-	n.Content = node.Content
-	n.Value = node.Value
-	n.Reference = node.Reference
-	n.Children = node.Children
-	n.Args = node.Args
-	n.ObjectAccessors = node.ObjectAccessors
-	n.Map = node.Map
-	n.Flags = node.Flags
-	n.Debug = node.Debug
+	return fmt.Sprintf("%v", n.Value)
 }

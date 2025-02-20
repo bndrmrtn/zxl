@@ -18,6 +18,7 @@ const (
 	DefinitionReference
 	EmptyReturnValue
 	ListVariable
+	ArrayVariable
 )
 
 func (v VariableType) String() string {

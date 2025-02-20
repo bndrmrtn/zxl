@@ -1,4 +1,4 @@
-.PHONY: build run
+.PHONY: build run serve format
 
 build:
 	@go build -o bin/zxlang
@@ -8,3 +8,6 @@ run: build
 
 serve: build
 	@DEBUG=true ./bin/zxlang serve examples/$(folder) --listenAddr=:3030
+
+format: build
+	@DEBUG=true ./bin/zxlang format examples/format

@@ -246,6 +246,75 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					},
 				})
 			}
+		case '!':
+			if pos+1 < len(s) && s[pos+1] == '=' {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.NotEquation,
+					Value: "!=",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
+				})
+				col += 2
+				pos++
+			}
+		case '&':
+			if pos+1 < len(s) && s[pos+1] == '&' {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.And,
+					Value: "&&",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
+				})
+				col += 2
+				pos++
+			} else {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.And,
+					Value: "&",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
+				})
+				col++
+			}
+		case '|':
+			if pos+1 < len(s) && s[pos+1] == '|' {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.Or,
+					Value: "||",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
+				})
+				col += 2
+				pos++
+			} else {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.Or,
+					Value: "|",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
+				})
+				col++
+			}
 		case '+':
 			if pos+1 < len(s) && s[pos+1] == '+' {
 				parsed = append(parsed, &models.Token{
@@ -341,7 +410,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				pos += 2
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.TemplateLiteral,
-					Value: str.String(),
+					Value: strings.TrimSpace(str.String()),
 					Debug: &models.Debug{
 						Line:   line,
 						Column: col,
@@ -539,6 +608,8 @@ func (lx *Lexer) getIdentType(s string) tokens.TokenType {
 		return tokens.While
 	case "in":
 		return tokens.In
+	case "array":
+		return tokens.Array
 	default:
 		return tokens.Identifier
 	}

@@ -118,6 +118,12 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 		obj = lang.NewBool(name, b, n.Debug)
 	case tokens.NilVariable:
 		obj = lang.NewNil(name, n.Debug)
+	case tokens.ArrayVariable:
+		arr, err := e.createObjectFromArrayNode(name, n)
+		if err != nil {
+			return "", nil, errs.WithDebug(err, n.Debug)
+		}
+		obj = arr
 	}
 
 	if len(n.ObjectAccessors) > 0 {
@@ -294,4 +300,37 @@ func (e *Executer) parseTemplate(template []tmpl.Part) (string, error) {
 	}
 
 	return result, nil
+}
+
+// createObjectFromArrayNode creates an array object from a node.
+func (e *Executer) createObjectFromArrayNode(name string, n *models.Node) (lang.Object, error) {
+	if len(n.Children) == 0 {
+		return lang.NewArray(name, n.Debug, nil, nil), nil
+	}
+
+	var keys []lang.Object
+	var values []lang.Object
+
+	for _, child := range n.Children {
+		key := child.Args[0]
+
+		if key.Type == tokens.Identifier {
+			keys = append(keys, lang.NewString(key.Content, key.Content, key.Debug))
+		} else {
+			_, val, err := e.createObjectFromNode(key)
+			if err != nil {
+				return nil, errs.WithDebug(err, key.Debug)
+			}
+			keys = append(keys, val)
+		}
+
+		value := child.Children[0]
+		_, val, err := e.createObjectFromNode(value)
+		if err != nil {
+			return nil, errs.WithDebug(err, value.Debug)
+		}
+		values = append(values, val)
+	}
+
+	return lang.NewArray(name, n.Debug, keys, values), nil
 }

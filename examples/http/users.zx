@@ -1,6 +1,6 @@
-namespace httpserver;
+namespace httpserver
 
-use http;
+use http
 
 const users = [
     ["Martin", 19],

@@ -18,6 +18,9 @@ func GetMethods(importer ImportFunc) map[string]lang.Method {
 		"type":    lang.NewFunction([]string{"value"}, fnType, nil),
 		"range":   lang.NewFunction([]string{"range"}, fnRange, nil),
 		"read":    lang.NewFunction([]string{"text"}, fnRead, nil),
+		"string": lang.NewFunction([]string{"object"}, func(args []lang.Object) (lang.Object, error) {
+			return lang.NewString("string", args[0].String(), args[0].Debug()), nil
+		}, nil),
 	}
 }
 

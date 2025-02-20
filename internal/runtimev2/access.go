@@ -75,10 +75,18 @@ func (e *Executer) GetVariable(name string) (lang.Object, error) {
 		last := names[len(names)-1]
 
 		if first == "this" {
-			if e.parent != nil && e.parent.scope == ExecuterScopeDefinition {
-				return e.parent.GetVariable(strings.Join(append(middle, last), "."))
+			ex := e
+			for ex.parent != nil {
+				if ex.scope == ExecuterScopeDefinition {
+					break
+				}
+				ex = ex.parent
 			}
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.ThisNotInMethod, name), nil)
+
+			ob, err := ex.GetVariable(strings.Join(append(middle, last), "."))
+			if ob != nil || err != nil {
+				return ob, err
+			}
 		}
 
 		exec, err := e.runtime.GetNamespaceExecuter(first)

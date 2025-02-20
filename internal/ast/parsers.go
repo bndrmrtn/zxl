@@ -263,7 +263,10 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 		}, nil
 	}
 
-	if ts[*inx].Type == tokens.Semicolon || (ts[*inx].Type != tokens.Assign && ts[*inx].Type != tokens.LeftParenthesis && ts[*inx].Type != tokens.LeftBracket) {
+	if ts[*inx].Type != tokens.Assign && ts[*inx].Type != tokens.LeftParenthesis && ts[*inx].Type != tokens.LeftBracket {
+		if ts[*inx].Type == tokens.Semicolon {
+			*inx++
+		}
 		return &models.Node{
 			Type:         token.Type,
 			VariableType: tokens.ReferenceVariable,
@@ -444,8 +447,12 @@ func (b *Builder) parseFunctionCall(ts []*models.Token, inx *int, node *models.N
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected ')', but got '%s'", errs.SyntaxError, node.Type), node.Debug)
 	}
 
+	node.Args = args
+	node.Type = tokens.FuncCall
+	node.VariableType = tokens.FunctionCallVariable
+
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got 'EOF'", errs.SyntaxError), node.Debug)
+		return node, nil
 	}
 
 	var funcCallTokens []*models.Token
@@ -472,14 +479,10 @@ func (b *Builder) parseFunctionCall(ts []*models.Token, inx *int, node *models.N
 		return nil, err
 	}
 
-	if ts[*inx].Type != tokens.Semicolon {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	if ts[*inx].Type == tokens.Semicolon {
+		*inx++
 	}
 
-	*inx++
-	node.Args = args
-	node.Type = tokens.FuncCall
-	node.VariableType = tokens.FunctionCallVariable
 	node.Children = funcCallChild
 
 	return node, nil
@@ -575,14 +578,13 @@ func (b *Builder) parseNamespace(ts []*models.Token, inx *int) (*models.Node, er
 	*inx++
 
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got 'EOF'", errs.SyntaxError), token.Debug)
+		return node, nil
 	}
 
-	if ts[*inx].Type != tokens.Semicolon {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	if ts[*inx].Type == tokens.Semicolon {
+		*inx++
 	}
 
-	*inx++
 	return node, nil
 }
 
@@ -888,11 +890,11 @@ func (b *Builder) parseUse(ts []*models.Token, inx *int) (*models.Node, error) {
 
 	*inx++
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got 'EOF'", errs.SyntaxError), token.Debug)
+		return node, nil
 	}
 
 	if ts[*inx].Type != tokens.Semicolon && ts[*inx].Type != tokens.As {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+		return node, nil
 	}
 
 	if ts[*inx].Type == tokens.Semicolon {
@@ -919,14 +921,13 @@ func (b *Builder) parseUse(ts []*models.Token, inx *int) (*models.Node, error) {
 	*inx++
 
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got 'EOF'", errs.SyntaxError), token.Debug)
+		return node, nil
 	}
 
-	if ts[*inx].Type != tokens.Semicolon {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	if ts[*inx].Type == tokens.Semicolon {
+		*inx++
+		return node, nil
 	}
-
-	*inx++
 
 	return node, nil
 }
@@ -1375,4 +1376,133 @@ func (b *Builder) parseFor(ts []*models.Token, inx *int) (*models.Node, error) {
 	node.Children = child
 
 	return node, nil
+}
+
+func (b *Builder) parseArray(ts []*models.Token, inx *int) (*models.Node, error) {
+	token := ts[*inx]
+	*inx++
+
+	if token.Type != tokens.Array {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected array, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
+	}
+
+	if *inx >= len(ts) {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{', but got EOF", errs.SyntaxError), token.Debug)
+	}
+
+	if ts[*inx].Type != tokens.LeftBrace {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	}
+
+	*inx++
+
+	var (
+		values     []*models.Node
+		braceCount = 1
+	)
+
+	for {
+		if *inx >= len(ts) {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got 'EOF'", errs.SyntaxError), token.Debug)
+		}
+
+		if ts[*inx].Type == tokens.RightBrace {
+			braceCount--
+			if braceCount == 0 {
+				*inx++
+				break
+			}
+		}
+
+		if ts[*inx].Type == tokens.LeftBrace {
+			braceCount++
+		}
+
+		keyValue, err := b.parseArrayKeyValues(ts, inx)
+		if err != nil {
+			return nil, err
+		}
+
+		values = append(values, keyValue)
+	}
+
+	if braceCount != 0 {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got EOF", errs.SyntaxError), token.Debug)
+	}
+
+	if *inx < len(ts) && ts[*inx].Type == tokens.Semicolon {
+		*inx++
+	}
+
+	return &models.Node{
+		Type:         tokens.Array,
+		VariableType: tokens.ArrayVariable,
+		Content:      "Array{}",
+		Children:     values,
+	}, nil
+}
+
+func (b *Builder) parseArrayKeyValues(ts []*models.Token, inx *int) (*models.Node, error) {
+	token := ts[*inx]
+	*inx++
+
+	if token.Type != tokens.Identifier &&
+		token.Type != tokens.Number &&
+		token.Type != tokens.String {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, number or string, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
+	}
+
+	keyNode, err := b.Build(append([]*models.Token{}, token, SemiColonToken))
+	if err != nil {
+		return nil, err
+	}
+
+	if *inx >= len(ts) {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected ':', but got EOF", errs.SyntaxError), token.Debug)
+	}
+
+	if ts[*inx].Type != tokens.Colon {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected ':', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	}
+
+	*inx++
+
+	var (
+		children   []*models.Token
+		braceCount int
+	)
+
+	for {
+		if *inx >= len(ts) {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got 'EOF'", errs.SyntaxError), token.Debug)
+		}
+
+		if ts[*inx].Type == tokens.LeftBrace {
+			braceCount++
+		}
+
+		if ts[*inx].Type == tokens.RightBrace {
+			braceCount--
+		}
+
+		if braceCount == 0 && ts[*inx].Type == tokens.Comma {
+			*inx++
+			break
+		}
+
+		children = append(children, ts[*inx])
+		*inx++
+	}
+
+	childNodes, err := b.Build(append(children, SemiColonToken))
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.Node{
+		Type:     tokens.ArrayKeyValuePair,
+		Content:  "ArrayKey-ValuePair",
+		Args:     keyNode,
+		Children: childNodes,
+	}, nil
 }

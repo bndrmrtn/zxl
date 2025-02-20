@@ -1,0 +1,14 @@
+namespace datatype;
+
+const String = "<String>";
+const Integer = "<Integer>";
+const Float = "<Float>";
+const Bool = "<Bool>";
+const List = "<List>";
+const Nil = "<Nil>";
+const Definition = "<Definition>";
+const Function = "<function>";
+const IOStream = "<IOStream>";
+const Array = "<Array>";
+
+define x {}

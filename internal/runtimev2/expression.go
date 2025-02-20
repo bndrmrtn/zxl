@@ -11,6 +11,7 @@ import (
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/tmpl"
 	"github.com/bndrmrtn/zxl/internal/tokens"
+	"github.com/google/uuid"
 )
 
 // evaluateExpression evaluates an expression node
@@ -52,7 +53,7 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 				obj = acc
 			}
 
-			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(fmt.Sprintf("%v::%v", node.Content, obj.Value()))))
+			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(uuid.NewString())))
 			sum = sum[:10]
 
 			expressionList = append(expressionList, sum)
@@ -85,7 +86,7 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 				obj = acc
 			}
 
-			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(node.Content)))
+			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(uuid.NewString())))
 			sum = sum[:10]
 
 			expressionList = append(expressionList, sum)
@@ -100,7 +101,7 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 		}
 
 		if variableType == tokens.InlineValue {
-			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(fmt.Sprint(node.Value))))
+			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(uuid.NewString())))
 			sum = sum[:10]
 
 			if node.Type == tokens.TemplateLiteral {
@@ -129,7 +130,27 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 				return nil, errs.WithDebug(err, n.Debug)
 			}
 
-			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(fmt.Sprint(node.Value))))
+			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(uuid.NewString())))
+			sum = sum[:10]
+
+			expressionList = append(expressionList, sum)
+
+			if obj.Type() == lang.TList {
+				args[sum] = obj
+				continue
+			}
+
+			args[sum] = obj.Value()
+			continue
+		}
+
+		if variableType == tokens.ArrayVariable {
+			_, obj, err := e.createObjectFromNode(node)
+			if err != nil {
+				return nil, errs.WithDebug(err, n.Debug)
+			}
+
+			sum := fmt.Sprintf("array_%x", md5.Sum([]byte(uuid.NewString())))
 			sum = sum[:10]
 
 			expressionList = append(expressionList, sum)
@@ -218,6 +239,8 @@ func (e *Executer) getVariableTypeFromType(n *models.Node) tokens.VariableType {
 		return tokens.BoolVariable
 	case tokens.TemplateLiteral:
 		return tokens.TemplateVariable
+	case tokens.Array:
+		return tokens.ArrayVariable
 	default:
 		return tokens.NilVariable
 	}

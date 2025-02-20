@@ -17,10 +17,11 @@ const (
 	TBool       ObjType = "<Bool>"
 	TList       ObjType = "<List>"
 	TNothing    ObjType = ""
-	TNil        ObjType = "nil"
+	TNil        ObjType = "<Nil>"
 	TDefinition ObjType = "<Definition>"
 	TFunction   ObjType = "<function>"
 	TIOStream   ObjType = "<IOStream>"
+	TArray      ObjType = "<Array>"
 )
 
 var errNotImplemented = fmt.Errorf("not implemented")

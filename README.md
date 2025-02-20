@@ -130,6 +130,20 @@ while i < 10 {
 }
 ```
 
+### Arrays
+
+```zxl
+let myArr = array {
+  name: "John",
+  "age": 30,
+  city: "New York"
+};
+
+for key in myArr.keys {
+    println(string(key) + ": " + string(myObj[key]));
+}
+```
+
 ## Support
 
 Support my work by giving this project a star.

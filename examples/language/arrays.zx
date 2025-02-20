@@ -1,0 +1,17 @@
+use iter;
+
+let kv = iter.KeyValue("x", "y");
+
+let myObj = array {
+    "name": "Martin",
+    "age": 19,
+    "occupation": "Web Developer",
+};
+
+if type(myObj) == datatype.Array {
+    println("myObj is an array");
+}
+
+for key in myObj.keys {
+    println(string(key) + ": " + string(myObj[key]));
+}

@@ -34,6 +34,8 @@ const (
 	ListValue
 	Definiton
 	TemplateLiteral
+	Array
+	ArrayKeyValuePair
 
 	Addition TokenType = iota + 10000
 	Subtraction

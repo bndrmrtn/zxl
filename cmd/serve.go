@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// runCmd represents the run command
+// serveCmd represents the serve command
 var serveCmd = &cobra.Command{
 	Use:     "serve folder",
 	Aliases: []string{"server"},
@@ -19,7 +19,7 @@ var serveCmd = &cobra.Command{
 }
 
 func init() {
-	// Add the run command to the root command
+	// Add the serve command to the root command
 	rootCmd.AddCommand(serveCmd)
 	serveCmd.Flags().BoolP("debug", "d", false, "Run the program in debug mode")
 	serveCmd.Flags().BoolP("nocolor", "n", false, "Enable or disable colorized output")

@@ -1,0 +1,52 @@
+namespace html;
+
+use datatype;
+
+define Builder {
+    let language = "en";
+    let title = "My Page";
+    let description;
+    let head;
+    let body;
+
+    fn construct(language, title) {
+        this.language = language;
+        this.title = title;
+    }
+
+    fn setBody(b) {
+        this.body = b;
+    }
+
+    fn setHead(h) {
+        this.head = h;
+    }
+
+    fn build() {
+        let generated = <>
+            <!DOCTYPE html>
+            <html lang="{{ this.language }}">
+            <head>
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width,initial-scale=1.0">
+            <title>{{ this.title }}</title>
+        </>;
+
+        if this.description != nil {
+            generated = generated + this.head;
+        }
+
+        if this.description != nil && this.description != "" {
+            generated = generated + <><meta name="description" content="{{ this.description }}"></>;
+        }
+
+        generated = generated + <></head><body></>;
+
+        if this.body != nil {
+            generated = generated + this.body;
+        }
+
+        return generated + <></body></html></>;
+    }
+}

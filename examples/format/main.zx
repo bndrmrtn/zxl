@@ -1,0 +1,21 @@
+namespace main;
+
+use application as app;
+use core as core;
+
+fn main(arg, arg2) {
+	let x = "x";
+}
+
+fn funcc(n1) {
+	let y = 5 + n1;
+}
+let x = funcc(15);
+
+define x {
+	let y = y;
+
+	fn construct(y) {
+		let z = y + 1;
+	}
+}

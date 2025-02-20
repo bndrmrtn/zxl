@@ -1,0 +1,11 @@
+namespace iter;
+
+define KeyValue {
+    let key = "";
+    let value = "";
+
+    fn construct(key, value) {
+        this.key = key;
+        this.value = value;
+    }
+}

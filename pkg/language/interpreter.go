@@ -2,10 +2,8 @@ package language
 
 import (
 	"bytes"
-	"embed"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/ast"
@@ -14,22 +12,6 @@ import (
 	"github.com/bndrmrtn/zxl/internal/lexer"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/runtimev2"
-	"gopkg.in/yaml.v3"
-)
-
-//go:embed source/*.zx
-var sourceFiles embed.FS
-
-// InterpreterMode is the mode of the interpreter
-type InterpreterMode int
-
-const (
-	// ModeDebug writes debug information to file
-	ModeDebug InterpreterMode = iota
-	// ModeProduction is the default mode
-	ModeProduction
-	// ModeTest is the test mode
-	ModeTest
 )
 
 // Interpreter is a language interpreter
@@ -61,11 +43,10 @@ func (ir *Interpreter) Interpret(fileName string, data io.Reader) (lang.Object, 
 	}
 
 	run := runtimev2.New()
-	source, err := ir.source()
+	err = ir.ExecuteSourceFiles(run)
 	if err != nil {
 		return nil, err
 	}
-	run.Execute(source)
 	return run.Execute(nodes)
 }
 
@@ -119,62 +100,4 @@ func (ir *Interpreter) getNodes(fileName string, data io.Reader) ([]*models.Node
 	}
 
 	return nodes, nil
-}
-
-func (ir *Interpreter) source() ([]*models.Node, error) {
-	files, err := sourceFiles.ReadDir("source")
-	if err != nil {
-		return nil, err
-	}
-
-	var allNodes []*models.Node
-
-	for _, file := range files {
-		if file.IsDir() {
-			continue
-		}
-
-		content, err := sourceFiles.ReadFile("source/" + file.Name())
-		if err != nil {
-			return nil, err
-		}
-
-		// Tokenize the source code with lexer
-		lx := lexer.New("@zx/" + file.Name())
-		ts, err := lx.Parse(bytes.NewReader(content))
-		if err != nil {
-			return nil, err
-		}
-
-		// Build the abstract syntax tree from tokens
-		builder := ast.NewBuilder()
-		nodes, err := builder.Build(ts)
-		if err != nil {
-			return nil, err
-		}
-
-		allNodes = append(allNodes, nodes...)
-	}
-
-	return allNodes, nil
-}
-
-// writeDebug writes debug information to file
-func (ir *Interpreter) writeDebug(file, suffix string, v any) {
-	// Create debug directory if it does not exist
-	_ = os.MkdirAll("debug/", os.ModePerm)
-
-	file = strings.ReplaceAll(file, "/", ".")
-	file = strings.Trim(file, ".")
-	file = file + "." + suffix + ".yaml"
-
-	// Write debug information to file
-	f, err := os.Create("debug/" + file)
-	if err != nil {
-		return
-	}
-	defer f.Close()
-
-	// Write debug information to file
-	_ = yaml.NewEncoder(f).Encode(v)
 }

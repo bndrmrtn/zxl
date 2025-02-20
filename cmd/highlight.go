@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// rootCmd is the root command for the CLI
+// highlightCmd highlights code for a given file
 var highlightCmd = &cobra.Command{
 	Use:     "highligh file.zx",
 	Aliases: []string{"hl"},
@@ -17,7 +17,7 @@ var highlightCmd = &cobra.Command{
 }
 
 func init() {
-	// Add the run command to the root command
+	// Add the highlight command to the root command
 	rootCmd.AddCommand(highlightCmd)
 	highlightCmd.Flags().BoolP("nocolor", "n", false, "Enable or disable colorized output")
 }

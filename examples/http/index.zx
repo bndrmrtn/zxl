@@ -1,7 +1,5 @@
 use http as h;
 
-let config = import("config.zx");
-
 h.write(type(config));
 
 h.html();
@@ -9,5 +7,7 @@ h.html();
 let users = ["John", "Jane"];
 
 for user in users {
-    h.write("<h1>Hello, " + user + "!</h1>\n");
+    h.write(<>
+        <h1>Hello, {{ user }}!</h1>\n
+    </>);
 }

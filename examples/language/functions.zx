@@ -2,7 +2,7 @@ fn sayHello(name) {
 	println("Hello, " + name + "!");
 }
 
-sayHello("Martin");
+sayHello(read("Enter your name: "));
 
 fn getMessage() {
 	return "Hello, World!";
