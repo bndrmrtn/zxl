@@ -2,9 +2,7 @@ package server
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -34,29 +32,11 @@ func (s *Server) getExecutablePath(path string) (string, error) {
 		return path, nil
 	}
 
-	return "", fmt.Errorf("file not found")
-}
-
-// handleError handles the error
-func (s *Server) handleError(err error, w http.ResponseWriter) {
-	var de errs.DebugError
-	if errors.As(err, &de) {
-		w.Header().Add("Content-Type", "text/html")
-		w.WriteHeader(http.StatusInternalServerError)
-		htmlErr := de.HttpError()
-		if htmlErr == nil {
-			w.Write([]byte(de.Error()))
-			return
-		}
-		w.Write([]byte(s.makePrettyCode(htmlErr)))
-		return
-	}
-
-	http.Error(w, err.Error(), http.StatusInternalServerError)
+	return "", fmt.Errorf("%w: file not found", errNotFound)
 }
 
 func (s *Server) makePrettyCode(htmlErr *errs.HtmlError) string {
-	lx := lexer.New("")
+	lx := lexer.New("source")
 	ts, err := lx.Parse(bytes.NewReader(htmlErr.Code))
 	if err != nil {
 		return htmlErr.Error()

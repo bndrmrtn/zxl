@@ -396,6 +396,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 			if pos+1 < len(s) && s[pos+1] == '>' {
 				var str strings.Builder
 				pos += 2
+				str.WriteString("<>")
 				for pos < len(s)-2 && !(s[pos] == '<' && (s[pos+1] == '/' && s[pos+2] == '>')) {
 					str.WriteByte(s[pos])
 					pos++
@@ -406,11 +407,12 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						col = 0
 					}
 				}
+				str.WriteString("</>")
 				line--
 				pos += 2
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.TemplateLiteral,
-					Value: strings.TrimSpace(str.String()),
+					Value: str.String(),
 					Debug: &models.Debug{
 						Line:   line,
 						Column: col,

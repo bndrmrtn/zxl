@@ -43,6 +43,10 @@ func (de DebugError) Error() string {
 	return fmt.Sprintf("%s\n%s\nat %s:%d:%d\n%s", color.New(color.FgBlue, color.Bold).Sprint("Zx - ", version.Version), redBold(de.err.Error()), de.debug.File, de.debug.Line, de.debug.Column, near)
 }
 
+func (de DebugError) GetParentError() error {
+	return de.err
+}
+
 func (de DebugError) getNear() string {
 	if de.debug == nil {
 		return ""

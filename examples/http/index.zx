@@ -1,13 +1,15 @@
 use server as s;
 
+const config = import ("./config.zx");
+
 s.write(type(config));
 
-s.html();
+s.html);
 
 let users = ["John", "Jane"];
 
 for user in users {
     s.write(<>
-        <h1>Hello, {{ user }}!</h1>\n
+        <h1>Hello, {{ user }}!</h1>
     </>);
 }

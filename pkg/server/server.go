@@ -93,14 +93,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Get the executable path
 	zxPath, err := s.getExecutablePath(path)
 	if err != nil {
-		s.handleError(err, w)
+		s.handleError(err, w, r)
 		return
 	}
 
 	// Open the file
 	file, err := os.Open(zxPath)
 	if err != nil {
-		s.handleError(err, w)
+		s.handleError(err, w, r)
 		return
 	}
 	defer file.Close()
@@ -108,7 +108,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Get the nodes
 	nodes, err := s.ir.GetNodes(zxPath, file)
 	if err != nil {
-		s.handleError(err, w)
+		s.handleError(err, w, r)
 		return
 	}
 
@@ -128,13 +128,13 @@ func (s *Server) executeNodes(nodes []*models.Node, w http.ResponseWriter, r *ht
 	run.BindModule(httpModule)
 	err := s.ir.ExecuteSourceFiles(run)
 	if err != nil {
-		s.handleError(err, w)
+		s.handleError(err, w, r)
 		return
 	}
 
 	// Execute the nodes
 	if _, err := run.Execute(nodes); err != nil {
-		s.handleError(err, w)
+		s.handleError(err, w, r)
 		return
 	}
 
