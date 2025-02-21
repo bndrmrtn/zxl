@@ -124,7 +124,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *Server) executeNodes(nodes []*models.Node, w http.ResponseWriter, r *http.Request) {
 	// Execute the nodes
 	run := runtimev2.New()
-	httpModule := modules.NewHttpModule(w, r)
+	httpModule := modules.NewHttpServerModule(w, r)
 	run.BindModule(httpModule)
 	err := s.ir.ExecuteSourceFiles(run)
 	if err != nil {

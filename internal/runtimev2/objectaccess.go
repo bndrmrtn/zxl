@@ -59,7 +59,7 @@ func (e *Executer) accessObject(obj lang.Object, accessors []*models.Node) (lang
 	}
 
 	if v, ok := value.(lang.Object); ok {
-		value = v.Value()
+		return v.Copy(), nil
 	}
 
 	_, ob, err := e.createObjectFromNode(&models.Node{

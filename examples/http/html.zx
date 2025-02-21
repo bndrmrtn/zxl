@@ -1,11 +1,11 @@
 namespace htmldemo;
 
 use html;
-use http;
+use server as s;
 
 let builder = html.Builder("hu", "Saját oldalam");
 builder.setBody(<>
     <h1>Saját oldalam</h1>
 </>);
 
-http.write(builder.build());
+s.write(builder.build());

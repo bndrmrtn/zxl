@@ -1,151 +1,82 @@
 package modules
 
 import (
-	"bytes"
-	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/bndrmrtn/zxl/internal/lang"
 )
 
-type HttpModule struct {
-	w http.ResponseWriter
-	r *http.Request
+type Http struct{}
 
-	Body bytes.Buffer
-	Code int
+func NewHttpModule() *Http {
+	return &Http{}
 }
 
-func NewHttpModule(w http.ResponseWriter, r *http.Request) *HttpModule {
-	return &HttpModule{
-		w:    w,
-		r:    r,
-		Code: http.StatusOK,
-	}
-}
-
-func (*HttpModule) Namespace() string {
+func (*Http) Namespace() string {
 	return "http"
 }
 
-func (h *HttpModule) Objects() map[string]lang.Object {
+func (h *Http) Objects() map[string]lang.Object {
+	m := h.getStatusMap()
+	return m
+}
+
+func (h *Http) Methods() map[string]lang.Method {
+	return nil
+}
+
+func (h *Http) getStatusMap() map[string]lang.Object {
 	return map[string]lang.Object{
-		"method": immute(lang.NewString("method", h.r.Method, nil)),
-		"url":    immute(lang.NewString("url", h.r.URL.String(), nil)),
-		"header": immute(lang.NewDefinition("Header", "header", nil, newHeader(h.r.Header, h.w.Header()))),
+		"statusOK":                            lang.NewInteger("statusOk", http.StatusOK, nil),
+		"statusCreated":                       lang.NewInteger("statusCreated", http.StatusCreated, nil),
+		"statusAccepted":                      lang.NewInteger("statusAccepted", http.StatusAccepted, nil),
+		"statusNoContent":                     lang.NewInteger("statusNoContent", http.StatusNoContent, nil),
+		"statusResetContent":                  lang.NewInteger("statusResetContent", http.StatusResetContent, nil),
+		"statusPartialContent":                lang.NewInteger("statusPartialContent", http.StatusPartialContent, nil),
+		"statusMultiStatus":                   lang.NewInteger("statusMultiStatus", http.StatusMultiStatus, nil),
+		"statusAlreadyReported":               lang.NewInteger("statusAlreadyReported", http.StatusAlreadyReported, nil),
+		"statusIMUsed":                        lang.NewInteger("statusIMUsed", http.StatusIMUsed, nil),
+		"statusMultipleChoices":               lang.NewInteger("statusMultipleChoices", http.StatusMultipleChoices, nil),
+		"statusMovedPermanently":              lang.NewInteger("statusMovedPermanently", http.StatusMovedPermanently, nil),
+		"statusFound":                         lang.NewInteger("statusFound", http.StatusFound, nil),
+		"statusSeeOther":                      lang.NewInteger("statusSeeOther", http.StatusSeeOther, nil),
+		"statusNotModified":                   lang.NewInteger("statusNotModified", http.StatusNotModified, nil),
+		"statusUseProxy":                      lang.NewInteger("statusUseProxy", http.StatusUseProxy, nil),
+		"statusTemporaryRedirect":             lang.NewInteger("statusTemporaryRedirect", http.StatusTemporaryRedirect, nil),
+		"statusPermanentRedirect":             lang.NewInteger("statusPermanentRedirect", http.StatusPermanentRedirect, nil),
+		"statusBadRequest":                    lang.NewInteger("statusBadRequest", http.StatusBadRequest, nil),
+		"statusUnauthorized":                  lang.NewInteger("statusUnauthorized", http.StatusUnauthorized, nil),
+		"statusPaymentRequired":               lang.NewInteger("statusPaymentRequired", http.StatusPaymentRequired, nil),
+		"statusForbidden":                     lang.NewInteger("statusForbidden", http.StatusForbidden, nil),
+		"statusNotFound":                      lang.NewInteger("statusNotFound", http.StatusNotFound, nil),
+		"statusMethodNotAllowed":              lang.NewInteger("statusMethodNotAllowed", http.StatusMethodNotAllowed, nil),
+		"statusNotAcceptable":                 lang.NewInteger("statusNotAcceptable", http.StatusNotAcceptable, nil),
+		"statusRequestTimeout":                lang.NewInteger("statusRequestTimeout", http.StatusRequestTimeout, nil),
+		"statusConflict":                      lang.NewInteger("statusConflict", http.StatusConflict, nil),
+		"statusGone":                          lang.NewInteger("statusGone", http.StatusGone, nil),
+		"statusLengthRequired":                lang.NewInteger("statusLengthRequired", http.StatusLengthRequired, nil),
+		"statusPreconditionFailed":            lang.NewInteger("statusPreconditionFailed", http.StatusPreconditionFailed, nil),
+		"statusUnsupportedMediaType":          lang.NewInteger("statusUnsupportedMediaType", http.StatusUnsupportedMediaType, nil),
+		"statusExpectationFailed":             lang.NewInteger("statusExpectationFailed", http.StatusExpectationFailed, nil),
+		"statusMisdirectedRequest":            lang.NewInteger("statusMisdirectedRequest", http.StatusMisdirectedRequest, nil),
+		"statusUnprocessableEntity":           lang.NewInteger("statusUnprocessableEntity", http.StatusUnprocessableEntity, nil),
+		"statusLocked":                        lang.NewInteger("statusLocked", http.StatusLocked, nil),
+		"statusFailedDependency":              lang.NewInteger("statusFailedDependency", http.StatusFailedDependency, nil),
+		"statusUpgradeRequired":               lang.NewInteger("statusUpgradeRequired", http.StatusUpgradeRequired, nil),
+		"statusPreconditionRequired":          lang.NewInteger("statusPreconditionRequired", http.StatusPreconditionRequired, nil),
+		"statusTooManyRequests":               lang.NewInteger("statusTooManyRequests", http.StatusTooManyRequests, nil),
+		"statusRequestHeaderFieldsTooLarge":   lang.NewInteger("statusRequestHeaderFieldsTooLarge", http.StatusRequestHeaderFieldsTooLarge, nil),
+		"statusUnavailableForLegalReasons":    lang.NewInteger("statusUnavailableForLegalReasons", http.StatusUnavailableForLegalReasons, nil),
+		"statusInternalServerError":           lang.NewInteger("statusInternalServerError", http.StatusInternalServerError, nil),
+		"statusNotImplemented":                lang.NewInteger("statusNotImplemented", http.StatusNotImplemented, nil),
+		"statusBadGateway":                    lang.NewInteger("statusBadGateway", http.StatusBadGateway, nil),
+		"statusServiceUnavailable":            lang.NewInteger("statusServiceUnavailable", http.StatusServiceUnavailable, nil),
+		"statusGatewayTimeout":                lang.NewInteger("statusGatewayTimeout", http.StatusGatewayTimeout, nil),
+		"statusHTTPVersionNotSupported":       lang.NewInteger("statusHTTPVersionNotSupported", http.StatusHTTPVersionNotSupported, nil),
+		"statusVariantAlsoNegotiates":         lang.NewInteger("statusVariantAlsoNegotiates", http.StatusVariantAlsoNegotiates, nil),
+		"statusInsufficientStorage":           lang.NewInteger("statusInsufficientStorage", http.StatusInsufficientStorage, nil),
+		"statusLoopDetected":                  lang.NewInteger("statusLoopDetected", http.StatusLoopDetected, nil),
+		"statusNotExtended":                   lang.NewInteger("statusNotExtended", http.StatusNotExtended, nil),
+		"statusNetworkAuthenticationRequired": lang.NewInteger("statusNetworkAuthenticationRequired", http.StatusNetworkAuthenticationRequired, nil),
 	}
-}
-
-func (h *HttpModule) Methods() map[string]lang.Method {
-	return map[string]lang.Method{
-		"write":  lang.NewFunction([]string{"data"}, h.fnWrite, nil),
-		"status": lang.NewFunction([]string{"code"}, h.fnStatus, nil),
-		"body":   lang.NewFunction(nil, h.fnBody, nil),
-		"json":   lang.NewFunction(nil, h.fnContentType("json"), nil),
-		"html":   lang.NewFunction(nil, h.fnContentType("html"), nil),
-		"text":   lang.NewFunction(nil, h.fnContentType("text"), nil),
-	}
-}
-
-func (h *HttpModule) fnWrite(args []lang.Object) (lang.Object, error) {
-	data := fmt.Sprint(args[0].Value())
-	h.Body.WriteString(data)
-	return nil, nil
-}
-
-func (h *HttpModule) fnStatus(args []lang.Object) (lang.Object, error) {
-	if args[0].Type() != lang.TInt {
-		return nil, fmt.Errorf("status code must be an integer")
-	}
-	code, ok := args[0].Value().(int)
-	if !ok {
-		return nil, fmt.Errorf("status code must be an integer")
-	}
-
-	if code < 100 || code > 599 {
-		return nil, fmt.Errorf("status code must be between 100 and 599")
-	}
-
-	h.Code = code
-	return nil, nil
-}
-
-func (h *HttpModule) fnBody(_ []lang.Object) (lang.Object, error) {
-	body, err := io.ReadAll(h.r.Body)
-	if err != nil {
-		return nil, fmt.Errorf("could not read body content: '%v'", err)
-	}
-
-	return lang.NewString("body", string(body), nil), nil
-}
-
-func (h *HttpModule) fnContentType(typ string) func([]lang.Object) (lang.Object, error) {
-	var contentType = "text/plain"
-
-	switch typ {
-	case "json":
-		contentType = "application/json"
-	case "html":
-		contentType = "text/html"
-	case "text":
-		contentType = "text/plain"
-	}
-
-	return func(_ []lang.Object) (lang.Object, error) {
-		h.w.Header().Set("Content-Type", contentType)
-		return nil, nil
-	}
-}
-
-// Header
-
-type header struct {
-	request  http.Header
-	response http.Header
-}
-
-func newHeader(r http.Header, w http.Header) *header {
-	return &header{
-		request:  r,
-		response: w,
-	}
-}
-
-func (h *header) GetVariable(variable string) (lang.Object, error) {
-	return nil, fmt.Errorf("variable '%s' not found on http.Header", variable)
-}
-
-func (h *header) AssignVariable(variable string, value lang.Object) error {
-	return fmt.Errorf("cannot set variable '%s' on http.Header", variable)
-}
-
-func (h *header) GetMethod(name string) (lang.Method, error) {
-	switch name {
-	default:
-		return nil, fmt.Errorf("method '%s' not found on http.Header", name)
-	case "set":
-		return lang.NewFunction([]string{"key", "value"}, func(args []lang.Object) (lang.Object, error) {
-			key := args[0]
-			if key.Type() != lang.TString {
-				return nil, fmt.Errorf("key must be a string")
-			}
-
-			h.response.Set(key.String(), args[1].String())
-			return nil, nil
-		}, nil), nil
-	case "get":
-		return lang.NewFunction([]string{"key"}, func(args []lang.Object) (lang.Object, error) {
-			if args[0].Type() != lang.TString {
-				return nil, fmt.Errorf("key must be a string")
-			}
-
-			key := args[0].String()
-			return lang.NewString(key, h.request.Get(key), nil), nil
-		}, nil), nil
-	}
-}
-
-func (h *header) Copy() lang.Executer {
-	return newHeader(h.request, h.response)
 }

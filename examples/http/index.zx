@@ -1,13 +1,13 @@
-use http as h;
+use server as s;
 
-h.write(type(config));
+s.write(type(config));
 
-h.html();
+s.html();
 
 let users = ["John", "Jane"];
 
 for user in users {
-    h.write(<>
+    s.write(<>
         <h1>Hello, {{ user }}!</h1>\n
     </>);
 }

@@ -50,13 +50,29 @@ func (a *Array) Method(name string) Method {
 
 			return NewList("values", values, a.debug), nil
 		}, a.debug)
+	case "$bind":
+		return NewFunction([]string{"key", "value"}, func(args []Object) (Object, error) {
+			key := args[0]
+			value := args[1]
+
+			if _, ok := a.Map[key]; !ok {
+				a.Keys = append(a.Keys, key)
+			}
+
+			if a.Map == nil {
+				a.Map = make(map[any]Object)
+			}
+
+			a.Map[key] = value
+			return nil, nil
+		}, nil)
 	default:
 		return nil
 	}
 }
 
 func (a *Array) Methods() []string {
-	return []string{"values"}
+	return []string{"values", "$bind"}
 }
 
 func (a *Array) Variable(variable string) Object {

@@ -1,0 +1,11 @@
+namespace testing;
+
+use json;
+
+let str = '{"x": 5,"ids": [1,2,3,4],"value": true}';
+
+let data = json.parse(str);
+
+let s = json.toString(data);
+
+println(s);

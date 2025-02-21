@@ -26,6 +26,8 @@ func New() *Runtime {
 	r.functions = builtin.GetMethods(r.importer)
 	r.BindModule(modules.NewRandModule())
 	r.BindModule(modules.NewIOModule())
+	r.BindModule(modules.NewHttpModule())
+	r.BindModule(modules.NewJSONModule())
 	return r
 }
 

@@ -57,7 +57,7 @@ func (p *PrettyCode) highlightToken(mode Mode, token *models.Token, next *models
 		tokens.Function, tokens.Define, tokens.Return,
 		tokens.Namespace, tokens.Use, tokens.As, tokens.From,
 		tokens.While, tokens.For,
-		tokens.If, tokens.Else, tokens.In:
+		tokens.If, tokens.Else, tokens.In, tokens.Array:
 		return p.highlightKeyword(mode, token.Value)
 	case tokens.Identifier:
 		if next != nil && next.Type == tokens.LeftParenthesis {

@@ -48,10 +48,10 @@ func (l *List) Value() any {
 }
 
 func (l *List) Method(name string) Method {
-	switch {
+	switch name {
 	default:
 		return nil
-	case name == "append":
+	case "append":
 		return NewFunction([]string{"item"}, func(args []Object) (Object, error) {
 			if len(l.value) == -1 {
 				l.length = len(l.value)
@@ -59,11 +59,25 @@ func (l *List) Method(name string) Method {
 			l.value = append(l.value, args[0])
 			return nil, nil
 		}, l.debug)
+	case "contains":
+		return NewFunction([]string{"item"}, func(args []Object) (Object, error) {
+			if l.length < 1 {
+				return NewBool("contains", false, l.debug), nil
+			}
+
+			for _, v := range l.value {
+				if v.Value() == args[0].Value() {
+					return NewBool("contains", true, l.debug), nil
+				}
+			}
+
+			return NewBool("contains", false, l.debug), nil
+		}, l.debug)
 	}
 }
 
 func (l *List) Methods() []string {
-	return []string{"append"}
+	return []string{"append", "contains"}
 }
 
 func (l *List) Variable(variable string) Object {
