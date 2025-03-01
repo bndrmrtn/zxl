@@ -190,6 +190,7 @@ func (e *Executer) callFunctionFromNode(n *models.Node) (lang.Object, error) {
 	}
 
 	r, err := method.Execute(args)
+
 	if err != nil {
 		return nil, errs.WithDebug(err, n.Debug)
 	}

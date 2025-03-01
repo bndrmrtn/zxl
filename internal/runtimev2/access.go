@@ -29,6 +29,7 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 		exec, err := e.GetNamespaceExecuter(first)
 		if err == nil {
 			ob, err := e.accessNamespace(exec, name, middle, last)
+
 			if ob != nil || err != nil {
 				return ob, err
 			}
@@ -130,7 +131,6 @@ func (e *Executer) accessNamespace(exec *Executer, name string, middle []string,
 		return nil, errs.WithDebug(fmt.Errorf("%w: '%s()'", errs.CannotAccessFunction, name), nil)
 	}
 
-	// Middle elemek feldolgozása
 	for _, part := range middle {
 		obj = obj.Variable(part)
 		if obj == nil {

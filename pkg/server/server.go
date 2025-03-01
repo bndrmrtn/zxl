@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/internal/modules"
+	"github.com/bndrmrtn/zxl/internal/modules/servermodule"
 	"github.com/bndrmrtn/zxl/internal/runtimev2"
 	"github.com/bndrmrtn/zxl/internal/version"
 	"github.com/bndrmrtn/zxl/pkg/language"
@@ -124,7 +124,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *Server) executeNodes(nodes []*models.Node, w http.ResponseWriter, r *http.Request) {
 	// Execute the nodes
 	run := runtimev2.New()
-	httpModule := modules.NewHttpServerModule(w, r)
+	httpModule := servermodule.New(w, r)
 	run.BindModule(httpModule)
 	err := s.ir.ExecuteSourceFiles(run)
 	if err != nil {

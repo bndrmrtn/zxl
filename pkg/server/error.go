@@ -9,7 +9,7 @@ import (
 	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/internal/modules"
+	"github.com/bndrmrtn/zxl/internal/modules/servermodule"
 	"github.com/bndrmrtn/zxl/internal/runtimev2"
 )
 
@@ -90,7 +90,7 @@ func (s *Server) handleCustomErrorHandler(serverErr error, code int, w http.Resp
 func (s *Server) executeErrorHandler(nodes []*models.Node, serverErr error, code int, w http.ResponseWriter, r *http.Request) bool {
 	// Execute the nodes
 	run := runtimev2.New()
-	httpModule := modules.NewHttpServerModule(w, r)
+	httpModule := servermodule.New(w, r)
 	httpModule.Code = code
 	run.BindModule(httpModule)
 	err := s.ir.ExecuteSourceFiles(run)

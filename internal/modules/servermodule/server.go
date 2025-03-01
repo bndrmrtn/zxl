@@ -1,4 +1,4 @@
-package modules
+package servermodule
 
 import (
 	"bytes"
@@ -17,7 +17,7 @@ type HttpServer struct {
 	Code int
 }
 
-func NewHttpServerModule(w http.ResponseWriter, r *http.Request) *HttpServer {
+func New(w http.ResponseWriter, r *http.Request) *HttpServer {
 	return &HttpServer{
 		w:    w,
 		r:    r,
@@ -31,9 +31,8 @@ func (*HttpServer) Namespace() string {
 
 func (h *HttpServer) Objects() map[string]lang.Object {
 	return map[string]lang.Object{
-		"method": immute(lang.NewString("method", h.r.Method, nil)),
-		"url":    immute(lang.NewString("url", h.r.URL.String(), nil)),
-		"header": immute(lang.NewDefinition("Header", "header", nil, newHeader(h.r.Header, h.w.Header()))),
+		"request": NewRequest(h.r),
+		"header":  immute(lang.NewDefinition("Header", "header", nil, newHeader(h.r.Header, h.w.Header()))),
 	}
 }
 

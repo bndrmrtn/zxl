@@ -50,48 +50,7 @@ func (j *JSON) parse(args []lang.Object) (lang.Object, error) {
 }
 
 func (j *JSON) traverseJSON(data interface{}) (lang.Object, error) {
-	switch value := data.(type) {
-	case map[string]interface{}:
-		var obj = lang.NewArray("object", nil, nil, nil)
-		for key, val := range value {
-			value, err := j.traverseJSON(val)
-			if err != nil {
-				return nil, err
-			}
-
-			obj.Method("$bind").Execute([]lang.Object{
-				lang.NewString("key", key, nil),
-				value,
-			})
-		}
-		return obj, nil
-	case []interface{}:
-		var li = make([]lang.Object, len(value))
-		for i, val := range value {
-			value, err := j.traverseJSON(val)
-			if err != nil {
-				return nil, err
-			}
-
-			li[i] = value
-		}
-		return lang.NewList("list", li, nil), nil
-	case int:
-		return lang.NewInteger("number", int(value), nil), nil
-	case float64:
-		return lang.NewFloat("number", value, nil), nil
-	case float32:
-		return lang.NewFloat("number", float64(value), nil), nil
-	case string:
-		return lang.NewString("string", value, nil), nil
-	case bool:
-		return lang.NewBool("bool", value, nil), nil
-	case nil:
-		return lang.NewNil("nil", nil), nil
-	case interface{}:
-		return j.traverseJSON(value)
-	}
-	return nil, fmt.Errorf("unsupported type %T", data)
+	return lang.FromValue(data)
 }
 
 func (j *JSON) toString(args []lang.Object) (lang.Object, error) {

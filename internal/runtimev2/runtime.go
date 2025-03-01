@@ -24,10 +24,11 @@ func New() *Runtime {
 		executers: make(map[string]*Executer),
 	}
 	r.functions = builtin.GetMethods(r.importer)
-	r.BindModule(modules.NewRandModule())
-	r.BindModule(modules.NewIOModule())
-	r.BindModule(modules.NewHttpModule())
-	r.BindModule(modules.NewJSONModule())
+
+	for _, module := range modules.Get() {
+		r.BindModule(module)
+	}
+
 	return r
 }
 

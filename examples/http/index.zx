@@ -1,15 +1,21 @@
-use server as s;
+use server;
+
+let req = server.request;
+
+if req.method == "GET" {
+    server.html();
+}
+
+println(server.request.method);
 
 const config = import ("./config.zx");
 
-s.write(type(config));
-
-s.html);
+server.write(type(config));
 
 let users = ["John", "Jane"];
 
 for user in users {
-    s.write(<>
+    server.write(<>
         <h1>Hello, {{ user }}!</h1>
     </>);
 }
