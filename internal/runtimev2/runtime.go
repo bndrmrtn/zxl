@@ -22,12 +22,16 @@ type Runtime struct {
 
 	// executers is a map of namespace names to exec
 	executers map[string]*Executer
+
+	// packages is a map of package names to runtime
+	packages map[string]*Runtime
 }
 
 // New creates a new runtime
 func New() *Runtime {
 	r := &Runtime{
 		executers: make(map[string]*Executer),
+		packages:  make(map[string]*Runtime),
 	}
 	r.functions = builtin.GetMethods(r.importer)
 
@@ -76,12 +80,18 @@ func (r *Runtime) GetNamespaceExecuter(namespace string) (*Executer, error) {
 			return nil, fmt.Errorf("invalid namespace %v", namespace)
 		}
 
-		ex = NewExecuter(ExecuterScopeGlobal, r, nil).WithName(namespace)
-		if err := r.loadPackage(ex, parts[0], parts[1]); err != nil {
+		if run, ok := r.packages[namespace]; ok {
+			ex, err := run.GetNamespaceExecuter(parts[1])
+			if err == nil {
+				return ex, nil
+			}
+		}
+
+		ex, err := r.loadPackage(parts[0], parts[1])
+		if err != nil {
 			return nil, err
 		}
 
-		r.executers[namespace] = ex
 		return ex, nil
 	}
 	return ex, nil
@@ -106,14 +116,23 @@ func (r *Runtime) BindModule(module lang.Module) {
 	}
 }
 
-func (r *Runtime) loadPackage(ex *Executer, author string, pkg string) error {
+func (r *Runtime) loadPackage(author string, pkg string) (*Executer, error) {
+	run := New()
+	r.packages[author+":"+pkg] = run
+	run.Exec(ExecuterScopeGlobal, nil, pkg, nil)
+
+	ex, err := run.GetNamespaceExecuter(pkg)
+	if err != nil {
+		return nil, err
+	}
+
 	stat, err := os.Stat(filepath.Join(PackageDirectory, author, pkg))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !stat.IsDir() {
-		return fmt.Errorf("package %v not found", pkg)
+		return nil, fmt.Errorf("package %v not found", pkg)
 	}
 
 	var files []string
@@ -129,8 +148,9 @@ func (r *Runtime) loadPackage(ex *Executer, author string, pkg string) error {
 
 	for _, file := range files {
 		if err := ex.LoadFile(file); err != nil {
-			return err
+			return nil, err
 		}
 	}
-	return nil
+
+	return ex, nil
 }

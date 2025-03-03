@@ -63,7 +63,7 @@ func (pm *PackageManager) installPackage(pkg *Package) error {
 		return nil
 	}
 
-	manager, err := New(dest)
+	manager, err := New(pkg.Package, dest)
 	if err != nil {
 		return err
 	}

@@ -10,7 +10,7 @@ import (
 
 // formatCmd represents the run command
 var formatCmd = &cobra.Command{
-	Use:     "format folder",
+	Use:     "format <folder>",
 	Aliases: []string{"fmt"},
 	Short:   "Format Zx (.zx) files in a directory",
 	Run:     execFormat,

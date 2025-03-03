@@ -1,0 +1,8 @@
+namespace helloer;
+
+use message;
+
+fn sayHello() {
+    let msg = message.Message("Hello, World!");
+    msg.say();
+}

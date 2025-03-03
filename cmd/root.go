@@ -10,7 +10,7 @@ import (
 // rootCmd is the root command for the CLI
 var rootCmd = &cobra.Command{
 	Use:     "zxl",
-	Short:   "Zx ✨ A small programming language for template rendering.",
+	Short:   "ZxLang ✨ A small programming language for template rendering.",
 	Version: version.Version,
 }
 

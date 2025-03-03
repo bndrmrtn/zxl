@@ -204,6 +204,6 @@ func (e *Executer) LoadFile(path string) error {
 
 	cache.Store(path, b, nodes)
 
-	_, err = e.Execute(nodes)
+	_, err = e.runtime.Execute(nodes)
 	return err
 }

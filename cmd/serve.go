@@ -12,7 +12,7 @@ import (
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
-	Use:     "serve folder",
+	Use:     "serve <folder>",
 	Aliases: []string{"server"},
 	Short:   "Start an HTTP server to serve Zx (.zx) files from a directory",
 	Run:     execServe,

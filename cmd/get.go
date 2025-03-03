@@ -8,7 +8,7 @@ import (
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
-	Use:     "get packageUrl",
+	Use:     "get <packageUrl>",
 	Aliases: []string{"install", "i"},
 	Short:   "Installs a Zx Package",
 	Run:     execGet,
@@ -43,7 +43,7 @@ func execGet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	pm, err := pkgman.New(".")
+	pm, err := pkgman.New("empty", ".")
 	if err != nil {
 		cmd.PrintErr(err)
 		return

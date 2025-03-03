@@ -1,0 +1,13 @@
+namespace message;
+
+define Message {
+    let msg;
+
+    fn construct(msg) {
+        this.msg = msg;
+    }
+
+    fn say() {
+        println(this.msg);
+    }
+}

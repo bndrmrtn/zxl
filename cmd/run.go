@@ -10,7 +10,7 @@ import (
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
-	Use:     "run file.zx",
+	Use:     "run <file.zx>",
 	Aliases: []string{"r", "exec"},
 	Short:   "Interpret and execute Zx (.zx) files",
 	Run:     execRun,

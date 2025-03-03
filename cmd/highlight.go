@@ -10,7 +10,7 @@ import (
 
 // highlightCmd highlights code for a given file
 var highlightCmd = &cobra.Command{
-	Use:     "highligh file.zx",
+	Use:     "highlight <file.zx>",
 	Aliases: []string{"hl"},
 	Short:   "Highlight Zx (.zx) files",
 	Run:     execHighlight,

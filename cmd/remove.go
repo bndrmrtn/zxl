@@ -8,7 +8,7 @@ import (
 
 // removeCmd represents the remove command
 var removeCmd = &cobra.Command{
-	Use:     "remove packageUrl",
+	Use:     "remove <packageUrl>",
 	Aliases: []string{"uninstall", "u"},
 	Short:   "Uninstalls a Zx Package",
 	Run:     execRemove,
@@ -43,7 +43,7 @@ func execRemove(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	pm, err := pkgman.New(".")
+	pm, err := pkgman.New("empty", ".")
 	if err != nil {
 		cmd.PrintErr(err)
 		return
