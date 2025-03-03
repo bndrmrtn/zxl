@@ -1,0 +1,6 @@
+packageName: packages
+packages:
+  - url: https://zxl.mrtn.vip/helloer/helloer
+    author: helloer
+    package: helloer
+    version: latest

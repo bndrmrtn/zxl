@@ -1,0 +1,11 @@
+use sql;
+
+let db = sql.open("sqlite3", "examples/sql/users.db");
+
+db.query("create table if not exists users (id int, name varchar)");
+
+let result = db.query("select * from users");
+
+for user in result {
+    println(user);
+}

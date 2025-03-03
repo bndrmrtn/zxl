@@ -1,12 +1,18 @@
 package runtimev2
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 	"sync"
 
+	"github.com/bndrmrtn/zxl/internal/ast"
+	"github.com/bndrmrtn/zxl/internal/cache"
 	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/internal/lexer"
 	"github.com/bndrmrtn/zxl/internal/models"
 )
 
@@ -162,4 +168,42 @@ func (e *Executer) getUsedNamespaces() map[string]string {
 	}
 
 	return e.parent.getUsedNamespaces()
+}
+
+func (e *Executer) LoadFile(path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	b, err := io.ReadAll(file)
+	if err != nil {
+		return err
+	}
+
+	builder := ast.NewBuilder()
+	nodes, ok := cache.Get(path, b)
+	if !ok {
+		lx := lexer.New(path)
+		ts, err := lx.Parse(bytes.NewReader(b))
+		if err != nil {
+			return err
+		}
+
+		nodes, err = builder.Build(ts)
+		if err != nil {
+			return err
+		}
+
+		if len(nodes) == 0 {
+			return nil
+		}
+
+	}
+
+	cache.Store(path, b, nodes)
+
+	_, err = e.Execute(nodes)
+	return err
 }

@@ -2,6 +2,10 @@ package runtimev2
 
 import (
 	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/builtin"
 	"github.com/bndrmrtn/zxl/internal/lang"
@@ -9,6 +13,8 @@ import (
 	"github.com/bndrmrtn/zxl/internal/modules"
 	"github.com/bndrmrtn/zxl/internal/tokens"
 )
+
+const PackageDirectory = ".zxpack"
 
 // RuntimeMode is the runtime mode
 type Runtime struct {
@@ -61,7 +67,22 @@ func (r *Runtime) Exec(scope ExecuterScope, parent *Executer, namespace string, 
 func (r *Runtime) GetNamespaceExecuter(namespace string) (*Executer, error) {
 	ex, ok := r.executers[namespace]
 	if !ok {
-		return nil, fmt.Errorf("namespace %v not found", namespace)
+		if !strings.Contains(namespace, ":") {
+			return nil, fmt.Errorf("namespace %v not found", namespace)
+		}
+
+		parts := strings.Split(namespace, ":")
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid namespace %v", namespace)
+		}
+
+		ex = NewExecuter(ExecuterScopeGlobal, r, nil).WithName(namespace)
+		if err := r.loadPackage(ex, parts[0], parts[1]); err != nil {
+			return nil, err
+		}
+
+		r.executers[namespace] = ex
+		return ex, nil
 	}
 	return ex, nil
 }
@@ -83,4 +104,33 @@ func (r *Runtime) BindModule(module lang.Module) {
 	for name, method := range module.Methods() {
 		ex.BindMethod(name, method)
 	}
+}
+
+func (r *Runtime) loadPackage(ex *Executer, author string, pkg string) error {
+	stat, err := os.Stat(filepath.Join(PackageDirectory, author, pkg))
+	if err != nil {
+		return err
+	}
+
+	if !stat.IsDir() {
+		return fmt.Errorf("package %v not found", pkg)
+	}
+
+	var files []string
+	err = filepath.WalkDir(filepath.Join(PackageDirectory, author, pkg), func(s string, d fs.DirEntry, e error) error {
+		if e != nil {
+			return e
+		}
+		if filepath.Ext(d.Name()) == ".zx" {
+			files = append(files, s)
+		}
+		return nil
+	})
+
+	for _, file := range files {
+		if err := ex.LoadFile(file); err != nil {
+			return err
+		}
+	}
+	return nil
 }

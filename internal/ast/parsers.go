@@ -893,6 +893,21 @@ func (b *Builder) parseUse(ts []*models.Token, inx *int) (*models.Node, error) {
 		return node, nil
 	}
 
+	if ts[*inx].Type == tokens.Colon {
+		*inx++
+		if *inx >= len(ts) {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got 'EOF'", errs.SyntaxError), token.Debug)
+		}
+
+		if ts[*inx].Type != tokens.Identifier {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+		}
+
+		node.Content += ":" + ts[*inx].Value
+		node.Value = ts[*inx].Value
+		*inx++
+	}
+
 	if ts[*inx].Type != tokens.Semicolon && ts[*inx].Type != tokens.As {
 		return node, nil
 	}
