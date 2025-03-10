@@ -1,11 +1,11 @@
 use iter;
 
-let l = array {
+let user = array {
     name: "John",
     age: 30,
     city: "New York",
 };
 
-for keyValue in iter.Array(l) {
-    println("key: " + keyValue.key);
+for keyValue in iter.Array(user) {
+    println(keyValue.key + ": " + keyValue.value);
 }

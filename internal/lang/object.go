@@ -23,6 +23,7 @@ const (
 	TFunction   ObjType = "<function>"
 	TIOStream   ObjType = "<IOStream>"
 	TArray      ObjType = "<Array>"
+	TFnRef      ObjType = "<Function Reference>"
 )
 
 var errNotImplemented = fmt.Errorf("not implemented")

@@ -53,6 +53,9 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 			instance := def.NewInstance()
 			return instance.Method("$init"), nil
 		}
+		if obj.Type() == lang.TFnRef {
+			return obj.Value().(lang.Method), nil
+		}
 	}
 
 	if e.parent != nil && (e.scope == ExecuterScopeBlock || e.scope == ExecuterScopeFunction || e.scope == ExecuterScopeDefinition) {
@@ -110,6 +113,10 @@ func (e *Executer) GetVariable(name string) (lang.Object, error) {
 
 	if obj, ok := e.objects[name]; ok {
 		return obj, nil
+	}
+
+	if fn, ok := e.functions[name]; ok {
+		return lang.NewFn(name, nil, fn), nil
 	}
 
 	if e.parent != nil && (e.scope == ExecuterScopeBlock || e.scope == ExecuterScopeFunction) {

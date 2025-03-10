@@ -52,7 +52,6 @@ func FromValue(data any) (Object, error) {
 	case nil:
 		return NewNil("nil", nil), nil
 	case interface{}:
-		fmt.Printf("%T", value)
 		return FromValue(value)
 	}
 	return nil, fmt.Errorf("unsupported type %T", data)

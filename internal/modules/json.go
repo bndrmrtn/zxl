@@ -74,7 +74,7 @@ func (j *JSON) convertToJSON(obj lang.Object) ([]byte, error) {
 		data := make(map[string]interface{}, len(keys))
 
 		for _, keyObj := range keys {
-			key := fmt.Sprintf("%v", keyObj.Value()) // Ensure key is a string
+			key := fmt.Sprintf("%v", keyObj.Value())
 			valObj := arr.Map[keyObj]
 			val, err := j.convertToJSON(valObj)
 			if err != nil {
@@ -105,7 +105,25 @@ func (j *JSON) convertToJSON(obj lang.Object) ([]byte, error) {
 		return json.Marshal(arr)
 	case lang.TNil, lang.TBool, lang.TInt, lang.TFloat, lang.TString:
 		return json.Marshal(obj.Value())
-	default:
-		return nil, fmt.Errorf("unsupported type: %s", obj.Type())
+	case lang.TInstance:
+		method := obj.Method("value")
+		if method != nil && len(method.Args()) == 0 {
+			data, err := method.Execute(nil)
+			if err != nil {
+				return nil, err
+			}
+			return j.convertToJSON(data)
+		}
+
+		variableNames := obj.Variables()
+		keys := make([]lang.Object, len(variableNames))
+		vars := make([]lang.Object, len(variableNames))
+		for i, name := range variableNames {
+			keys[i] = lang.NewString("key", name, nil)
+			vars[i] = obj.Variable(name)
+		}
+
+		return j.convertToJSON(lang.NewArray("variables", nil, keys, vars))
 	}
+	return nil, fmt.Errorf("unsupported type: %s", obj.Type())
 }

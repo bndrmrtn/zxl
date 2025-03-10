@@ -157,3 +157,7 @@ func (h *header) GetNew() lang.Executer {
 func (h *header) Get(_ []*models.Node) (lang.Object, error) {
 	return nil, nil
 }
+
+func (h *header) Variables() []string {
+	return []string{}
+}

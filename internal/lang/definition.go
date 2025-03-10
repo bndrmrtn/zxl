@@ -7,15 +7,6 @@ import (
 	"github.com/bndrmrtn/zxl/internal/models"
 )
 
-// Executer represents a node executer in the runtime
-type Executer interface {
-	GetVariable(name string) (Object, error)
-	AssignVariable(name string, object Object) error
-	GetMethod(name string) (Method, error)
-	Execute(nodes []*models.Node) (Object, error)
-	GetNew() Executer
-}
-
 type Definition struct {
 	Base
 

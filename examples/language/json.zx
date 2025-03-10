@@ -9,3 +9,12 @@ let data = json.parse(str);
 let s = json.toString(data);
 
 println(s);
+
+define MyObject {
+    let value = "MyValue";
+    let anotherValue = "AnotherValue";
+}
+
+let myObject = MyObject();
+
+println(json.toString(myObject));

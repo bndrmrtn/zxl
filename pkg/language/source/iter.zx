@@ -1,6 +1,16 @@
 namespace iter;
 use types;
 
+define KeyValue {
+    let key;
+    let value;
+
+    fn construct(key, value) {
+        this.key = key;
+        this.value = value;
+    }
+}
+
 fn Array(input) {
     if type(input) != types.Array {
         fail("Array only accepts array");
@@ -9,11 +19,7 @@ fn Array(input) {
     let li = [];
 
     for key in input.keys {
-        let kv = array {
-            key: key,
-            value: input[key],
-        };
-        li.append(kv);
+        li.append(KeyValue(key, input[key]));
     }
 
     return li;
@@ -27,11 +33,7 @@ fn List(input) {
     let li = [];
 
     for i in input.length {
-        let kv = array {
-            key: i,
-            value: input[i],
-        };
-        li.append(kv);
+        li.append(KeyValue(i, input[i]));
     }
 
     return li;

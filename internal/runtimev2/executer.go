@@ -230,3 +230,13 @@ func (e *Executer) LoadFile(path string) error {
 	_, err = e.runtime.Execute(nodes)
 	return err
 }
+
+func (e *Executer) Variables() []string {
+	var vars = make([]string, 0, len(e.objects))
+
+	for i := range e.objects {
+		vars = append(vars, e.objects[i].Name())
+	}
+
+	return vars
+}

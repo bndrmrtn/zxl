@@ -2,7 +2,19 @@ package lang
 
 import (
 	"fmt"
+
+	"github.com/bndrmrtn/zxl/internal/models"
 )
+
+// Executer represents a node executer in the runtime
+type Executer interface {
+	GetVariable(name string) (Object, error)
+	Variables() []string
+	AssignVariable(name string, object Object) error
+	GetMethod(name string) (Method, error)
+	Execute(nodes []*models.Node) (Object, error)
+	GetNew() Executer
+}
 
 type Instance struct {
 	Base
@@ -69,7 +81,7 @@ func (i *Instance) Variable(variable string) Object {
 }
 
 func (i *Instance) Variables() []string {
-	return nil
+	return i.ex.Variables()
 }
 
 func (i *Instance) SetVariable(name string, value Object) error {

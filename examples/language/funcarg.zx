@@ -1,0 +1,19 @@
+define Message {
+    let msg = "";
+
+    fn construct(msg) {
+        this.msg = msg;
+    }
+
+    fn say() {
+        return this.msg;
+    }
+}
+
+fn greet(messager) {
+    println(messager());
+}
+
+let m = Message(read("Enter your message: "));
+
+greet(m.say);
