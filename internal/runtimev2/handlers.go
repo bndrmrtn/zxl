@@ -147,10 +147,12 @@ func (e *Executer) handleFor(node *models.Node) (lang.Object, error) {
 	default:
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected iterable value or expression, got '%s'", errs.ValueError, iterable.Type()), node.Debug)
 	case lang.TList:
-		for _, item := range iterable.Value().([]lang.Object) {
+		for i := range iterable.Value().([]lang.Object) {
+			item := iterable.Value().([]lang.Object)[i]
+
 			exec := NewExecuter(ExecuterScopeBlock, ex.runtime, ex)
 			exec.mu.Lock()
-			exec.objects[name] = item
+			exec.objects[name] = item.Copy()
 			exec.mu.Unlock()
 
 			ret, err := exec.Execute(node.Children)

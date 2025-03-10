@@ -1,4 +1,4 @@
-namespace datatype;
+namespace types;
 
 const String = "<String>";
 const Integer = "<Integer>";
@@ -10,5 +10,3 @@ const Definition = "<Definition>";
 const Function = "<function>";
 const IOStream = "<IOStream>";
 const Array = "<Array>";
-
-define x {}

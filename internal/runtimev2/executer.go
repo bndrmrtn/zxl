@@ -140,16 +140,26 @@ func (e *Executer) Execute(nodes []*models.Node) (lang.Object, error) {
 
 // Copy creates a copy of the executer
 func (e *Executer) Copy() lang.Executer {
-	return &Executer{
+	newExec := &Executer{
 		name:           e.name,
 		scope:          e.scope,
 		runtime:        e.runtime,
-		parent:         e.parent,
 		functions:      e.functions,
-		objects:        e.objects,
+		objects:        make(map[string]lang.Object),
 		mu:             sync.RWMutex{},
 		usedNamespaces: e.usedNamespaces,
+		parent:         e.parent,
 	}
+
+	for key, obj := range e.objects {
+		if obj == nil || obj.Type() == lang.TNil {
+			newExec.objects[key] = obj
+		} else {
+			newExec.objects[key] = obj.Copy()
+		}
+	}
+
+	return newExec
 }
 
 func (e *Executer) GetNamespaceExecuter(namespace string) (*Executer, error) {

@@ -1,0 +1,7 @@
+use iter;
+
+let l = ["John", "Jane"];
+
+println(iter.List(l));
+
+// for keyValue in iter.Array(arr) {}

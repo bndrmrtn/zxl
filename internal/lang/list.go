@@ -56,7 +56,7 @@ func (l *List) Method(name string) Method {
 			if len(l.value) == -1 {
 				l.length = len(l.value)
 			}
-			l.value = append(l.value, args[0])
+			l.value = append(l.value, args[0].Copy())
 			return nil, nil
 		}, l.debug)
 	case "contains":

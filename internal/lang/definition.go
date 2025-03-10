@@ -91,6 +91,14 @@ func (d *Definition) SetVariable(name string, value Object) error {
 }
 
 func (d *Definition) String() string {
+	method, err := d.Ex.GetMethod("string")
+	if err == nil && len(method.Args()) == 0 {
+		val, err := method.Execute(nil)
+		if err == nil {
+			return val.String()
+		}
+	}
+
 	return fmt.Sprintf("<%s %s>", d.defName, addr(d))
 }
 
