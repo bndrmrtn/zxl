@@ -212,6 +212,8 @@ func (t TokenType) String() string {
 		return "list value"
 	case TemplateLiteral:
 		return "<></>"
+	case Array:
+		return "array"
 	default:
 		return "unkown"
 	}

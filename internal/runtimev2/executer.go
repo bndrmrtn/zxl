@@ -90,6 +90,16 @@ func (e *Executer) AssignVariable(name string, object lang.Object) error {
 			}
 			return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.ThisNotInMethod, name), nil)
 		}
+
+		variable := strings.Join(append([]string{first}, middle...), ".")
+
+		e.mu.Unlock()
+		v, err := e.GetVariable(variable)
+		e.mu.Lock()
+
+		if err == nil {
+			return v.SetVariable(last, object)
+		}
 	}
 
 	obj, ok := e.objects[name]

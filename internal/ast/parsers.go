@@ -1500,9 +1500,11 @@ func (b *Builder) parseArrayKeyValues(ts []*models.Token, inx *int) (*models.Nod
 			braceCount--
 		}
 
-		if braceCount == 0 && ts[*inx].Type == tokens.Comma {
-			*inx++
-			break
+		if braceCount == 0 {
+			if ts[*inx].Type == tokens.Comma {
+				*inx++
+				break
+			}
 		}
 
 		children = append(children, ts[*inx])

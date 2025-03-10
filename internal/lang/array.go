@@ -1,6 +1,7 @@
 package lang
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/models"
@@ -78,7 +79,8 @@ func (a *Array) Methods() []string {
 func (a *Array) Variable(variable string) Object {
 	switch variable {
 	default:
-		return nil
+		acc, _ := a.Access(variable)
+		return acc
 	case "$addr":
 		return addr(a)
 	case "keys":
@@ -90,8 +92,14 @@ func (a *Array) Variables() []string {
 	return []string{"$addr"}
 }
 
-func (a *Array) SetVariable(_ string, _ Object) error {
-	return errNotImplemented
+func (a *Array) SetVariable(name string, value Object) error {
+	key, ok := a.realKey(name)
+	if !ok {
+		return fmt.Errorf("key %v not found", name)
+	}
+
+	a.Map[key] = value
+	return nil
 }
 
 func (a *Array) String() string {
@@ -125,6 +133,19 @@ func (a *Array) Access(access any) (Object, bool) {
 	for _, key := range a.Keys {
 		if key.Value() == access {
 			return a.Map[key], true
+		}
+	}
+
+	return nil, false
+}
+func (a *Array) realKey(access any) (Object, bool) {
+	if access == nil {
+		return nil, false
+	}
+
+	for _, key := range a.Keys {
+		if key.Value() == access {
+			return key, true
 		}
 	}
 

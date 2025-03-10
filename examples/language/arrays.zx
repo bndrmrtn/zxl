@@ -5,7 +5,7 @@ let kv = iter.KeyValue("x", "y");
 let myObj = array {
     "name": "Martin",
     "age": 19,
-    "occupation": "Web Developer",
+    "occupation": "Web Developer"
 };
 
 if type(myObj) == datatype.Array {

@@ -86,8 +86,8 @@ func (d *Definition) Variables() []string {
 	return []string{"length"}
 }
 
-func (d *Definition) SetVariable(_ string, _ Object) error {
-	return errNotImplemented
+func (d *Definition) SetVariable(name string, value Object) error {
+	return d.Ex.AssignVariable(name, value)
 }
 
 func (d *Definition) String() string {
