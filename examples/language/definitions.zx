@@ -1,18 +1,15 @@
-define Greeter {
-    let name;
+define Object {
+    let value = 0;
 
-	fn construct(name) {
-        this.name = name;
-	}
-
-	fn greet() {
-	   println(this.message());
-	}
-
-	fn message() {
-       return "Hello, " + this.name + "!";
+    fn increment() {
+        this.value = this.value + 1;
     }
 }
 
-let greeter = Greeter("Martin");
-greeter.greet();
+let ob1 = Object();
+let ob2 = Object();
+ob2.increment();
+ob1.increment();
+
+println(ob1.value);
+println(ob2.value);

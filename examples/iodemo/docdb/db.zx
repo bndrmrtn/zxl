@@ -1,0 +1,63 @@
+namespace docdb;
+
+use io;
+
+fn NewDB() {
+    return DocDB();
+}
+
+define DocDB {
+    let memCopy = [];
+
+    fn construct() {
+        let file = io.open("dbfile.json");
+        let data = file.readLines();
+        file.close();
+        let tmp = json.parse(data);
+        let docs = [];
+        for data in tmp {
+            docs.append(Document(data));
+        }
+        this.memCopy = docs;
+    }
+
+    fn select(filters) {
+        let out = [];
+
+        for doc in memCopy {
+            let ok = filterDoc(filters, doc);
+            if ok == true {
+                out.append(doc);
+            }
+        }
+
+        return out;
+    }
+
+    fn filterDoc(filters, doc) {
+        if type(filters) == "docdb.Filter" {
+            return filters.check(doc.data);
+        }
+
+        for filter in filters {
+            if filter.check(doc.data) == false {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    fn insert(doc) {
+        this.memCopy.append(doc);
+        this.save();
+    }
+
+    fn save() {
+        let raw = [];
+        for doc in this.memCopy {
+            raw.append(doc.data);
+        }
+
+        io.writeFile("dbfile.json", json.toString(raw) + "\n");
+    }
+}

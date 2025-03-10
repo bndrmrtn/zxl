@@ -1,6 +1,8 @@
 package lang
 
-import "github.com/bndrmrtn/zxl/internal/models"
+import (
+	"github.com/bndrmrtn/zxl/internal/models"
+)
 
 type Nil struct {
 	Object
@@ -40,4 +42,8 @@ func (n Nil) Debug() *models.Debug {
 
 func (n Nil) IsMutable() bool {
 	return true
+}
+
+func (n Nil) Copy() Object {
+	return n
 }

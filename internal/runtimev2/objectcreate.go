@@ -235,14 +235,9 @@ func (e *Executer) createListFromNode(n *models.Node) (lang.Object, error) {
 // createDefinitionFromNode creates a definition from a node
 func (e *Executer) createObjectFromDefinitionNode(n *models.Node) (string, lang.Object, error) {
 	name := n.Content
-
 	ex := NewExecuter(ExecuterScopeDefinition, e.runtime, e).WithName(e.name + ".[" + name + "]")
-	_, err := ex.Execute(n.Children)
-	if err != nil {
-		return "", nil, errs.WithDebug(err, n.Debug)
-	}
 
-	return name, lang.NewDefinition(e.name+"."+name, name, n.Debug, ex), nil
+	return name, lang.NewDefinition(e.name+"."+name, name, n.Debug, n.Children, ex), nil
 }
 
 func (e *Executer) getObjectValueByNodes(obj lang.Object, nodes []*models.Node) (lang.Object, error) {

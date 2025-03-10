@@ -49,7 +49,9 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 
 	if obj, ok := e.objects[name]; ok {
 		if obj.Type() == lang.TDefinition {
-			return obj.Method("$init"), nil
+			def := obj.(*lang.Definition)
+			instance := def.NewInstance()
+			return instance.Method("$init"), nil
 		}
 	}
 

@@ -11,23 +11,26 @@ import (
 type Executer interface {
 	GetVariable(name string) (Object, error)
 	AssignVariable(name string, object Object) error
-
 	GetMethod(name string) (Method, error)
-	Copy() Executer
+	Execute(nodes []*models.Node) (Object, error)
+	GetNew() Executer
 }
 
 type Definition struct {
 	Base
 
 	defName string
-	Ex      Executer
+
+	ex    Executer
+	nodes []*models.Node
 }
 
-func NewDefinition(defName, name string, debug *models.Debug, ex Executer) Object {
+func NewDefinition(defName, name string, debug *models.Debug, nodes []*models.Node, ex Executer) *Definition {
 	return &Definition{
-		defName: strings.TrimLeft(defName, "."),
 		Base:    NewBase(name, debug),
-		Ex:      ex,
+		defName: strings.TrimLeft(defName, "."),
+		nodes:   nodes,
+		ex:      ex,
 	}
 }
 
@@ -44,64 +47,37 @@ func (d *Definition) Value() any {
 }
 
 func (d *Definition) Method(name string) Method {
-	if name == "$init" {
-		construct, err := d.Ex.GetMethod("construct")
-		if err != nil {
-			return NewFunction(nil, func(args []Object) (Object, error) {
-				return d.Copy(), nil
-			}, d.debug)
-		}
-
-		return NewFunction(construct.Args(), func(args []Object) (Object, error) {
-			obj := d.Copy().(*Definition)
-
-			construct, err := d.Ex.GetMethod("construct")
-			if err != nil {
-				return obj, nil
-			}
-
-			_, err = construct.Execute(args)
-			return obj, err
-		}, d.debug)
-	}
-
-	m, _ := d.Ex.GetMethod(name)
-	return m
+	return nil
 }
 
 func (d *Definition) Methods() []string {
-	return []string{"split"}
+	return nil
 }
 
 func (d *Definition) Variable(variable string) Object {
-	if variable == "$addr" {
-		return addr(d)
-	}
-
-	obj, _ := d.Ex.GetVariable(variable)
-	return obj
+	return nil
 }
 
 func (d *Definition) Variables() []string {
-	return []string{"length"}
+	return nil
 }
 
 func (d *Definition) SetVariable(name string, value Object) error {
-	return d.Ex.AssignVariable(name, value)
+	return nil
 }
 
 func (d *Definition) String() string {
-	method, err := d.Ex.GetMethod("string")
-	if err == nil && len(method.Args()) == 0 {
-		val, err := method.Execute(nil)
-		if err == nil {
-			return val.String()
-		}
-	}
-
-	return fmt.Sprintf("<%s %s>", d.defName, addr(d))
+	return fmt.Sprintf("<%s>", d.defName)
 }
 
 func (d *Definition) Copy() Object {
-	return NewDefinition(d.defName, d.name, d.debug, d.Ex.Copy())
+	return d
+}
+
+func (d *Definition) NewInstance() Object {
+	newDef := *&d
+	exec := newDef.ex.GetNew()
+
+	exec.Execute(newDef.nodes)
+	return NewDefinitionInstance(newDef, exec)
 }

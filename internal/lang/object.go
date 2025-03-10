@@ -19,6 +19,7 @@ const (
 	TNothing    ObjType = ""
 	TNil        ObjType = "<Nil>"
 	TDefinition ObjType = "<Definition>"
+	TInstance   ObjType = "<Instance>"
 	TFunction   ObjType = "<function>"
 	TIOStream   ObjType = "<IOStream>"
 	TArray      ObjType = "<Array>"

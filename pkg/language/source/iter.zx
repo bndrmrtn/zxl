@@ -1,30 +1,18 @@
 namespace iter;
 use types;
-use system;
-
-define KeyValue {
-    let key;
-    let value;
-
-    fn construct(key, value) {
-        this.key = key;
-        this.value = value;
-    }
-
-    fn string() {
-        return this.key + ": " + this.value;
-    }
-}
 
 fn Array(input) {
     if type(input) != types.Array {
         fail("Array only accepts array");
     }
-    
+
     let li = [];
 
     for key in input.keys {
-        let kv = KeyValue(key, input[key]);
+        let kv = array {
+            key: key,
+            value: input[key],
+        };
         li.append(kv);
     }
 
@@ -33,13 +21,17 @@ fn Array(input) {
 
 fn List(input) {
     if type(input) != types.List {
-        fail("List only accepts list");
+        fail("iter.List only accepts list");
     }
-    
+
     let li = [];
 
     for i in input.length {
-        let kv = KeyValue(i, input[i]);
+        let kv = array {
+            key: i,
+            value: input[i],
+        };
+        li.append(kv);
     }
 
     return li;

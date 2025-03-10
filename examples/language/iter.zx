@@ -1,7 +1,11 @@
 use iter;
 
-let l = ["John", "Jane"];
+let l = array {
+    name: "John",
+    age: 30,
+    city: "New York",
+};
 
-println(iter.List(l));
-
-// for keyValue in iter.Array(arr) {}
+for keyValue in iter.Array(l) {
+    println("key: " + keyValue.key);
+}

@@ -21,6 +21,9 @@ func GetMethods(importer ImportFunc) map[string]lang.Method {
 		"string": lang.NewFunction([]string{"object"}, func(args []lang.Object) (lang.Object, error) {
 			return lang.NewString("string", args[0].String(), args[0].Debug()), nil
 		}, nil),
+		"fail": lang.NewFunction([]string{"message"}, func(args []lang.Object) (lang.Object, error) {
+			return nil, errors.New(args[0].String())
+		}, nil),
 	}
 }
 
@@ -66,6 +69,9 @@ func fnType(args []lang.Object) (lang.Object, error) {
 	obj := args[0]
 	if def, ok := obj.(*lang.Definition); ok {
 		return lang.NewString("type", string(def.TypeString()), def.Debug()), nil
+	}
+	if inst, ok := obj.(*lang.Instance); ok {
+		return lang.NewString("type", string(inst.TypeString()), inst.Debug()), nil
 	}
 
 	return lang.NewString("type", string(obj.Type()), obj.Debug()), nil

@@ -52,6 +52,17 @@ func NewExecuter(scope ExecuterScope, r *Runtime, parent *Executer) *Executer {
 	}
 }
 
+func (e *Executer) GetNew() lang.Executer {
+	return &Executer{
+		scope:          e.scope,
+		runtime:        e.runtime,
+		parent:         e.parent,
+		functions:      make(map[string]lang.Method),
+		objects:        make(map[string]lang.Object),
+		usedNamespaces: e.usedNamespaces,
+	}
+}
+
 // WithName sets the name of the executer
 func (e *Executer) WithName(name string) *Executer {
 	e.name = strings.TrimLeft(e.name+"."+name, ".")
@@ -114,10 +125,6 @@ func (e *Executer) AssignVariable(name string, object lang.Object) error {
 		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotReassignConstant, name), nil)
 	}
 
-	if obj.Type() == lang.TDefinition {
-		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotReassignDefinition, name), nil)
-	}
-
 	e.objects[name] = object
 	return nil
 }
@@ -140,26 +147,22 @@ func (e *Executer) Execute(nodes []*models.Node) (lang.Object, error) {
 
 // Copy creates a copy of the executer
 func (e *Executer) Copy() lang.Executer {
-	newExec := &Executer{
+	ex := &Executer{
 		name:           e.name,
 		scope:          e.scope,
 		runtime:        e.runtime,
+		parent:         e.parent,
 		functions:      e.functions,
-		objects:        make(map[string]lang.Object),
 		mu:             sync.RWMutex{},
 		usedNamespaces: e.usedNamespaces,
-		parent:         e.parent,
 	}
 
-	for key, obj := range e.objects {
-		if obj == nil || obj.Type() == lang.TNil {
-			newExec.objects[key] = obj
-		} else {
-			newExec.objects[key] = obj.Copy()
-		}
+	ex.objects = make(map[string]lang.Object)
+	for k, v := range e.objects {
+		ex.objects[k] = v
 	}
 
-	return newExec
+	return ex
 }
 
 func (e *Executer) GetNamespaceExecuter(namespace string) (*Executer, error) {

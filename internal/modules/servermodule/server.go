@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/internal/models"
 )
 
 type HttpServer struct {
@@ -32,7 +33,7 @@ func (*HttpServer) Namespace() string {
 func (h *HttpServer) Objects() map[string]lang.Object {
 	return map[string]lang.Object{
 		"request": NewRequest(h.r),
-		"header":  immute(lang.NewDefinition("Header", "header", nil, newHeader(h.r.Header, h.w.Header()))),
+		"header":  immute(lang.NewDefinitionInstance(lang.NewDefinition("server.Header", "header", nil, nil, nil), newHeader(h.r.Header, h.w.Header()))),
 	}
 }
 
@@ -145,6 +146,14 @@ func (h *header) GetMethod(name string) (lang.Method, error) {
 	}
 }
 
-func (h *header) Copy() lang.Executer {
+func (h *header) Execute(_ []*models.Node) (lang.Object, error) {
+	return nil, nil
+}
+
+func (h *header) GetNew() lang.Executer {
 	return newHeader(h.request, h.response)
+}
+
+func (h *header) Get(_ []*models.Node) (lang.Object, error) {
+	return nil, nil
 }

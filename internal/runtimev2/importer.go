@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/ast"
 	"github.com/bndrmrtn/zxl/internal/cache"
@@ -22,6 +23,30 @@ func (r *Runtime) importer(filename string, dg *models.Debug) (lang.Object, erro
 
 	path := filepath.Join(filepath.Dir(root), filename)
 	path = filepath.Clean(path)
+
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return nil, errs.WithDebug(err, dg)
+	}
+
+	if fileInfo.IsDir() {
+		err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !info.IsDir() && filepath.Ext(filePath) == ".zx" {
+				_, err := r.importer(strings.Replace(filePath, filepath.Dir(root), "", 1), dg)
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
 
 	file, err := os.Open(path)
 	if err != nil {

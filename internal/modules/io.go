@@ -24,7 +24,8 @@ func (*IO) Objects() map[string]lang.Object {
 
 func (*IO) Methods() map[string]lang.Method {
 	return map[string]lang.Method{
-		"open": lang.NewFunction([]string{"path"}, fnReadFile, nil),
+		"open":      lang.NewFunction([]string{"path"}, fnReadFile, nil),
+		"writeFile": lang.NewFunction([]string{"path", "content"}, fnWriteFile, nil),
 	}
 }
 
@@ -42,4 +43,23 @@ func fnReadFile(args []lang.Object) (lang.Object, error) {
 	}
 
 	return lang.NewIOStream("file", reader), nil
+}
+
+func fnWriteFile(args []lang.Object) (lang.Object, error) {
+	if args[0].Type() != lang.TString {
+		return nil, fmt.Errorf("expected string, got %s", args[0].Type())
+	}
+
+	path := args[0]
+	pathString := filepath.Clean(filepath.Join(filepath.Dir(path.Debug().File), path.Value().(string)))
+
+	content := args[1]
+	contentString := content.String()
+
+	err := os.WriteFile(pathString, []byte(contentString), os.ModePerm)
+	if err != nil {
+		return lang.NewBool("succeed", false, nil), nil
+	}
+
+	return lang.NewBool("succeed", true, nil), nil
 }
