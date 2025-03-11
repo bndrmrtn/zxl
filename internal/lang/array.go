@@ -42,7 +42,7 @@ func (a *Array) Value() any {
 func (a *Array) Method(name string) Method {
 	switch name {
 	case "values":
-		return NewFunction(nil, func(args []Object) (Object, error) {
+		return NewFunction(func(args []Object) (Object, error) {
 			var values = make([]Object, len(a.Keys))
 
 			for i, key := range a.Keys {
@@ -50,9 +50,9 @@ func (a *Array) Method(name string) Method {
 			}
 
 			return NewList("values", values, a.debug), nil
-		}, a.debug)
+		}).WithDebug(a.debug)
 	case "$bind":
-		return NewFunction([]string{"key", "value"}, func(args []Object) (Object, error) {
+		return NewFunction(func(args []Object) (Object, error) {
 			key := args[0]
 			value := args[1]
 
@@ -66,7 +66,7 @@ func (a *Array) Method(name string) Method {
 
 			a.Map[key] = value
 			return nil, nil
-		}, nil)
+		}).WithDebug(a.debug).WithArgs([]string{"key", "value"})
 	default:
 		return nil
 	}

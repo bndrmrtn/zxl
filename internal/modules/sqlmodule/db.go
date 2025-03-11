@@ -39,7 +39,7 @@ func (db *DB) Value() any {
 func (db *DB) Method(name string) lang.Method {
 	switch name {
 	case "query":
-		return lang.NewFunction([]string{"query"}, func(args []lang.Object) (lang.Object, error) {
+		return lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			rows, err := db.db.Query(args[0].Value().(string))
 			if err != nil {
 				return nil, err
@@ -81,14 +81,14 @@ func (db *DB) Method(name string) lang.Method {
 			}
 
 			return lang.NewList("result", result, nil), nil
-		}, nil)
+		}).WithTypeSafeArgs(lang.TypeSafeArg{Name: "query", Type: lang.TString})
 	case "close":
-		return lang.NewFunction(nil, func(args []lang.Object) (lang.Object, error) {
+		return lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			if err := db.db.Close(); err != nil {
 				return nil, err
 			}
 			return lang.NewBool("closed", true, nil), nil
-		}, nil)
+		})
 	default:
 		return nil
 	}

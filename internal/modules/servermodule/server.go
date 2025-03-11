@@ -39,12 +39,12 @@ func (h *HttpServer) Objects() map[string]lang.Object {
 
 func (h *HttpServer) Methods() map[string]lang.Method {
 	return map[string]lang.Method{
-		"write":  lang.NewFunction([]string{"data"}, h.fnWrite, nil),
-		"status": lang.NewFunction([]string{"code"}, h.fnStatus, nil),
-		"body":   lang.NewFunction(nil, h.fnBody, nil),
-		"json":   lang.NewFunction(nil, h.fnContentType("json"), nil),
-		"html":   lang.NewFunction(nil, h.fnContentType("html"), nil),
-		"text":   lang.NewFunction(nil, h.fnContentType("text"), nil),
+		"write":  lang.NewFunction(h.fnWrite).WithArg("data"),
+		"status": lang.NewFunction(h.fnStatus).WithTypeSafeArgs(lang.TypeSafeArg{Name: "code", Type: lang.TInt}),
+		"body":   lang.NewFunction(h.fnBody),
+		"json":   lang.NewFunction(h.fnContentType("json")),
+		"html":   lang.NewFunction(h.fnContentType("html")),
+		"text":   lang.NewFunction(h.fnContentType("text")),
 	}
 }
 
@@ -55,14 +55,7 @@ func (h *HttpServer) fnWrite(args []lang.Object) (lang.Object, error) {
 }
 
 func (h *HttpServer) fnStatus(args []lang.Object) (lang.Object, error) {
-	if args[0].Type() != lang.TInt {
-		return nil, fmt.Errorf("status code must be an integer")
-	}
-	code, ok := args[0].Value().(int)
-	if !ok {
-		return nil, fmt.Errorf("status code must be an integer")
-	}
-
+	code := args[0].Value().(int)
 	if code < 100 || code > 599 {
 		return nil, fmt.Errorf("status code must be between 100 and 599")
 	}
@@ -125,24 +118,19 @@ func (h *header) GetMethod(name string) (lang.Method, error) {
 	default:
 		return nil, fmt.Errorf("method '%s' not found on http.Header", name)
 	case "set":
-		return lang.NewFunction([]string{"key", "value"}, func(args []lang.Object) (lang.Object, error) {
+		return lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			key := args[0]
-			if key.Type() != lang.TString {
-				return nil, fmt.Errorf("key must be a string")
-			}
-
 			h.response.Set(key.String(), args[1].String())
 			return nil, nil
-		}, nil), nil
+		}).WithTypeSafeArgs(
+			lang.TypeSafeArg{Name: "key", Type: lang.TString},
+			lang.TypeSafeArg{Name: "value", Type: lang.TString},
+		), nil
 	case "get":
-		return lang.NewFunction([]string{"key"}, func(args []lang.Object) (lang.Object, error) {
-			if args[0].Type() != lang.TString {
-				return nil, fmt.Errorf("key must be a string")
-			}
-
+		return lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			key := args[0].String()
 			return lang.NewString(key, h.request.Get(key), nil), nil
-		}, nil), nil
+		}).WithTypeSafeArgs(lang.TypeSafeArg{Name: "key", Type: lang.TString}), nil
 	}
 }
 

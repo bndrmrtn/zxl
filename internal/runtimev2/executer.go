@@ -125,6 +125,10 @@ func (e *Executer) AssignVariable(name string, object lang.Object) error {
 		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotReassignConstant, name), nil)
 	}
 
+	if obj.Type() == lang.TDefinition {
+		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotReassignDefinition, name), nil)
+	}
+
 	e.objects[name] = object
 	return nil
 }

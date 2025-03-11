@@ -16,7 +16,7 @@ const (
 	TFloat      ObjType = "<Float>"
 	TBool       ObjType = "<Bool>"
 	TList       ObjType = "<List>"
-	TNothing    ObjType = ""
+	TNothing    ObjType = "<Nothing>"
 	TNil        ObjType = "<Nil>"
 	TDefinition ObjType = "<Definition>"
 	TInstance   ObjType = "<Instance>"
@@ -95,6 +95,15 @@ type Method interface {
 	Args() []string
 	// Execute executes the method with the given arguments
 	Execute(args []Object) (Object, error)
+}
+
+// VariadicMethod represents a variadic method in the language
+type VariadicMethod interface {
+	Method
+	// HasVariadicArg returns if the method has a variadic argument
+	HasVariadicArg() bool
+	// GetVariadicArg returns the variadic argument of the method
+	GetVariadicArg() string
 }
 
 // Module represents a module in the language

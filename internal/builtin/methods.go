@@ -3,6 +3,7 @@ package builtin
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/models"
@@ -15,15 +16,15 @@ func GetMethods(importer ImportFunc) map[string]lang.Method {
 		"print":   &Print{},
 		"println": &Print{true},
 		"import":  &Import{importer},
-		"type":    lang.NewFunction([]string{"value"}, fnType, nil),
-		"range":   lang.NewFunction([]string{"range"}, fnRange, nil),
-		"read":    lang.NewFunction([]string{"text"}, fnRead, nil),
-		"string": lang.NewFunction([]string{"object"}, func(args []lang.Object) (lang.Object, error) {
+		"type":    lang.NewFunction(fnType).WithArg("object"),
+		"range":   lang.NewFunction(fnRange).WithArg("range"),
+		"read":    lang.NewFunction(fnRead).WithArg("text"),
+		"string": lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			return lang.NewString("string", args[0].String(), args[0].Debug()), nil
-		}, nil),
-		"fail": lang.NewFunction([]string{"message"}, func(args []lang.Object) (lang.Object, error) {
+		}).WithArg("object"),
+		"fail": lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			return nil, errors.New(args[0].String())
-		}, nil),
+		}).WithArg("message"),
 	}
 }
 
@@ -32,16 +33,37 @@ type Print struct {
 }
 
 func (p *Print) Args() []string {
-	return []string{"value"}
+	return nil
 }
 
 func (p *Print) Execute(args []lang.Object) (lang.Object, error) {
+	var sb strings.Builder
+	argList, ok := args[0].Value().([]lang.Object)
+	if !ok {
+		return nil, fmt.Errorf("expected []lang.Object, got %T", args[0].Value())
+	}
+
+	for i, arg := range argList {
+		sb.WriteString(arg.String())
+		if i < len(argList)-1 {
+			sb.WriteString(" ")
+		}
+	}
+
 	if p.newLine {
-		fmt.Println(args[0].String())
+		fmt.Println(sb.String())
 	} else {
-		fmt.Print(args[0].String())
+		fmt.Print(sb.String())
 	}
 	return nil, nil
+}
+
+func (p *Print) HasVariadicArg() bool {
+	return true
+}
+
+func (p *Print) GetVariadicArg() string {
+	return "message"
 }
 
 type Import struct {

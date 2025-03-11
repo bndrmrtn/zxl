@@ -23,16 +23,12 @@ func (j *JSON) Objects() map[string]lang.Object {
 
 func (j *JSON) Methods() map[string]lang.Method {
 	return map[string]lang.Method{
-		"parse":    lang.NewFunction([]string{"string"}, j.parse, nil),
-		"toString": lang.NewFunction([]string{"object"}, j.toString, nil),
+		"parse":    lang.NewFunction(j.parse).WithTypeSafeArgs(lang.TypeSafeArg{Name: "string", Type: lang.TString}),
+		"toString": lang.NewFunction(j.toString).WithArg("object"),
 	}
 }
 
 func (j *JSON) parse(args []lang.Object) (lang.Object, error) {
-	if args[0].Type() != lang.TString {
-		return nil, fmt.Errorf("expected string, got %s", args[0].Type())
-	}
-
 	value := args[0].Value().(string)
 
 	var data any

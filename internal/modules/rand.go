@@ -1,7 +1,6 @@
 package modules
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -28,16 +27,13 @@ func (r *Rand) Objects() map[string]lang.Object {
 
 func (r *Rand) Methods() map[string]lang.Method {
 	return map[string]lang.Method{
-		"int":  lang.NewFunction([]string{"min", "max"}, r.fnInt, nil),
-		"bool": lang.NewFunction(nil, r.fnBool, nil),
+		"int": lang.NewFunction(r.fnInt).
+			WithTypeSafeArgs(lang.TypeSafeArg{Name: "min", Type: lang.TInt}, lang.TypeSafeArg{Name: "max", Type: lang.TInt}),
+		"bool": lang.NewFunction(r.fnBool),
 	}
 }
 
 func (r *Rand) fnInt(args []lang.Object) (lang.Object, error) {
-	if args[0].Type() != lang.TInt || args[1].Type() != lang.TInt {
-		return nil, fmt.Errorf("min and max must be integers")
-	}
-
 	min := args[0].Value().(int)
 	max := args[1].Value().(int)
 

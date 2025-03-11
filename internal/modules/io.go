@@ -24,8 +24,8 @@ func (*IO) Objects() map[string]lang.Object {
 
 func (*IO) Methods() map[string]lang.Method {
 	return map[string]lang.Method{
-		"open":      lang.NewFunction([]string{"path"}, fnReadFile, nil),
-		"writeFile": lang.NewFunction([]string{"path", "content"}, fnWriteFile, nil),
+		"open":      lang.NewFunction(fnReadFile).WithTypeSafeArgs(lang.TypeSafeArg{Name: "path", Type: lang.TString}),
+		"writeFile": lang.NewFunction(fnWriteFile).WithArgs([]string{"path", "content"}),
 	}
 }
 

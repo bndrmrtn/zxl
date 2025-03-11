@@ -33,9 +33,9 @@ func (i *Integer) Value() any {
 func (i *Integer) Method(name string) Method {
 	switch name {
 	case "toString":
-		return NewFunction([]string{}, func(args []Object) (Object, error) {
+		return NewFunction(func(args []Object) (Object, error) {
 			return NewString("string", i.String(), nil), nil
-		}, i.debug)
+		}).WithDebug(i.debug)
 	}
 
 	return nil

@@ -13,6 +13,7 @@ func Get() []lang.Module {
 		NewIOModule(),
 		NewHttpModule(),
 		NewJSONModule(),
+		NewThreadModule(),
 		sqlmodule.New(),
 		zruntime.New(),
 	}

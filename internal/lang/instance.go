@@ -47,12 +47,12 @@ func (i *Instance) Method(name string) Method {
 	if name == "$init" {
 		construct, err := i.ex.GetMethod("construct")
 		if err != nil {
-			return NewFunction(nil, func(args []Object) (Object, error) {
+			return NewFunction(func(args []Object) (Object, error) {
 				return i, nil
-			}, i.debug)
+			}).WithDebug(i.debug)
 		}
 
-		return NewFunction(construct.Args(), func(args []Object) (Object, error) {
+		return NewFunction(func(args []Object) (Object, error) {
 			construct, err := i.ex.GetMethod("construct")
 			if err != nil {
 				return i, nil
@@ -60,7 +60,7 @@ func (i *Instance) Method(name string) Method {
 
 			_, err = construct.Execute(args)
 			return i, err
-		}, i.debug)
+		}).WithArgs(construct.Args()).WithDebug(i.debug)
 	}
 
 	m, _ := i.ex.GetMethod(name)
@@ -89,17 +89,15 @@ func (i *Instance) SetVariable(name string, value Object) error {
 }
 
 func (i *Instance) String() string {
-	str := addr(i).String()
-
 	method, err := i.ex.GetMethod("string")
 	if err == nil && len(method.Args()) == 0 {
 		val, err := method.Execute(nil)
 		if err == nil {
-			str = val.String()
+			return val.String()
 		}
 	}
 
-	return fmt.Sprintf("<%s %s>", i.def.defName, str)
+	return fmt.Sprintf("<%s %s>", i.def.defName, addr(i).String())
 }
 
 func (i *Instance) Copy() Object {

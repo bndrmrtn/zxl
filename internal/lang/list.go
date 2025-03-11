@@ -52,15 +52,15 @@ func (l *List) Method(name string) Method {
 	default:
 		return nil
 	case "append":
-		return NewFunction([]string{"item"}, func(args []Object) (Object, error) {
+		return NewFunction(func(args []Object) (Object, error) {
 			if len(l.value) == -1 {
 				l.length = len(l.value)
 			}
 			l.value = append(l.value, args[0].Copy())
 			return nil, nil
-		}, l.debug)
+		}).WithArgs([]string{"item"}).WithDebug(l.debug)
 	case "contains":
-		return NewFunction([]string{"item"}, func(args []Object) (Object, error) {
+		return NewFunction(func(args []Object) (Object, error) {
 			if l.length < 1 {
 				return NewBool("contains", false, l.debug), nil
 			}
@@ -72,7 +72,7 @@ func (l *List) Method(name string) Method {
 			}
 
 			return NewBool("contains", false, l.debug), nil
-		}, l.debug)
+		}).WithDebug(l.debug).WithArgs([]string{"item"})
 	}
 }
 

@@ -34,16 +34,16 @@ func (f *IOStream) Value() any {
 func (i *IOStream) Method(name string) Method {
 	switch name {
 	case "readLine":
-		return NewFunction(nil, func(_ []Object) (Object, error) {
+		return NewFunction(func(_ []Object) (Object, error) {
 			reader := bufio.NewReader(i.reader)
 			line, err := reader.ReadString('\n')
 			if err != nil {
 				return nil, err
 			}
 			return NewString("line", line, i.debug), nil
-		}, nil)
+		})
 	case "readLines":
-		return NewFunction(nil, func(_ []Object) (Object, error) {
+		return NewFunction(func(_ []Object) (Object, error) {
 			reader := bufio.NewReader(i.reader)
 			lines := strings.Builder{}
 			for {
@@ -57,14 +57,14 @@ func (i *IOStream) Method(name string) Method {
 				lines.WriteString(line)
 			}
 			return NewString("lines", lines.String(), i.debug), nil
-		}, nil)
+		})
 	case "close":
-		return NewFunction(nil, func(_ []Object) (Object, error) {
+		return NewFunction(func(_ []Object) (Object, error) {
 			if rc, ok := i.reader.(io.Closer); ok {
 				return nil, rc.Close()
 			}
 			return nil, nil
-		}, nil)
+		})
 	}
 
 	return nil
