@@ -136,7 +136,9 @@ func (r *Runtime) loadPackage(author string, pkg string) (*Executer, error) {
 	}
 
 	r.packages[author+":"+pkg] = run
-	run.Exec(ExecuterScopeGlobal, nil, pkg, nil)
+	if _, err := run.Exec(ExecuterScopeGlobal, nil, pkg, nil); err != nil {
+		return nil, err
+	}
 
 	ex, err := run.GetNamespaceExecuter(pkg)
 	if err != nil {
@@ -153,15 +155,18 @@ func (r *Runtime) loadPackage(author string, pkg string) (*Executer, error) {
 	}
 
 	var files []string
-	err = filepath.WalkDir(filepath.Join(PackageDirectory, author, pkg), func(s string, d fs.DirEntry, e error) error {
-		if e != nil {
-			return e
+	err = filepath.WalkDir(filepath.Join(PackageDirectory, author, pkg), func(s string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
 		}
 		if filepath.Ext(d.Name()) == ".zx" {
 			files = append(files, s)
 		}
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	for _, file := range files {
 		if err := ex.LoadFile(file); err != nil {

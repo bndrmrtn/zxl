@@ -86,9 +86,6 @@ func (e *Executer) BindMethod(name string, fn lang.Method) {
 }
 
 func (e *Executer) AssignVariable(name string, object lang.Object) error {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-
 	if strings.Contains(name, ".") {
 		names := strings.Split(name, ".")
 		first := names[0]
@@ -104,16 +101,16 @@ func (e *Executer) AssignVariable(name string, object lang.Object) error {
 
 		variable := strings.Join(append([]string{first}, middle...), ".")
 
-		e.mu.Unlock()
 		v, err := e.GetVariable(variable)
-		e.mu.Lock()
 
 		if err == nil {
 			return v.SetVariable(last, object)
 		}
 	}
 
+	e.mu.RLock()
 	obj, ok := e.objects[name]
+	e.mu.RUnlock()
 	if !ok {
 		if e.parent != nil && e.scope == ExecuterScopeBlock {
 			return e.parent.AssignVariable(name, object)
@@ -129,7 +126,9 @@ func (e *Executer) AssignVariable(name string, object lang.Object) error {
 		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotReassignDefinition, name), nil)
 	}
 
+	e.mu.Lock()
 	e.objects[name] = object
+	e.mu.Unlock()
 	return nil
 }
 

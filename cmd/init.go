@@ -22,7 +22,7 @@ func init() {
 // execInit executes the init command
 func execInit(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
-		cmd.Help()
+		_ = cmd.Help()
 		return
 	}
 

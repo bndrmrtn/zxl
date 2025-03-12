@@ -2,7 +2,16 @@ package lexer
 
 // isLetter returns true if the given character is a letter
 func isLetter(ch byte) bool {
-	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '$'
+	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '$' || ch == '_'
+}
+
+func IsIdentifier(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if !isLetter(s[i]) {
+			return false
+		}
+	}
+	return true
 }
 
 // isDigit returns true if the given character is a digit

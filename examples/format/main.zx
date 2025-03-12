@@ -1,21 +1,27 @@
-namespace main;
+namespace examples;
 
-use application as app;
+use application:app as app;
 use core as core;
 
-fn main(arg, arg2) {
-	let x = "x";
+fn main() {}
+
+let x = (10 + 4) * 3 + (5 * (2 * 3));
+x = 5 + 5;
+
+fn myApp() {
+	let y = 10;
 }
 
-fn funcc(n1) {
-	let y = 5 + n1;
-}
-let x = funcc(15);
+define UserID {
+	let id = 0;
 
-define x {
-	let y = y;
-
-	fn construct(y) {
-		let z = y + 1;
+	fn construct(id) {
+		this.id = id;
 	}
+}
+
+let li = [1, 2];
+
+fn x() {
+	let y = 10;
 }

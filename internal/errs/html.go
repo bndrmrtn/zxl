@@ -19,9 +19,6 @@ type HtmlError struct {
 	err *DebugError
 
 	Code []byte
-
-	startLine int
-	endLine   int
 }
 
 // NewHtmlError creates a new HtmlError

@@ -83,9 +83,9 @@ func (e *Executer) handleIf(node *models.Node) (lang.Object, error) {
 
 // handleWhile handles while tokens
 func (e *Executer) handleWhile(node *models.Node) (lang.Object, error) {
-	ex := NewExecuter(ExecuterScopeBlock, e.runtime, e).WithName(e.name)
-
 	for {
+		ex := NewExecuter(ExecuterScopeBlock, e.runtime, e).WithName(e.name + "#while")
+
 		// Evaluate condition
 		condition, err := e.evaluateExpression(&models.Node{
 			Type:         tokens.While,

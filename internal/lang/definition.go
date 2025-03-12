@@ -65,10 +65,13 @@ func (d *Definition) Copy() Object {
 	return d
 }
 
-func (d *Definition) NewInstance() Object {
-	newDef := *&d
-	exec := newDef.ex.GetNew()
+func (d *Definition) NewInstance() (Object, error) {
+	exec := d.ex.GetNew()
 
-	exec.Execute(newDef.nodes)
-	return NewDefinitionInstance(newDef, exec)
+	_, err := exec.Execute(d.nodes)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewDefinitionInstance(d, exec), nil
 }

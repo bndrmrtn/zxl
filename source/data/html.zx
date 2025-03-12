@@ -1,7 +1,5 @@
 namespace html;
 
-use datatype;
-
 define Builder {
     let language = "en";
     let title = "My Page";

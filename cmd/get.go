@@ -23,7 +23,7 @@ func init() {
 // execGet executes the get command
 func execGet(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
-		cmd.Help()
+		_ = cmd.Help()
 		return
 	}
 

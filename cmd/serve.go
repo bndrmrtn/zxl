@@ -30,7 +30,7 @@ func init() {
 // execRun executes the run command
 func execServe(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
-		cmd.Help()
+		_ = cmd.Help()
 		return
 	}
 

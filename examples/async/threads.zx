@@ -1,0 +1,35 @@
+use thread;
+use async;
+
+define MessageService {
+    let portal;
+
+    fn construct(portal) {
+        this.portal = portal;
+    }
+
+    fn receiveLoop() {
+        while true {
+            const message = this.portal.receive();
+            if message != false {
+                println("Received message:", message);
+            }
+        }
+    }
+}
+
+const portal = thread.portal(5);
+const service = MessageService(portal);
+
+println("Starting message service");
+println("Message sent");
+
+thread.spawn(service.receiveLoop);
+
+// iterable expression should be wrapped
+// in parentheses
+for i in (10*10) {
+    portal.send("Message - " + i);
+}
+
+thread.sleep(1000);

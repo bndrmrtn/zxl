@@ -471,9 +471,9 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 			}
 		default:
 			start := pos
-			if isLetter(s[pos]) || s[pos] == '_' {
+			if isLetter(s[pos]) {
 				// Identifier parsing
-				for pos < len(s) && (isLetter(s[pos]) || isDigit(s[pos]) || s[pos] == '_') {
+				for pos < len(s) && (isLetter(s[pos]) || isDigit(s[pos])) {
 					pos++
 				}
 				value := s[start:pos]

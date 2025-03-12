@@ -34,10 +34,10 @@ func (s *Server) handleError(err error, w http.ResponseWriter, r *http.Request) 
 		w.WriteHeader(statusCode)
 		htmlErr := de.HttpError()
 		if htmlErr == nil {
-			w.Write([]byte(de.Error()))
+			_, _ = w.Write([]byte(de.Error()))
 			return
 		}
-		w.Write([]byte(s.makePrettyCode(htmlErr)))
+		_, _ = w.Write([]byte(s.makePrettyCode(htmlErr)))
 		return
 	}
 
@@ -126,6 +126,6 @@ func (s *Server) executeErrorHandler(nodes []*models.Node, serverErr error, code
 
 	// Write the response
 	w.WriteHeader(httpModule.Code)
-	w.Write(httpModule.Body.Bytes())
+	_, _ = w.Write(httpModule.Body.Bytes())
 	return true
 }

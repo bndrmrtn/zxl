@@ -25,7 +25,7 @@ func init() {
 // execRun executes the run command
 func execFormat(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
-		cmd.Help()
+		_ = cmd.Help()
 		return
 	}
 

@@ -55,6 +55,5 @@ func (s *Server) makePrettyCode(htmlErr *errs.HtmlError) string {
 	hlCodeParts[errLine-1] = "<span style=\"color:#fb2c36;text-decoration:line-through\">" + codeParts[errLine-1] + "</span>"
 	htmlErr.Code = []byte(strings.Join(hlCodeParts, "\n"))
 
-	htmlErr.Debug()
 	return htmlErr.Error()
 }

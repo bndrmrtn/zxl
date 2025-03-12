@@ -20,10 +20,13 @@ func FromValue(data any) (Object, error) {
 				return nil, err
 			}
 
-			obj.Method("$bind").Execute([]Object{
+			_, err = obj.Method("$bind").Execute([]Object{
 				NewString("key", key, nil),
 				value,
 			})
+			if err != nil {
+				return nil, err
+			}
 		}
 		return obj, nil
 	case []interface{}:

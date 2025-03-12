@@ -3,6 +3,7 @@ package modules
 import (
 	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/modules/sqlmodule"
+	"github.com/bndrmrtn/zxl/internal/modules/thread"
 	"github.com/bndrmrtn/zxl/internal/modules/zruntime"
 )
 
@@ -13,8 +14,8 @@ func Get() []lang.Module {
 		NewIOModule(),
 		NewHttpModule(),
 		NewJSONModule(),
-		NewThreadModule(),
 		sqlmodule.New(),
 		zruntime.New(),
+		thread.New(),
 	}
 }

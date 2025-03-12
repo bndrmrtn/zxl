@@ -6,7 +6,7 @@ import (
 	"github.com/bndrmrtn/zxl/internal/models"
 )
 
-func (f *Formatter) formatExpression(wrap bool, nodes []*models.Node) string {
+func (f *FileFmt) formatExpression(wrap bool, nodes []*models.Node, indent int) string {
 	result := strings.Builder{}
 
 	if wrap {
@@ -17,7 +17,9 @@ func (f *Formatter) formatExpression(wrap bool, nodes []*models.Node) string {
 		if i > 0 {
 			result.WriteString(" ")
 		}
-		f.formatNode(0, &result, node)
+		var vB strings.Builder
+		f.formatNode(ScopeGlobal, indent, &vB, node, nil)
+		result.WriteString(strings.TrimLeft(vB.String(), " \t"))
 	}
 
 	if wrap {

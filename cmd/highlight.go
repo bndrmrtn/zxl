@@ -24,7 +24,7 @@ func init() {
 
 func execHighlight(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
-		cmd.Help()
+		_ = cmd.Help()
 		return
 	}
 

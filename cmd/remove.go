@@ -23,7 +23,7 @@ func init() {
 // execRemove executes the remove command
 func execRemove(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
-		cmd.Help()
+		_ = cmd.Help()
 		return
 	}
 

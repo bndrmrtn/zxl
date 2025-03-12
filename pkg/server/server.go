@@ -140,5 +140,5 @@ func (s *Server) executeNodes(nodes []*models.Node, w http.ResponseWriter, r *ht
 
 	// Write the response
 	w.WriteHeader(httpModule.Code)
-	w.Write(httpModule.Body.Bytes())
+	_, _ = w.Write(httpModule.Body.Bytes())
 }

@@ -1,16 +1,13 @@
 package sqlmodule
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/bndrmrtn/zxl/internal/lang"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type SQL struct {
-	conn *sql.Conn
-}
+type SQL struct{}
 
 func New() *SQL {
 	return &SQL{}

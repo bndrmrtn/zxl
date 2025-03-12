@@ -77,7 +77,9 @@ func (j *JSON) convertToJSON(obj lang.Object) ([]byte, error) {
 				return nil, err
 			}
 			var value interface{}
-			json.Unmarshal(val, &value)
+			if err := json.Unmarshal(val, &value); err != nil {
+				return nil, err
+			}
 			data[key] = value
 		}
 
@@ -94,7 +96,9 @@ func (j *JSON) convertToJSON(obj lang.Object) ([]byte, error) {
 				return nil, err
 			}
 			var value interface{}
-			json.Unmarshal(val, &value)
+			if err := json.Unmarshal(val, &value); err != nil {
+				return nil, err
+			}
 			arr = append(arr, value)
 		}
 

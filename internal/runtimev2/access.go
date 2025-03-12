@@ -10,9 +10,6 @@ import (
 
 // GetMethod gets a method by name
 func (e *Executer) GetMethod(name string) (lang.Method, error) {
-	e.mu.RLock()
-	defer e.mu.RUnlock()
-
 	if strings.Contains(name, ".") {
 		names := strings.Split(name, ".")
 		first := names[0]
@@ -20,9 +17,11 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 		last := names[len(names)-1]
 
 		if first == "this" {
-			if e.parent != nil && e.parent.scope == ExecuterScopeDefinition {
-				return e.parent.GetMethod(strings.Join(append(middle, last), "."))
+			def := e.isInsideDefinition(e)
+			if def != nil {
+				return e.GetMethod(strings.Join(append(middle, last), "."))
 			}
+
 			return nil, errs.WithDebug(fmt.Errorf("%w: '%s()'", errs.ThisNotInMethod, name), nil)
 		}
 
@@ -43,6 +42,8 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 		}
 	}
 
+	e.mu.RLock()
+	defer e.mu.RUnlock()
 	if method, ok := e.functions[name]; ok {
 		return method, nil
 	}
@@ -50,7 +51,10 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 	if obj, ok := e.objects[name]; ok {
 		if obj.Type() == lang.TDefinition {
 			def := obj.(*lang.Definition)
-			instance := def.NewInstance()
+			instance, err := def.NewInstance()
+			if err != nil {
+				return nil, err
+			}
 			return instance.Method("$init"), nil
 		}
 		if obj.Type() == lang.TFnRef {
@@ -71,9 +75,6 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 
 // GetVariable gets a variable by name
 func (e *Executer) GetVariable(name string) (lang.Object, error) {
-	e.mu.RLock()
-	defer e.mu.RUnlock()
-
 	if strings.Contains(name, ".") {
 		names := strings.Split(name, ".")
 		first := names[0]
@@ -83,12 +84,11 @@ func (e *Executer) GetVariable(name string) (lang.Object, error) {
 		if first == "this" {
 			ex := e
 			for ex.parent != nil {
+				ex = ex.parent
 				if ex.scope == ExecuterScopeDefinition {
 					break
 				}
-				ex = ex.parent
 			}
-
 			ob, err := ex.GetVariable(strings.Join(append(middle, last), "."))
 			if ob != nil || err != nil {
 				return ob, err
@@ -111,11 +111,14 @@ func (e *Executer) GetVariable(name string) (lang.Object, error) {
 		}
 	}
 
+	e.mu.RLock()
+	defer e.mu.RUnlock()
 	if obj, ok := e.objects[name]; ok {
 		return obj, nil
 	}
 
 	if fn, ok := e.functions[name]; ok {
+
 		return lang.NewFn(name, nil, fn), nil
 	}
 
@@ -220,4 +223,14 @@ func (e *Executer) accessObjDefinition(def lang.Object, name string, middle []st
 	}
 
 	return obj, nil
+}
+
+func (e *Executer) isInsideDefinition(ex *Executer) *Executer {
+	for ex.parent != nil {
+		ex = ex.parent
+		if ex.scope == ExecuterScopeDefinition {
+			return ex
+		}
+	}
+	return nil
 }
