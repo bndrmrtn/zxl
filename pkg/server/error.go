@@ -89,14 +89,14 @@ func (s *Server) handleCustomErrorHandler(serverErr error, code int, w http.Resp
 // executeErrorHandler executes the error handler nodes.
 func (s *Server) executeErrorHandler(nodes []*models.Node, serverErr error, code int, w http.ResponseWriter, r *http.Request) bool {
 	// Execute the nodes
-	run := runtimev2.New()
-	httpModule := servermodule.New(w, r)
-	httpModule.Code = code
-	run.BindModule(httpModule)
-	err := s.ir.ExecuteSourceFiles(run)
+	run, err := runtimev2.New()
 	if err != nil {
 		return false
 	}
+
+	httpModule := servermodule.New(w, r)
+	httpModule.Code = code
+	run.BindModule(httpModule)
 
 	// Execute the nodes
 	if _, err := run.Execute(nodes); err != nil {

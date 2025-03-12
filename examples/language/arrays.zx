@@ -1,14 +1,15 @@
 use iter;
+use types;
 
 let kv = iter.KeyValue("x", "y");
 
 let myObj = array {
     "name": "Martin",
     "age": 19,
-    "occupation": "Web Developer"
+    "occupation": "Web Developer",
 };
 
-if type(myObj) == datatype.Array {
+if type(myObj) == types.Array {
     println("myObj is an array");
 }
 

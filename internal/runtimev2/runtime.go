@@ -12,6 +12,7 @@ import (
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/modules"
 	"github.com/bndrmrtn/zxl/internal/tokens"
+	"github.com/bndrmrtn/zxl/source"
 )
 
 const PackageDirectory = ".zxpack"
@@ -28,7 +29,7 @@ type Runtime struct {
 }
 
 // New creates a new runtime
-func New() *Runtime {
+func New() (*Runtime, error) {
 	r := &Runtime{
 		executers: make(map[string]*Executer),
 		packages:  make(map[string]*Runtime),
@@ -39,7 +40,19 @@ func New() *Runtime {
 		r.BindModule(module)
 	}
 
-	return r
+	files, err := source.Get()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, nodes := range files {
+		_, err = r.Execute(nodes)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return r, nil
 }
 
 // Execute executes the given nodes
@@ -117,7 +130,11 @@ func (r *Runtime) BindModule(module lang.Module) {
 }
 
 func (r *Runtime) loadPackage(author string, pkg string) (*Executer, error) {
-	run := New()
+	run, err := New()
+	if err != nil {
+		return nil, err
+	}
+
 	r.packages[author+":"+pkg] = run
 	run.Exec(ExecuterScopeGlobal, nil, pkg, nil)
 

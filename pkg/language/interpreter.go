@@ -42,11 +42,11 @@ func (ir *Interpreter) Interpret(fileName string, data io.Reader) (lang.Object, 
 		return nil, err
 	}
 
-	run := runtimev2.New()
-	err = ir.ExecuteSourceFiles(run)
+	run, err := runtimev2.New()
 	if err != nil {
 		return nil, err
 	}
+
 	return run.Execute(nodes)
 }
 
