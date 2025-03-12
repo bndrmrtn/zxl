@@ -1,5 +1,4 @@
 use thread;
-use async;
 
 define MessageService {
     let portal;

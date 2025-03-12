@@ -13,6 +13,7 @@ Zx is built in Go as a learning project and is not intended to be used in produc
 - Weakly-typed
 - Interpreted
 - Zx Blocks
+- Threads and Concurrency
 
 ## Installation
 
@@ -133,15 +134,60 @@ while i < 10 {
 ### Arrays
 
 ```zxl
+use iter;
+
 let myArr = array {
   name: "John",
   "age": 30,
-  city: "New York"
+  city: "New York",
 };
 
-for key in myArr.keys {
-    println(string(key) + ": " + string(myObj[key]));
+for row in iter.Array(myArr) {
+    println(row.key + ":", row.value);
 }
+```
+
+### Concurrency
+
+```zxl
+use thread;
+
+fn doLater() {
+  // some task
+}
+
+thread.spawn(doLater);
+thread.sleep(1000); // Wait one second
+```
+
+```zxl
+use thread;
+
+define MyWorker {
+  let portal;
+  fn construct(portal) {
+    this.portal = portal;
+  }
+
+  fn run() {
+    while true {
+      const data = this.portal.receive();
+      if data != false {
+        println("Received data:", message);
+      }
+    }
+  }
+}
+
+const portal = thread.portal();
+const worker = MyWorker(portal);
+thread.spawn(worker.run);
+
+for i in range(10) {
+  portal.send(i);
+}
+
+thread.sleep(1000);
 ```
 
 ## Support
