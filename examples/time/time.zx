@@ -1,0 +1,10 @@
+namespace time;
+use time;
+use thread;
+
+const now = time.now();
+const portal = thread.portal();
+
+println(portal, type(portal));
+
+println(now, type(now));

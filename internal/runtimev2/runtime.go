@@ -5,9 +5,11 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/builtin"
+	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/modules"
@@ -23,6 +25,8 @@ type Runtime struct {
 
 	// executers is a map of namespace names to exec
 	executers map[string]*Executer
+	// builtinNamespaces is a list of builtin namespaces
+	builtinNamespaces []string
 
 	// packages is a map of package names to runtime
 	packages map[string]*Runtime
@@ -30,13 +34,16 @@ type Runtime struct {
 
 // New creates a new runtime
 func New() (*Runtime, error) {
+	modules := modules.Get()
+
 	r := &Runtime{
-		executers: make(map[string]*Executer),
-		packages:  make(map[string]*Runtime),
+		executers:         make(map[string]*Executer),
+		packages:          make(map[string]*Runtime),
+		builtinNamespaces: make([]string, len(modules)),
 	}
 	r.functions = builtin.GetMethods(r.importer)
 
-	for _, module := range modules.Get() {
+	for _, module := range modules {
 		r.BindModule(module)
 	}
 
@@ -64,6 +71,11 @@ func (r *Runtime) Execute(nodes []*models.Node) (lang.Object, error) {
 	if nodes[0].Type == tokens.Namespace {
 		namespace := nodes[0].Content
 		nodes = nodes[1:]
+
+		if slices.Contains(r.builtinNamespaces, namespace) {
+			return nil, errs.WithDebug(fmt.Errorf("cannot use builtin '%s' as namespace", namespace), nodes[0].Debug)
+		}
+
 		return r.Exec(ExecuterScopeGlobal, nil, namespace, nodes)
 	}
 
@@ -113,6 +125,7 @@ func (r *Runtime) GetNamespaceExecuter(namespace string) (*Executer, error) {
 // BindModule binds the given package to the given name
 func (r *Runtime) BindModule(module lang.Module) {
 	namespace := module.Namespace()
+	r.builtinNamespaces = append(r.builtinNamespaces, namespace)
 
 	ex, ok := r.executers[namespace]
 	if !ok {

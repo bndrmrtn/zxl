@@ -17,7 +17,7 @@ define MessageService {
     }
 }
 
-const portal = thread.portal(5);
+const portal = thread.portal();
 const service = MessageService(portal);
 
 println("Starting message service");

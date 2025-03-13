@@ -1,6 +1,8 @@
 package lang
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func Addr(s any) Object {
 	return addr(s)
@@ -42,12 +44,18 @@ func FromValue(data any) (Object, error) {
 		return NewList("list", li, nil), nil
 	case int:
 		return NewInteger("number", int(value), nil), nil
+	case int8:
+		return NewInteger("number", int(value), nil), nil
+	case int16:
+		return NewInteger("number", int(value), nil), nil
+	case int32:
+		return NewInteger("number", int(value), nil), nil
 	case int64:
 		return NewInteger("number", int(value), nil), nil
-	case float64:
-		return NewFloat("number", value, nil), nil
 	case float32:
 		return NewFloat("number", float64(value), nil), nil
+	case float64:
+		return NewFloat("number", value, nil), nil
 	case string:
 		return NewString("string", value, nil), nil
 	case bool:
@@ -58,4 +66,9 @@ func FromValue(data any) (Object, error) {
 		return FromValue(value)
 	}
 	return nil, fmt.Errorf("unsupported type %T", data)
+}
+
+func Immute(obj Object) Object {
+	obj.Immute()
+	return obj
 }

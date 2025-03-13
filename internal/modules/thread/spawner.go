@@ -29,6 +29,10 @@ func (s *Spawner) Type() lang.ObjType {
 	return lang.TDefinition
 }
 
+func (s *Spawner) TypeString() string {
+	return "thread.spawner"
+}
+
 func (s *Spawner) Value() any {
 	return s
 }

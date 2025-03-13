@@ -40,17 +40,17 @@ func execRun(cmd *cobra.Command, args []string) {
 	}
 
 	if len(args) == 0 {
-		cmd.PrintErr("No file specified")
+		cmd.PrintErrln("No file specified")
 		return
 	}
 
 	if len(args) > 1 {
-		cmd.PrintErr("Only one file can be run at a time")
+		cmd.PrintErrln("Only one file can be run at a time")
 		return
 	}
 
 	if _, err := os.Stat(args[0]); os.IsNotExist(err) {
-		cmd.PrintErr("File does not exist")
+		cmd.PrintErrln("File does not exist")
 		return
 	}
 
@@ -63,7 +63,7 @@ func execRun(cmd *cobra.Command, args []string) {
 
 	file, err := os.Open(args[0])
 	if err != nil {
-		cmd.PrintErr(err)
+		cmd.PrintErrln(err)
 		return
 	}
 	defer file.Close()
@@ -71,7 +71,7 @@ func execRun(cmd *cobra.Command, args []string) {
 	interpreter := language.NewInterpreter(mode, caching)
 
 	if _, err = interpreter.Interpret(args[0], file); err != nil {
-		cmd.PrintErr(err)
+		cmd.PrintErrln(err)
 		return
 	}
 }

@@ -62,6 +62,8 @@ func (e *Executer) callFunctionFromNode(n *models.Node) (lang.Object, error) {
 
 		variadicArg := lang.NewList(variadicArgName, variadicArgList, n.Debug)
 		args = append(args, variadicArg)
+	} else if isVariadic {
+		args = append(args, lang.NewList(variadicArgName, make([]lang.Object, 0), n.Debug))
 	}
 
 	r, err := method.Execute(args)

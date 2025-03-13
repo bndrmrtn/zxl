@@ -1,0 +1,27 @@
+use thread;
+
+define MyWorker {
+  let portal;
+  fn construct(portal) {
+    this.portal = portal;
+  }
+
+  fn run() {
+    while true {
+      const data = this.portal.receive();
+      if data != false {
+        println("Received data:", message);
+      }
+    }
+  }
+}
+
+const portal = thread.portal(1);
+const worker = MyWorker(portal);
+thread.spawn(worker.run);
+
+for i in range(10) {
+  portal.send(i);
+}
+
+thread.sleep(1000);

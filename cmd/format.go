@@ -36,28 +36,28 @@ func execFormat(cmd *cobra.Command, args []string) {
 	}
 
 	if len(args) == 0 {
-		cmd.PrintErr("No directory specified")
+		cmd.PrintErrln("No directory specified")
 		return
 	}
 
 	if len(args) > 1 {
-		cmd.PrintErr("Only one directory can be specified")
+		cmd.PrintErrln("Only one directory can be specified")
 		return
 	}
 
 	info, err := os.Stat(args[0])
 	if err != nil {
-		cmd.PrintErr("Error: " + err.Error())
+		cmd.PrintErrln("Error: " + err.Error())
 		return
 	}
 	if !info.IsDir() {
-		cmd.PrintErr("Specified path is not a directory")
+		cmd.PrintErrln("Specified path is not a directory")
 		return
 	}
 
 	f := formatter.New(args[0])
 	if err := f.Format(); err != nil {
-		cmd.PrintErr("Error: " + err.Error())
+		cmd.PrintErrln("Error: " + err.Error())
 		return
 	}
 }

@@ -41,7 +41,7 @@ func (f *Function) WithArgs(args []string) *Function {
 }
 
 func (f *Function) WithArg(arg string) *Function {
-	f.args = []string{arg}
+	f.args = append(f.args, arg)
 	return f
 }
 

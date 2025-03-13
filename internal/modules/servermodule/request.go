@@ -24,6 +24,10 @@ func (r *Request) Type() lang.ObjType {
 	return lang.TDefinition
 }
 
+func (*Request) TypeString() string {
+	return "server.request"
+}
+
 func (r *Request) Value() any {
 	return r
 }

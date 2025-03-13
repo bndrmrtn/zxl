@@ -77,6 +77,28 @@ func (pm *PackageManager) installPackage(pkg *Package) error {
 	return nil
 }
 
+// isOtherPackageUsing checks if another package is using the specified package.
+func (pm *PackageManager) isOtherPackageUsing(pkg *Package) bool {
+	for _, pack := range pm.Packages {
+		if pack.Author == pkg.Author && pack.Package == pkg.Package {
+			continue
+		}
+
+		pkgFile := filepath.Join(pm.root, PackageDirectory, pkg.Author, pkg.Package, PkgFile)
+		manager, err := New(pkg.Author, pkgFile)
+		if err != nil {
+			continue
+		}
+
+		for _, pack := range manager.Packages {
+			if pack.Author == pkg.Author && pack.Package == pkg.Package {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // deletePackage removes an installed package from the package manager.
 func (pm *PackageManager) deletePackage(pkg *Package) error {
 	dest := filepath.Join(pm.root, PackageDirectory, pkg.Author, pkg.Package)
@@ -85,8 +107,19 @@ func (pm *PackageManager) deletePackage(pkg *Package) error {
 		return fmt.Errorf("package not found: %s", pkg.Package)
 	}
 
-	err := os.RemoveAll(dest)
+	pkgFile := filepath.Join(dest, PkgFile)
+	manager, err := New(pkg.Author, pkgFile)
 	if err != nil {
+		return err
+	}
+
+	for _, pack := range manager.Packages {
+		if err := pm.Remove(pack.Url); err != nil {
+			return err
+		}
+	}
+
+	if err = os.RemoveAll(dest); err != nil {
 		return fmt.Errorf("failed to delete package: %s, error: %v", pkg.Package, err)
 	}
 

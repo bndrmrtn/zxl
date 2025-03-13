@@ -25,7 +25,11 @@ func NewPortal(id uint, portalBufferSize int) *Portal {
 }
 
 func (p *Portal) Type() lang.ObjType {
-	return lang.TDefinition
+	return lang.TInstance
+}
+
+func (p *Portal) TypeString() string {
+	return "thread.portal"
 }
 
 func (p *Portal) Value() any {

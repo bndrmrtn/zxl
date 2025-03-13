@@ -32,6 +32,10 @@ func (db *DB) Type() lang.ObjType {
 	return lang.TDefinition
 }
 
+func (*DB) TypeString() string {
+	return "sql.db"
+}
+
 func (db *DB) Value() any {
 	return db
 }

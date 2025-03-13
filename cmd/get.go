@@ -34,23 +34,28 @@ func execGet(cmd *cobra.Command, args []string) {
 	}
 
 	if len(args) == 0 {
-		cmd.PrintErr("No url specified")
+		cmd.PrintErrln("No url specified")
 		return
 	}
 
 	if len(args) > 1 {
-		cmd.PrintErr("Only one url can be specified")
+		cmd.PrintErrln("Only one url can be specified")
 		return
 	}
 
 	pm, err := pkgman.New("empty", ".")
 	if err != nil {
-		cmd.PrintErr(err)
+		cmd.PrintErrln(err)
+		return
+	}
+
+	if pm.PackageName == "" {
+		cmd.PrintErrln("Package name cannot be empty\nUse `zxl init <packageName>` to initialize your package")
 		return
 	}
 
 	if err := pm.Add(args[0]); err != nil {
-		cmd.PrintErr(err)
+		cmd.PrintErrln(err)
 		return
 	}
 }

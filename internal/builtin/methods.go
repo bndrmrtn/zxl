@@ -89,11 +89,9 @@ func (i *Import) Execute(args []lang.Object) (lang.Object, error) {
 // fnType returns the type of the given object.
 func fnType(args []lang.Object) (lang.Object, error) {
 	obj := args[0]
-	if def, ok := obj.(*lang.Definition); ok {
-		return lang.NewString("type", string(def.TypeString()), def.Debug()), nil
-	}
-	if inst, ok := obj.(*lang.Instance); ok {
-		return lang.NewString("type", string(inst.TypeString()), inst.Debug()), nil
+
+	if ts, ok := obj.(interface{ TypeString() string }); ok {
+		return lang.NewString("type", ts.TypeString(), obj.Debug()), nil
 	}
 
 	return lang.NewString("type", string(obj.Type()), obj.Debug()), nil

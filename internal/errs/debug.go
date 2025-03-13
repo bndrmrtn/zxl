@@ -34,7 +34,7 @@ type DebugError struct {
 // Error returns the error message with debug information
 func (de DebugError) Error() string {
 	if de.debug == nil {
-		return de.err.Error() + "\n"
+		return de.err.Error()
 	}
 
 	redBold := color.New(color.FgRed, color.Bold).SprintFunc()
@@ -61,10 +61,13 @@ func (de DebugError) getNear() string {
 		lineNum := de.debug.Line + i
 		lineNumStr := strconv.Itoa(lineNum)
 		lineNumStr = strings.Repeat(" ", maxLineNumLen-len(lineNumStr)) + lineNumStr
-		near += fmt.Sprintf("%s | %s\n", color.New(color.FgHiBlack).Sprint(lineNumStr), part)
+		near += fmt.Sprintf("%s | %s", color.New(color.FgHiBlack).Sprint(lineNumStr), part)
+		if i < len(parts)-1 {
+			near += "\n"
+		}
 	}
 
-	near = fmt.Sprintf("near:\n%s\n", color.New(color.FgHiBlack).Sprint(near))
+	near = fmt.Sprintf("near:\n%s", color.New(color.FgHiBlack).Sprint(near))
 
 	return near
 }

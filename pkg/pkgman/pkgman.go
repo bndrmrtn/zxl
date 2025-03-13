@@ -76,6 +76,11 @@ func (pm *PackageManager) Remove(packageUrl string) error {
 
 	for i, pack := range pm.Packages {
 		if pack.Author == pkg.Author && pack.Package == pkg.Package {
+			otherUsing := pm.isOtherPackageUsing(pack)
+			if otherUsing {
+				return nil
+			}
+
 			if err := pm.deletePackage(pack); err != nil {
 				return err
 			}

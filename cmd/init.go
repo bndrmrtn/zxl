@@ -33,23 +33,23 @@ func execInit(cmd *cobra.Command, args []string) {
 	}
 
 	if len(args) == 0 {
-		cmd.PrintErr("No package name specified")
+		cmd.PrintErrln("No package name specified")
 		return
 	}
 
 	if len(args) > 1 {
-		cmd.PrintErr("Only one package name can be specified")
+		cmd.PrintErrln("Only one package name can be specified")
 		return
 	}
 
 	pm, err := pkgman.New(args[0], ".")
 	if err != nil {
-		cmd.PrintErr(err)
+		cmd.PrintErrln(err)
 		return
 	}
 
 	if err := pm.Save(); err != nil {
-		cmd.PrintErr(err)
+		cmd.PrintErrln(err)
 		return
 	}
 }

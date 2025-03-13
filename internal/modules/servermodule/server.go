@@ -32,8 +32,8 @@ func (*HttpServer) Namespace() string {
 
 func (h *HttpServer) Objects() map[string]lang.Object {
 	return map[string]lang.Object{
-		"request": NewRequest(h.r),
-		"header":  immute(lang.NewDefinitionInstance(lang.NewDefinition("server.Header", "header", nil, nil, nil), newHeader(h.r.Header, h.w.Header()))),
+		"request": lang.Immute(NewRequest(h.r)),
+		"header":  lang.Immute(lang.NewDefinitionInstance(lang.NewDefinition("server.header", "header", nil, nil, nil), newHeader(h.r.Header, h.w.Header()))),
 	}
 }
 

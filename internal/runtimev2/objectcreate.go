@@ -111,7 +111,7 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 	}
 
 	// if the object is a constant, make it immutable
-	if n.Type == tokens.Const {
+	if obj.Type() != lang.TNil && n.Type == tokens.Const {
 		obj.Immute()
 	}
 
