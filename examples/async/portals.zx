@@ -1,0 +1,45 @@
+namespace demo;
+
+use thread;
+
+define User {
+    let name;
+    let age;
+    let portal;
+
+    fn construct(name, age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    fn intro() {
+        println("Hello, I am ", this.name, "and I am ", this.age, " years old.");
+        this.portal.send(true);
+        thread.sleep(10);
+    }
+}
+
+let users = [];
+users.append(User("John", 25));
+users.append(User("Jane", 23));
+users.append(User("Emily", 21));
+users.append(User("Alice", 28));
+users.append(User("Bob", 30));
+users.append(User("Charlie", 27));
+users.append(User("David", 29));
+users.append(User("Eve", 26));
+
+const portal = thread.portal(users.length);
+const spawner = thread.spawner(users.length);
+
+for user in users {
+    user.portal = portal;
+    spawner.spawn(user.intro);
+}
+
+for i in (users.length) {
+    portal.receive();
+}
+
+portal.close();
+spawner.close();

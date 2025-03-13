@@ -160,34 +160,53 @@ thread.spawn(doLater);
 thread.sleep(1000); // Wait one second
 ```
 
+### Usage of Portals
+
 ```zxl
 use thread;
 
-define MyWorker {
+define User {
+  let name;
+  let age;
   let portal;
-  fn construct(portal) {
-    this.portal = portal;
+
+  fn construct(name, age) {
+    this.name = name;
+    this.age = age;
   }
 
-  fn run() {
-    while true {
-      const data = this.portal.receive();
-      if data != false {
-        println("Received data:", message);
-      }
-    }
+  fn intro() {
+    println("Hello, I am ", this.name, "and I am ", this.age, " years old.");
+    this.portal.send(true);
   }
 }
 
-const portal = thread.portal();
-const worker = MyWorker(portal);
-thread.spawn(worker.run);
+let users = [];
+users.append(User("John", 25));
+users.append(User("Jane", 23));
+users.append(User("Emily", 21));
+// ...
 
-for i in range(10) {
-  portal.send(i);
+// create a portal for communication between threads
+const portal = thread.portal(users.length);
+// create a custom spawner with users.length async threads
+const spawner = thread.spawner(users.length);
+
+// spawn all async methods
+for user in users {
+  user.portal = portal;
+  spawner.spawn(user.intro);
 }
 
-thread.sleep(1000);
+// wait for all async methods to finish
+for i in (users.length) {
+  // portal.receive() waits until any async method sends a message to it
+  portal.receive();
+}
+
+// close the portal and spawner
+portal.close();
+spawner.close();
 ```
 
 ## Support

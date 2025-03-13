@@ -1,9 +1,7 @@
 package thread
 
 import (
-	"context"
 	"fmt"
-	"time"
 
 	"github.com/bndrmrtn/zxl/internal/lang"
 )
@@ -45,17 +43,15 @@ func (p *Portal) Method(name string) lang.Method {
 		}).WithArg("message")
 	case "receive":
 		return lang.NewFunction(func(_ []lang.Object) (lang.Object, error) {
-			for {
-				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-				defer cancel()
-
-				select {
-				case <-ctx.Done():
-					return lang.NewBool("ok", false, nil), nil
-				case msg := <-p.portal:
-					return msg, nil
-				}
+			select {
+			case msg := <-p.portal:
+				return msg, nil
 			}
+		})
+	case "close":
+		return lang.NewFunction(func(_ []lang.Object) (lang.Object, error) {
+			close(p.portal)
+			return lang.NewBool("ok", true, nil), nil
 		})
 	default:
 		return nil

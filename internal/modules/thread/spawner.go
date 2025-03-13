@@ -57,6 +57,12 @@ func (s *Spawner) Method(name string) lang.Method {
 
 			return nil, nil
 		}).WithTypeSafeArgs(lang.TypeSafeArg{Name: "method", Type: lang.TFnRef})
+	case "close":
+		return lang.NewFunction(func(_ []lang.Object) (lang.Object, error) {
+			close(s.sem)
+			s.wg.Wait()
+			return lang.NewBool("ok", true, nil), nil
+		})
 	default:
 		return nil
 	}
