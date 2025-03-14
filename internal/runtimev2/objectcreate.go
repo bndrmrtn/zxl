@@ -2,7 +2,6 @@ package runtimev2
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/internal/lang"
@@ -30,10 +29,6 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 		if !ok {
 			return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not a template", errs.ValueError), n.Debug)
 		}
-
-		str = strings.TrimPrefix(str, "<>")
-		str = strings.TrimSuffix(str, "</>")
-		str = strings.TrimSpace(str)
 
 		template, err := tmpl.NewTemplate(str)
 		if err != nil {

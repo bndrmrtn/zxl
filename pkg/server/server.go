@@ -23,6 +23,10 @@ type Server struct {
 
 	// root is the root string
 	root string
+	// isDir is the directory flag
+	isDir bool
+	// rootFile is the root file if isDir is false
+	rootFile string
 	// colors is the color flag
 	colors bool
 
@@ -35,10 +39,18 @@ type Server struct {
 }
 
 // NewServer creates a new server
-func New(ir *language.Interpreter, root string, cache, colors bool) *Server {
+func New(ir *language.Interpreter, root string, isDir bool, cache, colors bool) *Server {
+	var rootFile string
+	if !isDir {
+		rootFile = filepath.Base(root)
+		root = filepath.Dir(root)
+	}
+
 	return &Server{
 		ir:         ir,
 		root:       filepath.Clean(root),
+		isDir:      isDir,
+		rootFile:   rootFile,
 		colors:     colors,
 		useCaching: cache,
 		cache:      make(map[string]*NodeCache),
@@ -81,10 +93,18 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	if !s.isDir {
+		path = filepath.Join(s.root, s.rootFile)
+	}
+
+	s.serveRequest(w, r, path, &cached)
+}
+
+func (s *Server) serveRequest(w http.ResponseWriter, r *http.Request, path string, cached *bool) {
 	// Execute the cached nodes if they exist
 	if s.useCaching {
 		if nodes, ok := s.getCache(path); ok {
-			cached = true
+			*cached = true
 			s.executeNodes(nodes, w, r)
 			return
 		}

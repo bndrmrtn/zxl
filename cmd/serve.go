@@ -12,7 +12,7 @@ import (
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
-	Use:     "serve <folder>",
+	Use:     "serve <folder or file>",
 	Aliases: []string{"server"},
 	Short:   "Start an HTTP server to serve Zx (.zx) files from a directory",
 	Run:     execServe,
@@ -58,10 +58,6 @@ func execServe(cmd *cobra.Command, args []string) {
 		cmd.PrintErrln("Error: " + err.Error())
 		return
 	}
-	if !info.IsDir() {
-		cmd.PrintErrln("Specified path is not a directory")
-		return
-	}
 
 	var mode language.InterpreterMode
 	if debug {
@@ -71,7 +67,7 @@ func execServe(cmd *cobra.Command, args []string) {
 	}
 
 	interpreter := language.NewInterpreter(mode, true)
-	httpServer := server.New(interpreter, args[0], cache, colors)
+	httpServer := server.New(interpreter, args[0], info.IsDir(), cache, colors)
 
 	if err := httpServer.Serve(listenAddr); err != nil && err != http.ErrServerClosed {
 		cmd.PrintErrln("Error: " + err.Error())

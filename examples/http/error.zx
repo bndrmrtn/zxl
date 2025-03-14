@@ -1,8 +1,0 @@
-namespace error;
-
-use server;
-
-fn error(code, message) {
-    server.status(code);
-    server.write("Error: " + string(message));
-}

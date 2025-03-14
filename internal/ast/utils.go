@@ -59,6 +59,11 @@ func (b *Builder) getValue(t *models.Token) any {
 		return nil
 	case tokens.Identifier:
 		return t.Value
+	case tokens.TemplateLiteral:
+		str := strings.TrimPrefix(t.Value, "<>")
+		str = strings.TrimSuffix(str, "</>")
+		str = strings.TrimSpace(str)
+		return str
 	}
 	return t.Value
 }
