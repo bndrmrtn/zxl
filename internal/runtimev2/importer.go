@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/ast"
 	"github.com/bndrmrtn/zxl/internal/cache"
@@ -16,12 +15,14 @@ import (
 )
 
 func (r *Runtime) importer(filename string, dg *models.Debug) (lang.Object, error) {
-	var root = ""
-	if dg != nil {
-		root = dg.File
+	var rootDir string
+	if dg != nil && dg.File != "" {
+		rootDir = filepath.Dir(dg.File)
+	} else {
+		rootDir = "." // Use current directory as default
 	}
 
-	path := filepath.Join(filepath.Dir(root), filename)
+	path := filepath.Join(rootDir, filename)
 	path = filepath.Clean(path)
 
 	fileInfo, err := os.Stat(path)
@@ -34,14 +35,22 @@ func (r *Runtime) importer(filename string, dg *models.Debug) (lang.Object, erro
 			if err != nil {
 				return err
 			}
+
 			if !info.IsDir() && filepath.Ext(filePath) == ".zx" {
-				_, err := r.importer(strings.Replace(filePath, filepath.Dir(root), "", 1), dg)
+				// Calculate relative path correctly
+				relPath, err := filepath.Rel(rootDir, filePath)
+				if err != nil {
+					return err
+				}
+
+				_, err = r.importer(relPath, dg)
 				if err != nil {
 					return err
 				}
 			}
 			return nil
 		})
+
 		if err != nil {
 			return nil, err
 		}
@@ -67,20 +76,16 @@ func (r *Runtime) importer(filename string, dg *models.Debug) (lang.Object, erro
 		if err != nil {
 			return nil, errs.WithDebug(err, dg)
 		}
-
 		nodes, err = builder.Build(ts)
 		if err != nil {
 			return nil, errs.WithDebug(err, dg)
 		}
-
 		if len(nodes) == 0 {
 			return nil, nil
 		}
-
 	}
 
 	cache.Store(path, b, nodes)
-
 	ret, err := r.Execute(nodes)
 	if err != nil {
 		return nil, errs.WithDebug(err, dg)

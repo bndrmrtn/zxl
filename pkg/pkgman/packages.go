@@ -63,7 +63,7 @@ func (pm *PackageManager) installPackage(pkg *Package) error {
 		return nil
 	}
 
-	manager, err := New(pkg.Package, dest)
+	manager, err := New(dest)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (pm *PackageManager) isOtherPackageUsing(pkg *Package) bool {
 		}
 
 		pkgFile := filepath.Join(pm.root, PackageDirectory, pkg.Author, pkg.Package, PkgFile)
-		manager, err := New(pkg.Author, pkgFile)
+		manager, err := New(pkgFile)
 		if err != nil {
 			continue
 		}
@@ -108,7 +108,7 @@ func (pm *PackageManager) deletePackage(pkg *Package) error {
 	}
 
 	pkgFile := filepath.Join(dest, PkgFile)
-	manager, err := New(pkg.Author, pkgFile)
+	manager, err := New(pkgFile)
 	if err != nil {
 		return err
 	}

@@ -43,7 +43,7 @@ func execGet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	pm, err := pkgman.New("", ".")
+	pm, err := pkgman.New(".")
 	if err != nil {
 		cmd.PrintErrln(err)
 		return

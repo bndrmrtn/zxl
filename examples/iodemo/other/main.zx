@@ -2,7 +2,7 @@ namespace main;
 
 use docdb;
 
-import("./docdb");
+import("../docdb/");
 
 let db = docdb.NewDB();
 

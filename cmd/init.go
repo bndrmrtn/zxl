@@ -8,7 +8,7 @@ import (
 
 // initCmd represents the init command
 var initCmd = &cobra.Command{
-	Use:   "init <packageName>",
+	Use:   "init",
 	Short: "Initializes a new Zx project",
 	Run:   execInit,
 }
@@ -21,28 +21,13 @@ func init() {
 
 // execInit executes the init command
 func execInit(cmd *cobra.Command, args []string) {
-	if len(args) == 0 {
-		_ = cmd.Help()
-		return
-	}
-
 	colors := cmd.Flag("nocolor").Value.String() == "false"
 
 	if !colors {
 		color.NoColor = true
 	}
 
-	if len(args) == 0 {
-		cmd.PrintErrln("No package name specified")
-		return
-	}
-
-	if len(args) > 1 {
-		cmd.PrintErrln("Only one package name can be specified")
-		return
-	}
-
-	pm, err := pkgman.New(args[0], ".")
+	pm, err := pkgman.NewInitializer(".")
 	if err != nil {
 		cmd.PrintErrln(err)
 		return
