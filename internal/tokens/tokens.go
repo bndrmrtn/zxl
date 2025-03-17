@@ -15,7 +15,6 @@ const (
 	Const
 	Define
 	Return
-	New
 	This // Reference for blocks
 	Identifier
 	FuncCall
@@ -23,6 +22,8 @@ const (
 	For
 	In
 	While
+	Throw
+	Spin
 
 	Number TokenType = iota + 1000
 	String
@@ -114,8 +115,6 @@ func (t TokenType) String() string {
 		return "define"
 	case Return:
 		return "return"
-	case New:
-		return "new"
 	case This:
 		return "this"
 	case Identifier:
@@ -206,6 +205,8 @@ func (t TokenType) String() string {
 		return "white space"
 	case For:
 		return "for"
+	case Throw:
+		return "throw"
 	case List:
 		return "list"
 	case ListValue:
@@ -214,6 +215,8 @@ func (t TokenType) String() string {
 		return "<></>"
 	case Array:
 		return "array"
+	case Spin:
+		return "spin"
 	default:
 		return "unkown"
 	}

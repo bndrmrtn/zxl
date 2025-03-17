@@ -26,6 +26,10 @@ const (
 	TFnRef      ObjType = "<Function Reference>"
 )
 
+func (o ObjType) String() string {
+	return string(o)
+}
+
 var errNotImplemented = fmt.Errorf("not implemented")
 
 func (o ObjType) TokenType() tokens.TokenType {

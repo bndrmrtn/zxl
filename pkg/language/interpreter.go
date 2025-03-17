@@ -8,10 +8,10 @@ import (
 
 	"github.com/bndrmrtn/zxl/internal/ast"
 	"github.com/bndrmrtn/zxl/internal/cache"
-	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/lexer"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/runtimev2"
+	"github.com/bndrmrtn/zxl/lang"
 )
 
 // Interpreter is a language interpreter

@@ -39,7 +39,7 @@ func (b *Builder) Build(ts []*models.Token) ([]*models.Node, error) {
 		nodes = append(nodes, node)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
 	for inx < len(ts) {
@@ -98,7 +98,7 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 		return b.parseList(ts, inx)
 	case tokens.LeftParenthesis:
 		return b.parseParenthesis(ts, inx)
-	case tokens.For:
+	case tokens.For, tokens.Spin:
 		return b.parseFor(ts, inx)
 	case tokens.Semicolon:
 		*inx++

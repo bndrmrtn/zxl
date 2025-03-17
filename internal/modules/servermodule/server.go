@@ -6,8 +6,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/lang"
 )
 
 type HttpServer struct {

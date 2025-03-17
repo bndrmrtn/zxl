@@ -7,10 +7,10 @@ import (
 
 	"github.com/Knetic/govaluate"
 	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/tmpl"
 	"github.com/bndrmrtn/zxl/internal/tokens"
+	"github.com/bndrmrtn/zxl/lang"
 	"github.com/google/uuid"
 )
 

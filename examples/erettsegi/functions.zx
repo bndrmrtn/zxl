@@ -1,0 +1,41 @@
+namespace main;
+
+use io;
+use conv;
+use types;
+
+fn loadData() {
+    const data = [];
+    const file = io.open("data.txt");
+    const lines = file.readLines().split("\n");
+    file.close();
+    
+    for line in lines {
+        if line == "" {
+            return data;
+        }
+
+        const parts = line.split(' ');
+        const id = parts[0];
+        const eventTime = parts[1];
+        const eventID = conv.object(parts[2], types.Integer);
+
+        const obj = array {
+            id: id,
+            eventTime: eventTime,
+            eventID: eventID,
+        };
+
+        data.append(obj);
+    }
+
+    return data;
+}
+
+fn fel(n) {
+    if type(n) != types.Integer {
+        fail("n must be an integer");
+    }
+
+    println(`{{ n }}. feladat`);
+}

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/lang"
 )
 
 type Request struct {

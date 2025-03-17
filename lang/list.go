@@ -2,6 +2,7 @@ package lang
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/models"
@@ -31,7 +32,7 @@ func NewList(name string, li []Object, debug *models.Debug) Object {
 			mutable: true,
 		},
 		value:  li,
-		length: -1,
+		length: len(li),
 	}
 }
 
@@ -53,10 +54,8 @@ func (l *List) Method(name string) Method {
 		return nil
 	case "append":
 		return NewFunction(func(args []Object) (Object, error) {
-			if len(l.value) == -1 {
-				l.length = len(l.value)
-			}
 			l.value = append(l.value, args[0].Copy())
+			l.length++
 			return nil, nil
 		}).WithArgs([]string{"item"}).WithDebug(l.debug)
 	case "contains":
@@ -65,8 +64,10 @@ func (l *List) Method(name string) Method {
 				return NewBool("contains", false, l.debug), nil
 			}
 
+			search := args[0].Value()
+
 			for _, v := range l.value {
-				if v.Value() == args[0].Value() {
+				if reflect.DeepEqual(v.Value(), search) {
 					return NewBool("contains", true, l.debug), nil
 				}
 			}
@@ -85,9 +86,6 @@ func (l *List) Variable(variable string) Object {
 	default:
 		return nil
 	case "length":
-		if l.length == -1 {
-			l.length = len(l.value)
-		}
 		return NewInteger("length", l.length, l.debug)
 	case "$addr":
 		return addr(l)

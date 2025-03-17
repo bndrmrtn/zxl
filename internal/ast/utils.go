@@ -60,6 +60,10 @@ func (b *Builder) getValue(t *models.Token) any {
 	case tokens.Identifier:
 		return t.Value
 	case tokens.TemplateLiteral:
+		if q, ok := t.Map["quote"]; ok && q == byte('`') {
+			return strings.TrimPrefix(strings.TrimSuffix(t.Value, "`"), "`")
+		}
+
 		str := strings.TrimPrefix(t.Value, "<>")
 		str = strings.TrimSuffix(str, "</>")
 		str = strings.TrimSpace(str)

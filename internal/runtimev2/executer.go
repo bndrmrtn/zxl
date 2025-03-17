@@ -11,9 +11,9 @@ import (
 	"github.com/bndrmrtn/zxl/internal/ast"
 	"github.com/bndrmrtn/zxl/internal/cache"
 	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/lexer"
 	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/lang"
 )
 
 // Executer represents a node executer in the runtime

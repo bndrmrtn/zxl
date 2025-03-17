@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/lang"
 )
 
 type DB struct {

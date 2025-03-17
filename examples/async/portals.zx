@@ -1,6 +1,9 @@
 namespace demo;
 
 use thread;
+use time;
+
+const start = time.now();
 
 define User {
     let name;
@@ -43,3 +46,5 @@ for i in (users.length) {
 
 portal.close();
 spawner.close();
+
+println(time.since(start));

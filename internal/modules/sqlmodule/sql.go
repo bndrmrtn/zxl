@@ -3,7 +3,7 @@ package sqlmodule
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/lang"
 	_ "github.com/mattn/go-sqlite3"
 )
 

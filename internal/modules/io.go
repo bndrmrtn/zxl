@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/lang"
 )
 
 type IO struct{}

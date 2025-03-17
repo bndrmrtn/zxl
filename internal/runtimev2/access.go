@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/lang"
 )
 
 // GetMethod gets a method by name

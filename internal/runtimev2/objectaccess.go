@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/tokens"
+	"github.com/bndrmrtn/zxl/lang"
 )
 
 // accessObject accesses an object

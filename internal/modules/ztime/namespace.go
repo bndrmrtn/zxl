@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/lang"
 )
 
 // TimeNamespace implements a namespace for time operations
@@ -29,7 +29,7 @@ func (*TimeNamespace) Objects() map[string]lang.Object {
 func (*TimeNamespace) Methods() map[string]lang.Method {
 	return map[string]lang.Method{
 		"now": lang.NewFunction(fnNow),
-		"from": lang.NewFunction(fnFrom).
+		"parse": lang.NewFunction(fnFrom).
 			WithTypeSafeArgs(lang.TypeSafeArg{Name: "format", Type: lang.TString}, lang.TypeSafeArg{Name: "value", Type: lang.TString}),
 		"since": lang.NewFunction(fnSince).WithArg("time"),
 		"until": lang.NewFunction(fnUntil).WithArg("time"),
@@ -37,7 +37,6 @@ func (*TimeNamespace) Methods() map[string]lang.Method {
 }
 
 func fnNow(args []lang.Object) (lang.Object, error) {
-	fmt.Println("NEW", NewTime(time.Now()))
 	return NewTime(time.Now()), nil
 }
 

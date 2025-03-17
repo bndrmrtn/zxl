@@ -3,7 +3,7 @@ package modules
 import (
 	"os"
 
-	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/lang"
 	"github.com/joho/godotenv"
 )
 

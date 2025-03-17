@@ -10,10 +10,10 @@ import (
 
 	"github.com/bndrmrtn/zxl/internal/builtin"
 	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/modules"
 	"github.com/bndrmrtn/zxl/internal/tokens"
+	"github.com/bndrmrtn/zxl/lang"
 	"github.com/bndrmrtn/zxl/source"
 )
 

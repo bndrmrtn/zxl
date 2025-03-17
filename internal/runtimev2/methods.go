@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/lang"
 	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/lang"
 )
 
 // callFunctionFromNode calls a function from a node

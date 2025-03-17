@@ -138,7 +138,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				col++
 			}
 		// Handle strings
-		case '"', '\'':
+		case '"', '\'', '`':
 			// Skip the opening quote
 			quote := s[pos] // Store the opening quote character
 			pos++
@@ -180,9 +180,14 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				})
 			}
 
+			typ := tokens.String
+			if quote == '`' {
+				typ = tokens.TemplateLiteral
+			}
+
 			// Add the string token to the parsed tokens
 			parsed = append(parsed, &models.Token{
-				Type:  tokens.String,
+				Type:  typ,
 				Value: string(quote) + value + string(quote),
 				Debug: &models.Debug{
 					Line:   line,
@@ -594,8 +599,8 @@ func (lx *Lexer) getIdentType(s string) tokens.TokenType {
 		return tokens.Return
 	case "fn":
 		return tokens.Function
-	case "new":
-		return tokens.New
+	case "throw":
+		return tokens.Throw
 	case "true", "false":
 		return tokens.Bool
 	case "nil":
@@ -612,6 +617,8 @@ func (lx *Lexer) getIdentType(s string) tokens.TokenType {
 		return tokens.In
 	case "array":
 		return tokens.Array
+	case "spin":
+		return tokens.Spin
 	default:
 		return tokens.Identifier
 	}

@@ -3,7 +3,7 @@ package modules
 import (
 	"net/http"
 
-	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/lang"
 )
 
 type Http struct{}

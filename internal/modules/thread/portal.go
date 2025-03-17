@@ -3,7 +3,7 @@ package thread
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zxl/internal/lang"
+	"github.com/bndrmrtn/zxl/lang"
 )
 
 type Portal struct {
