@@ -178,11 +178,12 @@ func (db *DB) Method(name string) lang.Method {
 	case "query":
 		return lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			var queryArgs []interface{}
-			for _, arg := range args[1:] {
+			for _, arg := range args[1].Value().([]lang.Object) {
 				queryArgs = append(queryArgs, arg.Value())
 			}
 			rows, err := db.db.Query(args[0].Value().(string), queryArgs...)
 			if err != nil {
+				fmt.Println("err", queryArgs)
 				return nil, err
 			}
 			defer rows.Close()
@@ -225,7 +226,7 @@ func (db *DB) Method(name string) lang.Method {
 	case "exec":
 		return lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			var queryArgs []interface{}
-			for _, arg := range args[1:] {
+			for _, arg := range args[1].Value().([]lang.Object) {
 				queryArgs = append(queryArgs, arg.Value())
 			}
 
@@ -249,7 +250,7 @@ func (db *DB) Method(name string) lang.Method {
 	case "queryRow":
 		return lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			var queryArgs []interface{}
-			for _, arg := range args[1:] {
+			for _, arg := range args[1].Value().([]lang.Object) {
 				queryArgs = append(queryArgs, arg.Value())
 			}
 
@@ -405,7 +406,7 @@ func (s *Statement) Method(name string) lang.Method {
 	case "exec":
 		return lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			var queryArgs []interface{}
-			for _, arg := range args {
+			for _, arg := range args[0].Value().([]lang.Object) {
 				queryArgs = append(queryArgs, arg.Value())
 			}
 
@@ -429,7 +430,7 @@ func (s *Statement) Method(name string) lang.Method {
 	case "query":
 		return lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			var queryArgs []interface{}
-			for _, arg := range args {
+			for _, arg := range args[0].Value().([]lang.Object) {
 				queryArgs = append(queryArgs, arg.Value())
 			}
 
@@ -477,7 +478,7 @@ func (s *Statement) Method(name string) lang.Method {
 	case "queryRow":
 		return lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			var queryArgs []interface{}
-			for _, arg := range args {
+			for _, arg := range args[0].Value().([]lang.Object) {
 				queryArgs = append(queryArgs, arg.Value())
 			}
 
@@ -607,7 +608,7 @@ func (t *Transaction) Method(name string) lang.Method {
 	case "exec":
 		return lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			var queryArgs []interface{}
-			for _, arg := range args[1:] {
+			for _, arg := range args[1].Value().([]lang.Object) {
 				queryArgs = append(queryArgs, arg.Value())
 			}
 
@@ -631,7 +632,7 @@ func (t *Transaction) Method(name string) lang.Method {
 	case "query":
 		return lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			var queryArgs []interface{}
-			for _, arg := range args[1:] {
+			for _, arg := range args[1].Value().([]lang.Object) {
 				queryArgs = append(queryArgs, arg.Value())
 			}
 
