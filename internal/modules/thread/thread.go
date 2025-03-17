@@ -48,7 +48,7 @@ func (t *Thread) Methods() map[string]lang.Method {
 			return portal, nil
 		}).WithVariadicArg("buffer"),
 		"spawn": lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
-			fn := args[0].Value().(lang.Method)
+			fn := args[0].(*lang.Fn).Fn
 			if len(fn.Args()) != 0 {
 				return nil, fmt.Errorf("spawn handler must have 0 arguments, got %d", len(fn.Args()))
 			}

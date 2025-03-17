@@ -58,7 +58,7 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 			return instance.Method("$init"), nil
 		}
 		if obj.Type() == lang.TFnRef {
-			return obj.Value().(lang.Method), nil
+			return obj.(*lang.Fn).Fn, nil
 		}
 	}
 

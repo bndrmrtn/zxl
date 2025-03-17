@@ -63,12 +63,24 @@ func (i *Instance) Method(name string) Method {
 		}).WithArgs(construct.Args()).WithDebug(i.debug)
 	}
 
+	if name == "$method" {
+		return NewFunction(func(args []Object) (Object, error) {
+			name := args[0].Value().(string)
+			fn, err := i.ex.GetMethod(name)
+			if err != nil {
+				return nil, err
+			}
+
+			return NewFn(name, args[0].Debug(), fn), nil
+		}).WithDebug(i.debug).WithTypeSafeArgs(TypeSafeArg{"method", TString})
+	}
+
 	m, _ := i.ex.GetMethod(name)
 	return m
 }
 
 func (i *Instance) Methods() []string {
-	return nil
+	return []string{"$method"}
 }
 
 func (i *Instance) Variable(variable string) Object {
@@ -81,7 +93,7 @@ func (i *Instance) Variable(variable string) Object {
 }
 
 func (i *Instance) Variables() []string {
-	return i.ex.Variables()
+	return append(i.ex.Variables(), "$addr")
 }
 
 func (i *Instance) SetVariable(name string, value Object) error {

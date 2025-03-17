@@ -64,8 +64,16 @@ func New() (*Runtime, error) {
 
 // Execute executes the given nodes
 func (r *Runtime) Execute(nodes []*models.Node) (lang.Object, error) {
+	namespace, nodes, err := r.GetNamespace(nodes)
+	if err != nil {
+		return nil, err
+	}
+	return r.Exec(ExecuterScopeGlobal, nil, namespace, nodes)
+}
+
+func (r *Runtime) GetNamespace(nodes []*models.Node) (string, []*models.Node, error) {
 	if len(nodes) == 0 {
-		return nil, nil
+		return "", nil, nil
 	}
 
 	if nodes[0].Type == tokens.Namespace {
@@ -73,13 +81,13 @@ func (r *Runtime) Execute(nodes []*models.Node) (lang.Object, error) {
 		nodes = nodes[1:]
 
 		if slices.Contains(r.builtinNamespaces, namespace) {
-			return nil, errs.WithDebug(fmt.Errorf("cannot use builtin '%s' as namespace", namespace), nodes[0].Debug)
+			return "", nil, errs.WithDebug(fmt.Errorf("cannot use builtin '%s' as namespace", namespace), nodes[0].Debug)
 		}
 
-		return r.Exec(ExecuterScopeGlobal, nil, namespace, nodes)
+		return namespace, nodes, nil
 	}
 
-	return r.Exec(ExecuterScopeGlobal, nil, "", nodes)
+	return "", nodes, nil
 }
 
 // Exec executes the given nodes in the given namespace
@@ -114,6 +122,7 @@ func (r *Runtime) GetNamespaceExecuter(namespace string) (*Executer, error) {
 
 		ex, err := r.loadPackage(parts[0], parts[1])
 		if err != nil {
+			fmt.Println(err)
 			return nil, err
 		}
 
@@ -177,6 +186,7 @@ func (r *Runtime) loadPackage(author string, pkg string) (*Executer, error) {
 		}
 		return nil
 	})
+
 	if err != nil {
 		return nil, err
 	}

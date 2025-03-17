@@ -8,13 +8,13 @@ import (
 
 type Fn struct {
 	Base
-	fn Method
+	Fn Method
 }
 
 func NewFn(name string, debug *models.Debug, fn Method) Object {
 	return &Fn{
 		Base: NewBase(name, debug),
-		fn:   fn,
+		Fn:   fn,
 	}
 }
 
@@ -27,7 +27,7 @@ func (f *Fn) Name() string {
 }
 
 func (f *Fn) Value() any {
-	return f.fn
+	return f
 }
 
 func (f *Fn) Method(name string) Method {
@@ -43,7 +43,7 @@ func (f *Fn) Variable(name string) Object {
 	default:
 		return nil
 	case "$addr":
-		return addr(f.fn)
+		return addr(f.Fn)
 	}
 }
 
@@ -56,7 +56,7 @@ func (f *Fn) SetVariable(_ string, _ Object) error {
 }
 
 func (f *Fn) String() string {
-	return fmt.Sprintf("Fn(%s)", f.name)
+	return fmt.Sprintf("Fn(reference:%s)", f.name)
 }
 
 func (f *Fn) Copy() Object {

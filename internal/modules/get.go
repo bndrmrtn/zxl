@@ -17,6 +17,7 @@ func Get() []lang.Module {
 		NewJSONModule(),
 		NewEnv(),
 		NewConvert(),
+		NewCrypto(),
 		sqlmodule.New(),
 		zruntime.New(),
 		thread.New(),
