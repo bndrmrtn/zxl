@@ -15,7 +15,7 @@ const PackageDirectory = ".zxpack"
 func (pm *PackageManager) installPackage(pkg *Package) error {
 	dest := filepath.Join(pm.root, PackageDirectory, pkg.Author, pkg.Package)
 
-	if _, err := os.Stat(dest); err == nil {
+	if info, err := os.Stat(dest); err == nil && info.IsDir() {
 		return nil
 	}
 

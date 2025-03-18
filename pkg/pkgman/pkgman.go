@@ -115,7 +115,7 @@ func (pm *PackageManager) parseUrl(packageUrl string) (*Package, error) {
 
 	// Split the trimmed URL into parts
 	parts := strings.Split(trimmed, "@")
-	repoPath := parts[0]
+	repoPath := strings.TrimSuffix(parts[0], "/")
 	version := "latest"
 	if len(parts) > 1 && parts[1] != "" {
 		version = parts[1]
@@ -155,4 +155,13 @@ func (pm *PackageManager) save() error {
 
 func (pm *PackageManager) Save() error {
 	return pm.save()
+}
+
+func (pm *PackageManager) Download() error {
+	for _, pkg := range pm.Packages {
+		if err := pm.installPackage(pkg); err != nil {
+			return err
+		}
+	}
+	return nil
 }
