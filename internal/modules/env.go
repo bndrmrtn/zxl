@@ -33,7 +33,7 @@ func (h *Env) Methods() map[string]lang.Method {
 	return map[string]lang.Method{
 		"get": lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			key := args[0].Value().(string)
-			return lang.NewString(key, key, nil), nil
+			return lang.NewString(key, os.Getenv(key), nil), nil
 		}).WithTypeSafeArgs(lang.TypeSafeArg{Name: "key", Type: lang.TString}),
 		"set": lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			key := args[0].Value().(string)
