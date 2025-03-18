@@ -57,6 +57,7 @@ func New(root string) (*PackageManager, error) {
 
 // Add adds a package to pkg.yaml
 func (pm *PackageManager) Add(packageUrl string) error {
+	fmt.Println("ℹ️ Installing package...")
 	pkg, err := pm.parseUrl(packageUrl)
 	if err != nil {
 		return err
@@ -64,7 +65,7 @@ func (pm *PackageManager) Add(packageUrl string) error {
 
 	for _, pack := range pm.Packages {
 		if pack.Author == pkg.Author && pack.Package == pkg.Package {
-			return fmt.Errorf("package already exists")
+			return fmt.Errorf("Package already exists")
 		}
 	}
 
@@ -158,6 +159,7 @@ func (pm *PackageManager) Save() error {
 }
 
 func (pm *PackageManager) Download() error {
+	fmt.Println("ℹ️ Downloading packages...")
 	for _, pkg := range pm.Packages {
 		if err := pm.installPackage(pkg); err != nil {
 			return err

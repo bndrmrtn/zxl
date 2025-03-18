@@ -7,4 +7,8 @@ config:
     web:
         host: 127.0.0.1
         port: 3000
-packages: []
+packages:
+    - url: https://github.com/zxlgo/hello
+      author: zxlgo
+      package: hello
+      version: latest

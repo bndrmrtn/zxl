@@ -28,6 +28,8 @@ func (n Nil) Name() string {
 	return ""
 }
 
+func (n Nil) Rename(_ string) {}
+
 func (n Nil) Value() any {
 	return nil
 }
@@ -43,6 +45,8 @@ func (n Nil) Debug() *models.Debug {
 func (n Nil) IsMutable() bool {
 	return true
 }
+
+func (n Nil) Immute() {}
 
 func (n Nil) Copy() Object {
 	return n

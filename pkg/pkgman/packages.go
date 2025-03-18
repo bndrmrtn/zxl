@@ -16,6 +16,7 @@ func (pm *PackageManager) installPackage(pkg *Package) error {
 	dest := filepath.Join(pm.root, PackageDirectory, pkg.Author, pkg.Package)
 
 	if info, err := os.Stat(dest); err == nil && info.IsDir() {
+		fmt.Printf("✅ Package %s already installed\n", pkg.Author+":"+pkg.Package)
 		return nil
 	}
 
@@ -74,6 +75,7 @@ func (pm *PackageManager) installPackage(pkg *Package) error {
 		}
 	}
 
+	fmt.Printf("✅ Package %s installed successfully\n", pkg.Author+":"+pkg.Package)
 	return nil
 }
 
