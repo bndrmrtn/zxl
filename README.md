@@ -3,6 +3,8 @@
 Zx is a simple programming language
 that is designed to be easy to use and understand.
 
+[Examples](https://github.com/orgs/zxlgo/repositories)
+
 ## About
 
 Zx is a weakly-typed, interpreted language that is designed to be easy to use and understand.
