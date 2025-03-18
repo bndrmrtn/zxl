@@ -31,6 +31,20 @@ func NewArray(name string, debug *models.Debug, keys []Object, values []Object) 
 	return array
 }
 
+func NewArrayMap(name string, debug *models.Debug, m map[string]Object) Object {
+	var keys = make([]Object, len(m))
+	var values = make([]Object, len(m))
+
+	i := 0
+	for key, value := range m {
+		keys[i] = NewString("key", key, nil)
+		values[i] = value
+		i++
+	}
+
+	return NewArray(name, debug, keys, values)
+}
+
 func (a *Array) Type() ObjType {
 	return TArray
 }
@@ -89,7 +103,7 @@ func (a *Array) Variable(variable string) Object {
 }
 
 func (a *Array) Variables() []string {
-	return []string{"$addr"}
+	return []string{"$addr", "keys"}
 }
 
 func (a *Array) SetVariable(name string, value Object) error {

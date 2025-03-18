@@ -158,7 +158,9 @@ func (s *Server) executeNodes(nodes []*models.Node, w http.ResponseWriter, r *ht
 		return
 	}
 
-	// Write the response
-	w.WriteHeader(httpModule.Code)
-	_, _ = w.Write(httpModule.Body.Bytes())
+	if !httpModule.Written {
+		// Write the response
+		w.WriteHeader(httpModule.Code)
+		_, _ = w.Write(httpModule.Body.Bytes())
+	}
 }
