@@ -872,6 +872,29 @@ func (b *Builder) parseFuncCallArg(ts []*models.Token, inx *int) (*models.Node, 
 			}
 		}
 
+		if ts[*inx].Type == tokens.LeftBrace {
+			braceCount := 0
+			for {
+				if *inx >= len(ts) {
+					return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got 'EOF'", errs.SyntaxError), ts[*inx-1].Debug)
+				}
+
+				if ts[*inx].Type == tokens.LeftBrace {
+					braceCount++
+				}
+
+				if ts[*inx].Type == tokens.RightBrace {
+					braceCount--
+					if braceCount == 0 {
+						break
+					}
+				}
+
+				children = append(children, ts[*inx])
+				*inx++
+			}
+		}
+
 		if ts[*inx].Type == tokens.Comma && parenCount == 1 {
 			*inx++
 			break
