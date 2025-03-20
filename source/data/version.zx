@@ -3,5 +3,3 @@ namespace zx;
 use runtime;
 
 const version = runtime.langVersion;
-
-let x = ref(app);
