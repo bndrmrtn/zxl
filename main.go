@@ -29,6 +29,11 @@ func main() {
 func fatal() {
 	if r := recover(); r != nil {
 		f := color.New(color.FgRed, color.Bold).SprintFunc()
-		fmt.Printf("%s: %v\nStack trace: %s\n", f("Fatal error"), r, debug.Stack())
+		fmt.Printf("%s: %v\n", f("Fatal error"), r)
+
+		// Show Go's stack trace if the SHOW_STACK environment variable is set to true
+		if os.Getenv("SHOW_STACK") == "true" {
+			fmt.Printf("Stack trace: %s\n", debug.Stack())
+		}
 	}
 }

@@ -1,0 +1,10 @@
+// does not work currently
+const value = ref(5 + 5);
+
+fn incr(v) {
+    v = v + 1;
+}
+
+println(value);
+incr(value);
+println(value);

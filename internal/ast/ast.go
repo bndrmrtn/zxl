@@ -92,7 +92,7 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 		return b.parseUse(ts, inx)
 	case tokens.While:
 		return b.parseWhile(ts, inx)
-	case tokens.Array:
+	case tokens.Array, tokens.LeftBrace:
 		return b.parseArray(ts, inx)
 	case tokens.LeftBracket:
 		return b.parseList(ts, inx)

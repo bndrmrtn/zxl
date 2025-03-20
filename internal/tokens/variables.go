@@ -11,6 +11,7 @@ const (
 	TemplateVariable
 	BoolVariable
 	FunctionCallVariable
+	FunctionVariable
 	ExpressionVariable
 	ReferenceVariable
 	InlineValue

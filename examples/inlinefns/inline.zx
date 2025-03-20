@@ -1,0 +1,9 @@
+use zx;
+
+const x = fn() => 5 + 5;
+const y = fn() {
+    return zx.version // currently semi-colons breaks this
+};
+
+println(x());
+println(y());

@@ -9,7 +9,7 @@ import (
 // Node represents a node in the AST
 type Node struct {
 	// Type represents the type of the node
-	Type tokens.TokenType `yaml:"type"`
+	Type tokens.TokenType `yaml:"token"`
 	// VariableType represents the type of the variable
 	VariableType tokens.VariableType `yaml:"variableType"`
 
@@ -34,7 +34,7 @@ type Node struct {
 	Flags []string `yaml:"flags,omitempty"`
 
 	// Debug represents the debug information of the node
-	Debug *Debug `yaml:"debug,omitempty"`
+	Debug *Debug `yaml:"-"`
 }
 
 func (n *Node) String() string {

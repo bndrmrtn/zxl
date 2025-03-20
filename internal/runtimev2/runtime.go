@@ -5,8 +5,8 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
+	"sync"
 
 	"github.com/bndrmrtn/zxl/internal/builtin"
 	"github.com/bndrmrtn/zxl/internal/errs"
@@ -14,7 +14,6 @@ import (
 	"github.com/bndrmrtn/zxl/internal/modules"
 	"github.com/bndrmrtn/zxl/internal/tokens"
 	"github.com/bndrmrtn/zxl/lang"
-	"github.com/bndrmrtn/zxl/source"
 )
 
 const PackageDirectory = ".zxpack"
@@ -25,11 +24,15 @@ type Runtime struct {
 
 	// executers is a map of namespace names to exec
 	executers map[string]*Executer
-	// builtinNamespaces is a list of builtin namespaces
-	builtinNamespaces []string
+	// builtinModules is a map of builtin module names to module objects
+	builtinModules map[string]lang.Module
+	// sourceNamespaces is a list of source namespaces
+	sourceNamespaces map[string]*Namespace
 
 	// packages is a map of package names to runtime
 	packages map[string]*Runtime
+
+	mu sync.RWMutex
 }
 
 // New creates a new runtime
@@ -37,26 +40,18 @@ func New() (*Runtime, error) {
 	modules := modules.Get()
 
 	r := &Runtime{
-		executers:         make(map[string]*Executer),
-		packages:          make(map[string]*Runtime),
-		builtinNamespaces: make([]string, len(modules)),
+		executers:      make(map[string]*Executer),
+		packages:       make(map[string]*Runtime),
+		builtinModules: make(map[string]lang.Module, len(modules)),
 	}
-	r.functions = builtin.GetMethods(r.importer)
+	r.functions = builtin.GetMethods(r.importer, r.evaler)
 
 	for _, module := range modules {
 		r.BindModule(module)
 	}
 
-	files, err := source.Get()
-	if err != nil {
+	if err := r.LoadSourceNamespaces(); err != nil {
 		return nil, err
-	}
-
-	for _, nodes := range files {
-		_, err = r.Execute(nodes)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return r, nil
@@ -72,6 +67,9 @@ func (r *Runtime) Execute(nodes []*models.Node) (lang.Object, error) {
 }
 
 func (r *Runtime) GetNamespace(nodes []*models.Node) (string, []*models.Node, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
 	if len(nodes) == 0 {
 		return "", nil, nil
 	}
@@ -80,7 +78,7 @@ func (r *Runtime) GetNamespace(nodes []*models.Node) (string, []*models.Node, er
 		namespace := nodes[0].Content
 		nodes = nodes[1:]
 
-		if slices.Contains(r.builtinNamespaces, namespace) {
+		if _, ok := r.builtinModules[namespace]; ok {
 			return "", nil, errs.WithDebug(fmt.Errorf("cannot use builtin '%s' as namespace", namespace), nodes[0].Debug)
 		}
 
@@ -92,55 +90,85 @@ func (r *Runtime) GetNamespace(nodes []*models.Node) (string, []*models.Node, er
 
 // Exec executes the given nodes in the given namespace
 func (r *Runtime) Exec(scope ExecuterScope, parent *Executer, namespace string, nodes []*models.Node) (lang.Object, error) {
+	r.mu.RLock()
 	ex, ok := r.executers[namespace]
+	r.mu.RUnlock()
 	if !ok {
 		ex = NewExecuter(scope, r, parent).WithName(namespace)
+		r.mu.Lock()
 		r.executers[namespace] = ex
+		r.mu.Unlock()
 	}
 	return ex.Execute(nodes)
 }
 
 // GetNamespaceExecuter gets the executer for the given namespace
 func (r *Runtime) GetNamespaceExecuter(namespace string) (*Executer, error) {
-	ex, ok := r.executers[namespace]
-	if !ok {
-		if !strings.Contains(namespace, ":") {
-			return nil, fmt.Errorf("namespace %v not found", namespace)
-		}
-
-		parts := strings.Split(namespace, ":")
-		if len(parts) != 2 {
-			return nil, fmt.Errorf("invalid namespace %v", namespace)
-		}
-
-		if run, ok := r.packages[namespace]; ok {
-			ex, err := run.GetNamespaceExecuter(parts[1])
-			if err == nil {
-				return ex, nil
+	r.mu.RLock()
+	ns, ok := r.sourceNamespaces[namespace]
+	r.mu.RUnlock()
+	if ok {
+		if !ns.Loaded {
+			if _, err := r.Execute(ns.Nodes); err != nil {
+				return nil, err
 			}
+			ns.Loaded = true
+			return r.GetNamespaceExecuter(ns.Name)
 		}
+	}
 
-		ex, err := r.loadPackage(parts[0], parts[1])
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-
+	r.mu.RLock()
+	ex, ok := r.executers[namespace]
+	r.mu.RUnlock()
+	if ok {
 		return ex, nil
 	}
+
+	r.mu.RLock()
+	mod, ok := r.builtinModules[namespace]
+	r.mu.RUnlock()
+	if ok {
+		return r.UseModule(mod), nil
+	}
+
+	if !strings.Contains(namespace, ":") {
+		return nil, fmt.Errorf("namespace %v not found", namespace)
+	}
+
+	parts := strings.Split(namespace, ":")
+	if len(parts) != 2 {
+		return nil, fmt.Errorf("invalid namespace %v", namespace)
+	}
+
+	r.mu.RLock()
+	run, ok := r.packages[namespace]
+	r.mu.RUnlock()
+	if ok {
+		ex, err := run.GetNamespaceExecuter(parts[1])
+		if err == nil {
+			return ex, nil
+		}
+	}
+
+	ex, err := r.loadPackage(parts[0], parts[1])
+	if err != nil {
+		return nil, err
+	}
+
 	return ex, nil
 }
 
 // BindModule binds the given package to the given name
-func (r *Runtime) BindModule(module lang.Module) {
+func (r *Runtime) UseModule(module lang.Module) *Executer {
 	namespace := module.Namespace()
-	r.builtinNamespaces = append(r.builtinNamespaces, namespace)
 
 	ex, ok := r.executers[namespace]
-	if !ok {
-		ex = NewExecuter(ExecuterScopeGlobal, r, nil).WithName(namespace)
-		r.executers[namespace] = ex
+	if ok {
+		return ex
 	}
+
+	ex = NewExecuter(ExecuterScopeGlobal, r, nil).WithName(namespace)
+	r.executers[namespace] = ex
 
 	for name, object := range module.Objects() {
 		ex.BindObject(name, object)
@@ -149,6 +177,16 @@ func (r *Runtime) BindModule(module lang.Module) {
 	for name, method := range module.Methods() {
 		ex.BindMethod(name, method)
 	}
+
+	return ex
+}
+
+func (r *Runtime) BindModule(module lang.Module) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	namespace := module.Namespace()
+	r.builtinModules[namespace] = module
 }
 
 func (r *Runtime) loadPackage(author string, pkg string) (*Executer, error) {

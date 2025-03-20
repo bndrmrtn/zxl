@@ -75,7 +75,8 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 			}
 
 			if obj == nil {
-				return nil, errs.WithDebug(fmt.Errorf("%w: function call value used but nothing is returned", errs.RuntimeError), n.Debug)
+				// Allow empty returns as nil
+				obj = lang.NewNil("nil", node.Debug)
 			}
 
 			if len(node.ObjectAccessors) > 0 {
@@ -97,6 +98,27 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 			}
 
 			args[sum] = obj.Value()
+			continue
+		}
+
+		if variableType == tokens.FunctionVariable {
+			name, method, err := e.createMethodFromNode(node)
+			if err != nil {
+				return nil, errs.WithDebug(err, n.Debug)
+			}
+
+			if name != "fn" {
+				return nil, errs.WithDebug(fmt.Errorf("%w: inline functions cannot have names", errs.RuntimeError), n.Debug)
+			}
+
+			obj := lang.NewFn(name, node.Debug, method)
+
+			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(uuid.NewString())))
+			sum = sum[:10]
+
+			expressionList = append(expressionList, sum)
+
+			args[sum] = obj
 			continue
 		}
 

@@ -97,32 +97,41 @@ func (b *Builder) parseLetConst(ts []*models.Token, inx *int) (*models.Node, err
 func (b *Builder) parseFunction(ts []*models.Token, inx *int) (m *models.Node, e error) {
 	token := ts[*inx]
 	node := &models.Node{
-		Type:    token.Type,
+		Type:    tokens.Function,
 		Debug:   token.Debug,
-		Content: "func",
+		Content: "fn",
+		Map:     map[string]interface{}{},
 	}
 	*inx++
 
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got 'EOF'", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier or '(', but got 'EOF'", errs.SyntaxError), token.Debug)
 	}
 
-	if ts[*inx].Type != tokens.Identifier {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	if ts[*inx].Type != tokens.Identifier && ts[*inx].Type != tokens.LeftParenthesis {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier or '(', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
-	node.Content = ts[*inx].Value
-	*inx++
-
-	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '(', but got 'EOF'", errs.SyntaxError), token.Debug)
-	}
-
-	if ts[*inx].Type != tokens.LeftParenthesis {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '(', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	if ts[*inx].Type == tokens.LeftParenthesis {
+		node.Type = tokens.InlineFunction
+		node.VariableType = tokens.FunctionVariable
+	} else {
+		node.Content = ts[*inx].Value
 	}
 
 	*inx++
+
+	if node.Type == tokens.Function {
+		if *inx >= len(ts) {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected '(', but got 'EOF'", errs.SyntaxError), token.Debug)
+		}
+
+		if ts[*inx].Type != tokens.LeftParenthesis {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected '(', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+		}
+
+		*inx++
+	}
 
 	var (
 		args       []*models.Node
@@ -176,44 +185,63 @@ func (b *Builder) parseFunction(ts []*models.Token, inx *int) (m *models.Node, e
 	}
 
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{', but got 'EOF'", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{' or '=>', but got 'EOF'", errs.SyntaxError), token.Debug)
 	}
 
-	if ts[*inx].Type != tokens.LeftBrace {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	if ts[*inx].Type != tokens.LeftBrace && ts[*inx].Type != tokens.Arrow {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{' or '=>', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
-	var (
-		children   []*models.Token
-		braceCount = 1
-	)
+	var children []*models.Token
 
-	for {
+	if ts[*inx].Type == tokens.Arrow {
 		*inx++
-		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got 'EOF'", errs.SyntaxError), token.Debug)
-		}
+		// Bind return token for auto-returning arrow function values
+		children = append(children, &models.Token{
+			Type: tokens.Return,
+		})
+		for {
+			if *inx >= len(ts) {
+				return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got 'EOF'", errs.SyntaxError), token.Debug)
+			}
 
-		if ts[*inx].Type == tokens.RightBrace {
-			braceCount--
-			if braceCount == 0 {
-				*inx++
+			if ts[*inx].Type == tokens.Semicolon {
 				break
 			}
+
+			children = append(children, ts[*inx])
+			*inx++
+		}
+	} else {
+		var braceCount = 1
+
+		for {
+			*inx++
+			if *inx >= len(ts) {
+				return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got 'EOF'", errs.SyntaxError), token.Debug)
+			}
+
+			if ts[*inx].Type == tokens.RightBrace {
+				braceCount--
+				if braceCount == 0 {
+					*inx++
+					break
+				}
+			}
+
+			if ts[*inx].Type == tokens.LeftBrace {
+				braceCount++
+			}
+
+			children = append(children, ts[*inx])
 		}
 
-		if ts[*inx].Type == tokens.LeftBrace {
-			braceCount++
+		if braceCount != 0 {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
 		}
-
-		children = append(children, ts[*inx])
 	}
 
-	if braceCount != 0 {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
-	}
-
-	child, err := b.Build(children)
+	child, err := b.Build(append(children, SemiColonToken))
 	if err != nil {
 		return nil, err
 	}
@@ -493,7 +521,7 @@ func (b *Builder) parseInlineValue(ts []*models.Token, inx *int) (*models.Node, 
 	*inx++
 
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected value, but got 'EOF'", errs.SyntaxError), ts[*inx].Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected value, but got 'EOF'", errs.SyntaxError), token.Debug)
 	}
 
 	if ts[*inx].Type == tokens.Semicolon || ts[*inx].Type == tokens.Comma || ts[*inx].Type == tokens.RightParenthesis || b.isExpression(ts[*inx]) {
@@ -611,6 +639,10 @@ func (b *Builder) parseReturn(ts []*models.Token, inx *int) (*models.Node, error
 
 	var children = []*models.Token{}
 	for {
+		if *inx >= len(ts) {
+			break
+		}
+
 		if ts[*inx].Type == tokens.Semicolon {
 			*inx++
 			break
@@ -1395,13 +1427,15 @@ func (b *Builder) parseFor(ts []*models.Token, inx *int) (*models.Node, error) {
 
 func (b *Builder) parseArray(ts []*models.Token, inx *int) (*models.Node, error) {
 	token := ts[*inx]
-	*inx++
-
-	if token.Type != tokens.Array {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected array, but got '%s'", errs.SyntaxError, token.Type), token.Debug)
+	if token.Type == tokens.Array {
+		*inx++
 	}
 
-	if *inx >= len(ts) {
+	if token.Type != tokens.Array && token.Type != tokens.LeftBrace {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected array or '{', but got '%s'", errs.SyntaxError, token.Type), token.Debug)
+	}
+
+	if token.Type == tokens.Array && *inx >= len(ts) {
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{', but got EOF", errs.SyntaxError), token.Debug)
 	}
 
@@ -1490,6 +1524,10 @@ func (b *Builder) parseArrayKeyValues(ts []*models.Token, inx *int) (*models.Nod
 	for {
 		if *inx >= len(ts) {
 			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got 'EOF'", errs.SyntaxError), token.Debug)
+		}
+
+		if braceCount == 0 && ts[*inx].Type == tokens.RightBrace {
+			break
 		}
 
 		if ts[*inx].Type == tokens.LeftBrace {

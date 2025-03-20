@@ -97,6 +97,10 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 		obj = arr
 	}
 
+	if obj == nil {
+		return "", nil, errs.WithDebug(fmt.Errorf("%w: invalid object", errs.ValueError), n.Debug)
+	}
+
 	if len(n.ObjectAccessors) > 0 {
 		accessed, err := e.accessObject(obj, n.ObjectAccessors)
 		if err != nil {

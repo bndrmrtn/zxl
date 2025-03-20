@@ -1,3 +1,7 @@
 namespace zx;
 
-const version = "v0.5.0";
+use runtime;
+
+const version = runtime.langVersion;
+
+let x = ref(app);

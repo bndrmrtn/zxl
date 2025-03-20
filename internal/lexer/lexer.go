@@ -239,6 +239,18 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					},
 				})
 				pos++
+			} else if pos+1 < len(s) && s[pos+1] == '>' {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.Arrow,
+					Value: "=>",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
+				})
+				pos++
 			} else {
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.Assign,
@@ -265,6 +277,17 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				})
 				col += 2
 				pos++
+			} else {
+				parsed = append(parsed, &models.Token{
+					Type:  tokens.Not,
+					Value: "!",
+					Debug: &models.Debug{
+						Line:   line,
+						Column: col,
+						File:   lx.filename,
+						Near:   lx.near(s, pos, fileLen),
+					},
+				})
 			}
 		case '&':
 			if pos+1 < len(s) && s[pos+1] == '&' {
@@ -554,6 +577,8 @@ func (lx *Lexer) getCharIdent(ch byte) tokens.TokenType {
 		return tokens.Multiplication
 	case '/':
 		return tokens.Division
+	case '!':
+		return tokens.Not
 	case ';':
 		return tokens.Semicolon
 	case ':':

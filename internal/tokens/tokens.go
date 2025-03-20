@@ -18,6 +18,7 @@ const (
 	This // Reference for blocks
 	Identifier
 	FuncCall
+	InlineFunction
 	EmptyReturn
 	For
 	In
@@ -56,6 +57,7 @@ const (
 	And
 	Or
 	Not
+	Arrow
 
 	LeftParenthesis TokenType = iota + 100000
 	RightParenthesis
@@ -131,6 +133,8 @@ func (t TokenType) String() string {
 		return "nil"
 	case Function:
 		return "function"
+	case InlineFunction:
+		return "inlineFunction"
 	case Definiton:
 		return "definiton"
 	case Addition:

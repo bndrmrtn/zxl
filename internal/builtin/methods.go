@@ -10,8 +10,9 @@ import (
 )
 
 type ImportFunc func(file string, d *models.Debug) (lang.Object, error)
+type EvalFunc func(code string) (lang.Object, error)
 
-func GetMethods(importer ImportFunc) map[string]lang.Method {
+func GetMethods(importer ImportFunc, evaler EvalFunc) map[string]lang.Method {
 	return map[string]lang.Method{
 		"print":   &Print{},
 		"println": &Print{true},
@@ -25,6 +26,12 @@ func GetMethods(importer ImportFunc) map[string]lang.Method {
 		"fail": lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 			return nil, errors.New(args[0].String())
 		}).WithArg("message"),
+		"eval": lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
+			return evaler(args[0].String())
+		}).WithTypeSafeArgs(lang.TypeSafeArg{Type: lang.TString, Name: "code"}),
+		"ref": lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
+			return lang.NewRef(args[0].Name(), args[0].Debug(), args[0]), nil
+		}).WithArg("object"),
 	}
 }
 

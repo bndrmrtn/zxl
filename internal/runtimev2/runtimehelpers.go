@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/ast"
 	"github.com/bndrmrtn/zxl/internal/cache"
@@ -89,6 +90,27 @@ func (r *Runtime) importer(filename string, dg *models.Debug) (lang.Object, erro
 	ret, err := r.Execute(nodes)
 	if err != nil {
 		return nil, errs.WithDebug(err, dg)
+	}
+
+	return ret, nil
+}
+
+func (r *Runtime) evaler(code string) (lang.Object, error) {
+	lx := lexer.New("<eval>")
+	ts, err := lx.Parse(strings.NewReader(code))
+	if err != nil {
+		return nil, errs.WithDebug(err, nil)
+	}
+
+	builder := ast.NewBuilder()
+	nodes, err := builder.Build(ts)
+	if err != nil {
+		return nil, errs.WithDebug(err, nil)
+	}
+
+	ret, err := r.Execute(nodes)
+	if err != nil {
+		return nil, errs.WithDebug(err, nil)
 	}
 
 	return ret, nil

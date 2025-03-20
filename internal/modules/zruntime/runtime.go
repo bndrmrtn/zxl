@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bndrmrtn/zxl/internal/version"
 	"github.com/bndrmrtn/zxl/lang"
 )
 
@@ -18,7 +19,9 @@ func (*Runtime) Namespace() string {
 }
 
 func (h *Runtime) Objects() map[string]lang.Object {
-	return nil
+	return map[string]lang.Object{
+		"langVersion": lang.NewString("version", version.Version, nil),
+	}
 }
 
 func (h *Runtime) Methods() map[string]lang.Method {
