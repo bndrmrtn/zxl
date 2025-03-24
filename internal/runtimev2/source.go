@@ -3,6 +3,7 @@ package runtimev2
 import (
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/source"
+	"go.uber.org/zap"
 )
 
 type Namespace struct {
@@ -12,6 +13,8 @@ type Namespace struct {
 }
 
 func (r *Runtime) LoadSourceNamespaces() error {
+	zap.L().Info("loading source namespaces")
+
 	namespaces, err := source.Get()
 	if err != nil {
 		return err

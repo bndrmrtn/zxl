@@ -13,26 +13,32 @@ type ImportFunc func(file string, d *models.Debug) (lang.Object, error)
 type EvalFunc func(code string) (lang.Object, error)
 
 func GetMethods(importer ImportFunc, evaler EvalFunc) map[string]lang.Method {
-	return map[string]lang.Method{
-		"print":   &Print{},
-		"println": &Print{true},
-		"import":  &Import{importer},
-		"type":    lang.NewFunction(fnType).WithArg("object"),
-		"range":   lang.NewFunction(fnRange).WithArg("range"),
-		"read":    lang.NewFunction(fnRead).WithArg("text"),
-		"string": lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
-			return lang.NewString("string", args[0].String(), args[0].Debug()), nil
-		}).WithArg("object"),
-		"fail": lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
-			return nil, errors.New(args[0].String())
-		}).WithArg("message"),
-		"eval": lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
-			return evaler(args[0].String())
-		}).WithTypeSafeArgs(lang.TypeSafeArg{Type: lang.TString, Name: "code"}),
-		"ref": lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
-			return lang.NewRef(args[0].Name(), args[0].Debug(), args[0]), nil
-		}).WithArg("object"),
-	}
+	m := make(map[string]lang.Method)
+
+	m["print"] = &Print{}
+	m["println"] = &Print{true}
+	m["import"] = &Import{importer}
+	m["type"] = lang.NewFunction(fnType).WithArg("object")
+	m["range"] = lang.NewFunction(fnRange).WithArg("range")
+	m["read"] = lang.NewFunction(fnRead).WithArg("text")
+	m["string"] = lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
+		return lang.NewString("string", args[0].String(), args[0].Debug()), nil
+	}).WithArg("object")
+	m["fail"] = lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
+		return nil, errors.New(args[0].String())
+	}).WithArg("message")
+	m["eval"] = lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
+		return evaler(args[0].String())
+	}).WithTypeSafeArgs(lang.TypeSafeArg{Type: lang.TString, Name: "code"})
+	m["ref"] = lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
+		return lang.NewRef(args[0].Name(), args[0].Debug(), args[0]), nil
+	}).WithArg("object")
+
+	m["map"] = lang.NewFunction(fnMap).WithArgs([]string{"fn", "object"})
+
+	m = setTypeMethods(m)
+	m = setIsMethods(m)
+	return m
 }
 
 type Print struct {
@@ -187,4 +193,32 @@ func fnRead(args []lang.Object) (lang.Object, error) {
 	var value string
 	fmt.Scanln(&value)
 	return lang.NewString("read", value, nil), nil
+}
+
+func fnMap(args []lang.Object) (lang.Object, error) {
+	if args[0].Type() != lang.TFnRef {
+		return nil, fmt.Errorf("expected %s, got %v", lang.TFnRef.String(), args[0].Type())
+	}
+
+	fn := args[0].Value().(*lang.Fn).Fn
+
+	value := args[1]
+	if value.Type() != lang.TList {
+		return fn.Execute([]lang.Object{value})
+	}
+
+	list := value.Value().([]lang.Object)
+	var (
+		result []lang.Object = make([]lang.Object, len(list))
+		err    error
+	)
+
+	for i, item := range list {
+		result[i], err = fn.Execute([]lang.Object{item})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return lang.NewList("map", result, args[1].Debug()), nil
 }

@@ -1,0 +1,5 @@
+namespace convert;
+
+let num = int(read("Hello: "));
+
+println(type(num));

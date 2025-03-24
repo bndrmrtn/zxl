@@ -24,6 +24,7 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 		variableName   string         = n.Content
 		expressionList []string       = make([]string, 0, len(n.Children))
 		args           map[string]any = make(map[string]any, len(n.Children))
+		nameVal        map[string]any = make(map[string]any, len(n.Children))
 	)
 
 	for _, node := range n.Children {
@@ -53,17 +54,18 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 				obj = acc
 			}
 
-			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(uuid.NewString())))
-			sum = sum[:10]
+			sum := newVariableName()
 
 			expressionList = append(expressionList, sum)
 
 			if obj.Type() == lang.TList {
 				args[sum] = obj
+				nameVal[sum] = obj
 				continue
 			}
 
 			args[sum] = obj.Value()
+			nameVal[sum] = obj.Value()
 			continue
 		}
 
@@ -87,17 +89,18 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 				obj = acc
 			}
 
-			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(uuid.NewString())))
-			sum = sum[:10]
+			sum := newVariableName()
 
 			expressionList = append(expressionList, sum)
 
 			if obj.Type() == lang.TList {
 				args[sum] = obj
+				nameVal[sum] = obj
 				continue
 			}
 
 			args[sum] = obj.Value()
+			nameVal[sum] = obj.Value()
 			continue
 		}
 
@@ -113,18 +116,17 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 
 			obj := lang.NewFn(name, node.Debug, method)
 
-			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(uuid.NewString())))
-			sum = sum[:10]
+			sum := newVariableName()
 
 			expressionList = append(expressionList, sum)
 
 			args[sum] = obj
+			nameVal[sum] = obj
 			continue
 		}
 
 		if variableType == tokens.InlineValue {
-			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(uuid.NewString())))
-			sum = sum[:10]
+			sum := newVariableName()
 
 			if node.Type == tokens.TemplateLiteral {
 				rawTmpl, err := tmpl.NewTemplate(node.Value.(string))
@@ -138,11 +140,13 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 
 				expressionList = append(expressionList, sum)
 				args[sum] = s
+				nameVal[sum] = fmt.Sprintf("%q", s)
 				continue
 			}
 
 			expressionList = append(expressionList, sum)
 			args[sum] = node.Value
+			nameVal[sum] = node.Value
 			continue
 		}
 
@@ -152,17 +156,18 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 				return nil, errs.WithDebug(err, n.Debug)
 			}
 
-			sum := fmt.Sprintf("var_%x", md5.Sum([]byte(uuid.NewString())))
-			sum = sum[:10]
+			sum := newVariableName()
 
 			expressionList = append(expressionList, sum)
 
 			if obj.Type() == lang.TList {
 				args[sum] = obj
+				nameVal[sum] = obj
 				continue
 			}
 
 			args[sum] = obj.Value()
+			nameVal[sum] = obj.Value()
 			continue
 		}
 
@@ -172,17 +177,18 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 				return nil, errs.WithDebug(err, n.Debug)
 			}
 
-			sum := fmt.Sprintf("array_%x", md5.Sum([]byte(uuid.NewString())))
-			sum = sum[:10]
+			sum := newVariableName()
 
 			expressionList = append(expressionList, sum)
 
 			if obj.Type() == lang.TList {
 				args[sum] = obj
+				nameVal[sum] = obj
 				continue
 			}
 
 			args[sum] = obj.Value()
+			nameVal[sum] = obj.Value()
 			continue
 		}
 	}
@@ -206,11 +212,19 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 	value := strings.Join(expressionList, " ")
 	expression, err := govaluate.NewEvaluableExpression(value)
 	if err != nil {
+		for name, val := range nameVal {
+			value = strings.ReplaceAll(value, name, fmt.Sprintf("%v", val))
+		}
+
 		return nil, errs.WithDebug(fmt.Errorf("%w: %w: %s", errs.RuntimeError, err, value), n.Debug)
 	}
 
 	result, err := expression.Evaluate(args)
 	if err != nil {
+		for name, val := range nameVal {
+			value = strings.ReplaceAll(value, name, fmt.Sprintf("%v", val))
+		}
+
 		return nil, errs.WithDebug(fmt.Errorf("%w: %w: %s", errs.RuntimeError, err, value), n.Debug)
 	}
 
@@ -283,4 +297,9 @@ func (e *Executer) getTypeFromValue(value any) tokens.TokenType {
 	default:
 		return tokens.Nil
 	}
+}
+
+func newVariableName() string {
+	sum := fmt.Sprintf("var_%x", md5.Sum([]byte(uuid.NewString())))
+	return sum[:10]
 }

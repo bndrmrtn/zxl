@@ -118,7 +118,10 @@ func (e *Executer) GetVariable(name string) (lang.Object, error) {
 	}
 
 	if fn, ok := e.functions[name]; ok {
+		return lang.NewFn(name, nil, fn), nil
+	}
 
+	if fn, ok := e.GetMethod(name); ok == nil {
 		return lang.NewFn(name, nil, fn), nil
 	}
 

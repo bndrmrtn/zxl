@@ -11,19 +11,19 @@ import (
 type ObjType string
 
 const (
-	TString     ObjType = "<String>"
-	TInt        ObjType = "<Integer>"
-	TFloat      ObjType = "<Float>"
-	TBool       ObjType = "<Bool>"
-	TList       ObjType = "<List>"
-	TNothing    ObjType = "<Nothing>"
-	TNil        ObjType = "<Nil>"
+	TString     ObjType = "<Object:string>"
+	TInt        ObjType = "<Object:int>"
+	TFloat      ObjType = "<Object:float>"
+	TBool       ObjType = "<Object:bool>"
+	TList       ObjType = "<Object:list>"
+	TNothing    ObjType = "<Object:nothing>"
+	TNil        ObjType = "<Object:nil>"
 	TDefinition ObjType = "<Definition>"
-	TInstance   ObjType = "<Instance>"
-	TFunction   ObjType = "<function>"
-	TIOStream   ObjType = "<IOStream>"
-	TArray      ObjType = "<Array>"
-	TFnRef      ObjType = "<Function Reference>"
+	TInstance   ObjType = "<Object:instance>"
+	TFunction   ObjType = "<Function>"
+	TIOStream   ObjType = "<Object:iostream>"
+	TArray      ObjType = "<Object:array>"
+	TFnRef      ObjType = "<Object:function>"
 )
 
 func (o ObjType) String() string {

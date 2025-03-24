@@ -6,7 +6,7 @@ build:
 
 # run the project
 run: build
-	@DEBUG=false SHOW_STACK=true ./bin/zxlang run examples/$(file).zx --debug
+	@DEBUG=true SHOW_STACK=true ./bin/zxlang run examples/$(file).zx --debug
 
 # start the default http server
 serve: build

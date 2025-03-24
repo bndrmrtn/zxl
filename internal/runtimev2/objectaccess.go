@@ -7,6 +7,7 @@ import (
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/tokens"
 	"github.com/bndrmrtn/zxl/lang"
+	"go.uber.org/zap"
 )
 
 // accessObject accesses an object
@@ -23,6 +24,8 @@ func (e *Executer) accessObject(obj lang.Object, accessors []*models.Node) (lang
 	if err != nil {
 		return nil, err
 	}
+
+	zap.L().Debug("accessing object", zap.Any("object", obj), zap.Any("accessor", access))
 
 	var value any
 	if obj.Type() == lang.TList {
@@ -82,8 +85,13 @@ func (e *Executer) getObjAccessors(accessor *models.Node) (any, error) {
 		if err != nil {
 			return nil, errs.WithDebug(err, accessor.Debug)
 		}
+
+		zap.L().Debug("accessing object", zap.Any("object", obj))
+
 		return obj.Value(), nil
 	}
+
+	zap.L().Debug("accessing object", zap.Any("accessor", accessor))
 
 	return accessor.Value, nil
 }

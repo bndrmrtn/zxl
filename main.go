@@ -13,7 +13,20 @@ import (
 
 	"github.com/bndrmrtn/zxl/cmd"
 	"github.com/fatih/color"
+	"go.uber.org/zap"
 )
+
+var logger *zap.Logger
+
+// initLogger initializes the logger
+func initLogger() {
+	if os.Getenv("DEBUG") == "true" {
+		logger, _ = zap.NewDevelopment()
+	} else {
+		logger = zap.NewNop()
+	}
+	zap.ReplaceGlobals(logger)
+}
 
 // main is the entry point of the ZxLang program
 func main() {
@@ -21,6 +34,10 @@ func main() {
 	if os.Getenv("DEBUG") != "true" {
 		defer fatal()
 	}
+
+	initLogger()
+	defer logger.Sync()
+
 	// Execute the command
 	cmd.Execute()
 }

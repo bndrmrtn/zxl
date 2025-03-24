@@ -14,6 +14,7 @@ import (
 	"github.com/bndrmrtn/zxl/internal/modules"
 	"github.com/bndrmrtn/zxl/internal/tokens"
 	"github.com/bndrmrtn/zxl/lang"
+	"go.uber.org/zap"
 )
 
 const PackageDirectory = ".zxpack"
@@ -37,6 +38,7 @@ type Runtime struct {
 
 // New creates a new runtime
 func New() (*Runtime, error) {
+	zap.L().Info("creating new runtime")
 	modules := modules.Get()
 
 	r := &Runtime{
@@ -63,6 +65,7 @@ func (r *Runtime) Execute(nodes []*models.Node) (lang.Object, error) {
 	if err != nil {
 		return nil, err
 	}
+	zap.L().Info("executing nodes", zap.String("namespace", namespace))
 	return r.Exec(ExecuterScopeGlobal, nil, namespace, nodes)
 }
 
@@ -71,6 +74,7 @@ func (r *Runtime) GetNamespace(nodes []*models.Node) (string, []*models.Node, er
 	defer r.mu.RUnlock()
 
 	if len(nodes) == 0 {
+		zap.L().Debug("no nodes to execute")
 		return "", nil, nil
 	}
 
@@ -82,6 +86,7 @@ func (r *Runtime) GetNamespace(nodes []*models.Node) (string, []*models.Node, er
 			return "", nil, errs.WithDebug(fmt.Errorf("cannot use builtin '%s' as namespace", namespace), nodes[0].Debug)
 		}
 
+		zap.L().Debug("using namespace", zap.String("namespace", namespace))
 		return namespace, nodes, nil
 	}
 
@@ -104,6 +109,7 @@ func (r *Runtime) Exec(scope ExecuterScope, parent *Executer, namespace string, 
 
 // GetNamespaceExecuter gets the executer for the given namespace
 func (r *Runtime) GetNamespaceExecuter(namespace string) (*Executer, error) {
+	zap.L().Debug("getting namespace executer", zap.String("namespace", namespace))
 	r.mu.RLock()
 	ns, ok := r.sourceNamespaces[namespace]
 	r.mu.RUnlock()
@@ -158,17 +164,23 @@ func (r *Runtime) GetNamespaceExecuter(namespace string) (*Executer, error) {
 	return ex, nil
 }
 
-// BindModule binds the given package to the given name
+// UseModule returns a module by its namespace
 func (r *Runtime) UseModule(module lang.Module) *Executer {
 	namespace := module.Namespace()
+	zap.L().Debug("using module", zap.String("namespace", namespace))
 
+	r.mu.RLock()
 	ex, ok := r.executers[namespace]
+	r.mu.RUnlock()
 	if ok {
 		return ex
 	}
 
 	ex = NewExecuter(ExecuterScopeGlobal, r, nil).WithName(namespace)
+
+	r.mu.Lock()
 	r.executers[namespace] = ex
+	r.mu.Unlock()
 
 	for name, object := range module.Objects() {
 		ex.BindObject(name, object)
@@ -181,6 +193,7 @@ func (r *Runtime) UseModule(module lang.Module) *Executer {
 	return ex
 }
 
+// BindModule binds the given module to the runtime
 func (r *Runtime) BindModule(module lang.Module) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -190,12 +203,16 @@ func (r *Runtime) BindModule(module lang.Module) {
 }
 
 func (r *Runtime) loadPackage(author string, pkg string) (*Executer, error) {
+	zap.L().Debug("loading package", zap.String("author", author), zap.String("package", pkg))
+
 	run, err := New()
 	if err != nil {
 		return nil, err
 	}
 
+	r.mu.Lock()
 	r.packages[author+":"+pkg] = run
+	r.mu.Unlock()
 	if _, err := run.Exec(ExecuterScopeGlobal, nil, pkg, nil); err != nil {
 		return nil, err
 	}

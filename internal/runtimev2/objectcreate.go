@@ -8,12 +8,15 @@ import (
 	"github.com/bndrmrtn/zxl/internal/tmpl"
 	"github.com/bndrmrtn/zxl/internal/tokens"
 	"github.com/bndrmrtn/zxl/lang"
+	"go.uber.org/zap"
 )
 
 // createObjectFromNode creates an object from a node
 func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, error) {
 	name := n.Content
 	var obj lang.Object
+
+	zap.L().Debug("creating object from node", zap.String("name", name))
 
 	switch n.VariableType {
 	default:
@@ -101,6 +104,8 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 		return "", nil, errs.WithDebug(fmt.Errorf("%w: invalid object", errs.ValueError), n.Debug)
 	}
 
+	zap.L().Debug("object created", zap.String("name", name), zap.String("type", obj.Type().String()))
+
 	if len(n.ObjectAccessors) > 0 {
 		accessed, err := e.accessObject(obj, n.ObjectAccessors)
 		if err != nil {
@@ -111,6 +116,7 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 
 	// if the object is a constant, make it immutable
 	if obj.Type() != lang.TNil && n.Type == tokens.Const {
+		zap.L().Debug("making object immutable", zap.String("name", name))
 		obj.Immute()
 	}
 
@@ -125,6 +131,8 @@ func (e *Executer) assignObjectFromNode(n *models.Node) error {
 	if err != nil {
 		return errs.WithDebug(err, n.Debug)
 	}
+
+	zap.L().Debug("assigning object from node", zap.String("name", name), zap.Any("object", obj))
 
 	return e.AssignVariable(name, obj)
 }
@@ -144,6 +152,8 @@ func (e *Executer) createListFromNode(n *models.Node) (lang.Object, error) {
 		li[i] = obj
 	}
 
+	zap.L().Debug("creating list from node", zap.String("name", name), zap.Any("list", li))
+
 	return lang.NewList(name, li, n.Debug), nil
 }
 
@@ -152,10 +162,14 @@ func (e *Executer) createObjectFromDefinitionNode(n *models.Node) (string, lang.
 	name := n.Content
 	ex := NewExecuter(ExecuterScopeDefinition, e.runtime, e).WithName(e.name + ".[" + name + "]")
 
+	zap.L().Debug("creating object from definition node", zap.String("name", name))
+
 	return name, lang.NewDefinition(e.name+"."+name, name, n.Debug, n.Children, ex), nil
 }
 
 func (e *Executer) getObjectValueByNodes(obj lang.Object, nodes []*models.Node) (lang.Object, error) {
+	zap.L().Debug("getting object value by nodes", zap.Any("nodes", nodes))
+
 	for _, node := range nodes {
 		if node.Type != tokens.FuncCall && node.Type != tokens.Identifier {
 			return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), node.Debug)
@@ -215,6 +229,8 @@ func (e *Executer) parseTemplate(template []tmpl.Part) (string, error) {
 		}
 	}
 
+	zap.L().Debug("parsed template", zap.String("result", result))
+
 	return result, nil
 }
 
@@ -247,6 +263,8 @@ func (e *Executer) createObjectFromArrayNode(name string, n *models.Node) (lang.
 		}
 		values = append(values, val)
 	}
+
+	zap.L().Debug("creating array from node", zap.String("name", name), zap.Any("keys", keys), zap.Any("values", values))
 
 	return lang.NewArray(name, n.Debug, keys, values), nil
 }

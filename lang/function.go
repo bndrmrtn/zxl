@@ -18,7 +18,7 @@ type Function struct {
 	// variadicArg is the variadic argument of the function
 	variadicArg string
 	// exec is the function to execute when the function is called
-	exec func(args []Object) (Object, error)
+	exec ExecFunc
 
 	debug *models.Debug
 }
@@ -28,8 +28,10 @@ type TypeSafeArg struct {
 	Type ObjType
 }
 
+type ExecFunc func(args []Object) (Object, error)
+
 // NewFunction creates a new function method
-func NewFunction(exec func(args []Object) (Object, error)) *Function {
+func NewFunction(exec ExecFunc) *Function {
 	return &Function{
 		exec: exec,
 	}

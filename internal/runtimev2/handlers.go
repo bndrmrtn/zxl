@@ -9,10 +9,13 @@ import (
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/tokens"
 	"github.com/bndrmrtn/zxl/lang"
+	"go.uber.org/zap"
 )
 
 // handleReturn handles return tokens
 func (e *Executer) handleReturn(node *models.Node) (lang.Object, error) {
+	zap.L().Debug("handling return", zap.String("scope", e.scope.String()))
+
 	if node.Type == tokens.EmptyReturn {
 		if e.scope == ExecuterScopeBlock && e.parent != nil {
 			return e.parent.handleReturn(node)
@@ -55,6 +58,8 @@ func (e *Executer) handleIf(node *models.Node) (lang.Object, error) {
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected boolean", errs.ValueError), node.Debug)
 	}
 
+	zap.L().Debug("handling if", zap.Any("condition", condition))
+
 	ok := condition.Value().(bool)
 
 	if ok {
@@ -74,6 +79,7 @@ func (e *Executer) handleIf(node *models.Node) (lang.Object, error) {
 
 		child := node.Children[1]
 		if child.Type == tokens.Else {
+			zap.L().Debug("handling else")
 			ex := NewExecuter(ExecuterScopeBlock, e.runtime, e).WithName(e.name)
 			return ex.Execute(child.Children)
 		}
@@ -98,6 +104,8 @@ func (e *Executer) handleWhile(node *models.Node) (lang.Object, error) {
 			return nil, err
 		}
 
+		zap.L().Debug("handling while loop", zap.Any("condition", condition))
+
 		if condition.Type() != lang.TBool {
 			return nil, errs.WithDebug(fmt.Errorf("%w: expected boolean", errs.ValueError), node.Debug)
 		}
@@ -121,6 +129,8 @@ func (e *Executer) handleFor(node *models.Node) (lang.Object, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	zap.L().Debug("handling for loop", zap.String("name", name), zap.Any("iterable", iterable))
 
 	switch iterable.Type() {
 	default:
@@ -174,6 +184,8 @@ func (e *Executer) handleSpin(node *models.Node) (lang.Object, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	zap.L().Debug("handling spin loop", zap.String("name", name), zap.Any("iterable", iterable))
 
 	switch iterable.Type() {
 	default:

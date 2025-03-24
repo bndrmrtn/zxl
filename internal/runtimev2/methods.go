@@ -6,6 +6,7 @@ import (
 	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/lang"
+	"go.uber.org/zap"
 )
 
 // callFunctionFromNode calls a function from a node
@@ -30,6 +31,8 @@ func (e *Executer) callFunctionFromNode(n *models.Node) (lang.Object, error) {
 
 	expectedArgs := len(method.Args())
 	givenArgs := len(n.Args)
+
+	zap.L().Debug("calling function", zap.String("name", name), zap.Int("expectedArgs", expectedArgs), zap.Int("givenArgs", givenArgs), zap.Bool("isVariadic", isVariadic))
 
 	if !isVariadic {
 		// argument number should match
@@ -92,6 +95,8 @@ func (e *Executer) getFunctionArguments(nodeArgs []*models.Node, argNames []stri
 		args = append(args, obj)
 	}
 
+	zap.L().Debug("function arguments", zap.Any("args", args))
+
 	return args, nil
 }
 
@@ -139,6 +144,8 @@ func (e *Executer) createMethodFromNode(n *models.Node) (string, lang.Method, er
 		r, err := ex.Execute(n.Children)
 		return r, err
 	}).WithArgs(args).WithDebug(n.Debug)
+
+	zap.L().Debug("creating method from node", zap.String("name", name), zap.Any("args", args))
 
 	return name, method, nil
 }

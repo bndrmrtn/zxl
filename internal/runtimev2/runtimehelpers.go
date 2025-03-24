@@ -13,9 +13,12 @@ import (
 	"github.com/bndrmrtn/zxl/internal/lexer"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/lang"
+	"go.uber.org/zap"
 )
 
 func (r *Runtime) importer(filename string, dg *models.Debug) (lang.Object, error) {
+	zap.L().Info("importing file", zap.String("filename", filename))
+
 	var rootDir string
 	if dg != nil && dg.File != "" {
 		rootDir = filepath.Dir(dg.File)

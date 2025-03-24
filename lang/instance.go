@@ -43,6 +43,10 @@ func (i *Instance) Value() any {
 	return i
 }
 
+func (i *Instance) Definition() *Definition {
+	return i.def
+}
+
 func (i *Instance) Method(name string) Method {
 	if name == "$init" {
 		construct, err := i.ex.GetMethod("construct")
