@@ -291,7 +291,7 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 		}, nil
 	}
 
-	if ts[*inx].Type != tokens.Assign && ts[*inx].Type != tokens.LeftParenthesis && ts[*inx].Type != tokens.LeftBracket {
+	if ts[*inx].Type != tokens.Assign && ts[*inx].Type != tokens.LeftParenthesis && ts[*inx].Type != tokens.LeftBracket && ts[*inx].Type != tokens.Increment && ts[*inx].Type != tokens.Decrement {
 		if ts[*inx].Type == tokens.Semicolon {
 			*inx++
 		}
@@ -320,6 +320,22 @@ func (b *Builder) parseIdentifier(ts []*models.Token, inx *int) (*models.Node, e
 	if ts[*inx].Type == tokens.LeftBracket {
 		node.VariableType = tokens.ReferenceVariable
 		return b.parseObjectAccess(ts, inx, node)
+	}
+
+	if ts[*inx].Type == tokens.Increment || ts[*inx].Type == tokens.Decrement {
+		node.Type = ts[*inx].Type
+		*inx++
+
+		if *inx > len(ts) {
+			return node, nil
+		}
+
+		if ts[*inx].Type != tokens.Semicolon {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected semicolon after increment/decrement operator", errs.SyntaxError), ts[*inx].Debug)
+		}
+
+		*inx++
+		return node, nil
 	}
 
 	if ts[*inx].Type != tokens.Assign {

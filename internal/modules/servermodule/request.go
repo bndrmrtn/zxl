@@ -23,7 +23,7 @@ func NewRequest(r *http.Request) *Request {
 }
 
 func (r *Request) Type() lang.ObjType {
-	return lang.TDefinition
+	return lang.TInstance
 }
 
 func (*Request) TypeString() string {

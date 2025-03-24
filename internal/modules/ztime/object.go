@@ -23,7 +23,7 @@ func NewTime(t time.Time) *Time {
 
 // Type returns the object type
 func (t *Time) Type() lang.ObjType {
-	return lang.TDefinition
+	return lang.TInstance
 }
 
 func (t *Time) TypeString() string {

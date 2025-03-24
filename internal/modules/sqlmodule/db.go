@@ -162,7 +162,7 @@ func configureDBConnection(db *sql.DB, driver string) {
 }
 
 func (db *DB) Type() lang.ObjType {
-	return lang.TDefinition
+	return lang.TInstance
 }
 
 func (*DB) TypeString() string {
@@ -390,7 +390,7 @@ type Statement struct {
 }
 
 func (s *Statement) Type() lang.ObjType {
-	return lang.TDefinition
+	return lang.TInstance
 }
 
 func (*Statement) TypeString() string {
@@ -576,7 +576,7 @@ type Transaction struct {
 }
 
 func (t *Transaction) Type() lang.ObjType {
-	return lang.TDefinition
+	return lang.TInstance
 }
 
 func (*Transaction) TypeString() string {

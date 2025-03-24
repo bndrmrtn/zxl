@@ -8,7 +8,7 @@ import (
 
 // downloadCmd represents the download command
 var downloadCmd = &cobra.Command{
-	Use:   "download <packageUrl>",
+	Use:   "download",
 	Short: "Downloads all Zx Packages from zxpack.yaml",
 	Run:   execDownload,
 }

@@ -26,7 +26,7 @@ func NewSpawner(max int) *Spawner {
 }
 
 func (s *Spawner) Type() lang.ObjType {
-	return lang.TDefinition
+	return lang.TInstance
 }
 
 func (s *Spawner) TypeString() string {

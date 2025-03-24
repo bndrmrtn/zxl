@@ -54,6 +54,22 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 		if err != nil {
 			return nil, errs.WithDebug(err, node.Debug)
 		}
+	case tokens.Increment, tokens.Decrement:
+		v, err := e.GetVariable(node.Content)
+		if err != nil {
+			return nil, errs.WithDebug(err, node.Debug)
+		}
+
+		if v.Type() != lang.TInt {
+			return nil, errs.WithDebug(fmt.Errorf("%w: cannot increment type: '%s'", errs.RuntimeError, v.Type()), node.Debug)
+		}
+
+		add := 1
+		if node.Type == tokens.Decrement {
+			add = -1
+		}
+
+		e.AssignVariable(node.Content, lang.NewInteger(node.Content, v.Value().(int)+add, node.Debug))
 	case tokens.Define:
 		name, object, err := e.createObjectFromDefinitionNode(node)
 		if err != nil {
