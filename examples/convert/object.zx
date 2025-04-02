@@ -1,0 +1,10 @@
+namespace test;
+
+// FEATURE IDEA
+// Error blocks, with error errorVariableName: syntax
+// if err != nil {} the code failed but the error remains silent
+// so you can implement your own error handling logic
+error err: const number = map();
+if err != nil {
+    println("Error:", err);
+}

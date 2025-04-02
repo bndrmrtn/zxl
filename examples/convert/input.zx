@@ -1,5 +1,11 @@
 namespace convert;
 
+const comp = fn(c) => c > 3;
+
+let li = [1, 2, 3, 4, 5];
+li = li.filter(comp);
+println(li);
+
 let num = int(read("Hello: "));
 
 println(type(num));

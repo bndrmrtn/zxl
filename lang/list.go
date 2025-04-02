@@ -74,6 +74,37 @@ func (l *List) Method(name string) Method {
 
 			return NewBool("contains", false, l.debug), nil
 		}).WithDebug(l.debug).WithArgs([]string{"item"})
+	case "filter":
+		return NewFunction(func(args []Object) (Object, error) {
+			fn := args[0].(*Fn).Fn
+			fnArgs := fn.Args()
+
+			if len(fn.Args()) != 1 {
+				return nil, fmt.Errorf("filter function must have one argument")
+			}
+
+			var filtered []Object
+
+			for _, v := range l.value {
+				arg := v.Copy()
+				arg.Rename(fnArgs[0])
+
+				obj, err := fn.Execute([]Object{arg})
+				if err != nil {
+					return nil, err
+				}
+
+				if obj.Type() != TBool {
+					return nil, fmt.Errorf("filter function must return a boolean")
+				}
+
+				if obj.Value().(bool) {
+					filtered = append(filtered, v)
+				}
+			}
+
+			return NewList(l.name, filtered, l.debug), nil
+		}).WithTypeSafeArgs(TypeSafeArg{"filterFunc", TFnRef})
 	}
 }
 
