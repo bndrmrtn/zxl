@@ -1,6 +1,9 @@
 package builtin
 
 import (
+	"fmt"
+
+	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/lang"
 )
 
@@ -9,7 +12,7 @@ func setIsMethods(m map[string]lang.Method) map[string]lang.Method {
 	m["isFloat"] = lang.NewFunction(is(toFloat)).WithArg("object")
 	m["isBool"] = lang.NewFunction(is(toBool)).WithArg("object")
 	m["isInstanceOf"] = lang.NewFunction(isInstaceOf).
-		WithTypeSafeArgs(lang.TypeSafeArg{Name: "type", Type: lang.TDefinition}, lang.TypeSafeArg{Name: "object", Type: lang.TInstance})
+		WithArg("type").WithArg("value")
 
 	return m
 }
@@ -22,8 +25,14 @@ func is(exec lang.ExecFunc) lang.ExecFunc {
 }
 
 func isInstaceOf(args []lang.Object) (lang.Object, error) {
-	typ := args[0].(*lang.Definition)
-	inst := args[1].(*lang.Instance).Definition()
+	typ, ok := args[0].(*lang.Definition)
+	if !ok {
+		return nil, errs.WithDebug(fmt.Errorf("type must be a definition"), args[0].Debug())
+	}
+	inst, ok := args[1].(*lang.Instance)
+	if !ok {
+		return lang.NewBool("ok", false, args[1].Debug()), nil
+	}
 
-	return lang.NewBool("ok", inst.Type() == typ.Type(), args[1].Debug()), nil
+	return lang.NewBool("ok", inst.Definition().Type() == typ.Type(), args[1].Debug()), nil
 }

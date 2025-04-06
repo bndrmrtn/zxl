@@ -1,16 +1,6 @@
 package lang
 
-import (
-	"fmt"
-)
-
-func Addr(s any) Object {
-	return addr(s)
-}
-
-func addr(s any) Object {
-	return NewString("$addr", fmt.Sprintf("%p", s), nil)
-}
+import "fmt"
 
 func FromValue(data any) (Object, error) {
 	switch value := data.(type) {

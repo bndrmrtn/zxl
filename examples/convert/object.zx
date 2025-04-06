@@ -8,3 +8,14 @@ error err: const number = map();
 if err != nil {
     println("Error:", err);
 }
+
+error err {
+    const x = 1;
+    x++;
+}
+
+error err: const x = 1;
+if err != nil {
+    println("Error:", err);
+}
+error err: x++;

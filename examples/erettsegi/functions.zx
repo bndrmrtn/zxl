@@ -1,24 +1,18 @@
 namespace main;
 
 use io;
-use conv;
-use types;
 
 fn loadData() {
     const data = [];
     const file = io.open("data.txt");
     const lines = file.readLines().split("\n");
     file.close();
-    
-    for line in lines {
-        if line == "" {
-            return data;
-        }
 
+    for line in lines {
         const parts = line.split(' ');
         const id = parts[0];
         const eventTime = parts[1];
-        const eventID = conv.object(parts[2], types.Integer);
+        const eventID = int(parts[2]);
 
         const obj = array {
             id: id,
@@ -33,7 +27,7 @@ fn loadData() {
 }
 
 fn fel(n) {
-    if type(n) != types.Integer {
+    if !isInt(n) {
         fail("n must be an integer");
     }
 

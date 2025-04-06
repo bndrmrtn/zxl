@@ -1,0 +1,7 @@
+error err: for file in dir.files() {
+
+}
+
+if err != nil {
+    println("Cannot read dir files");
+}

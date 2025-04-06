@@ -77,7 +77,7 @@ func (f *Function) Execute(args []Object) (Object, error) {
 	if len(f.typesafeArgs) == len(f.args) {
 		for i, name := range f.args {
 			if args[i].Type() != f.typesafeArgs[i].Type {
-				return nil, fmt.Errorf("argument %s is not of type %s", name, f.typesafeArgs[i].Type)
+				return nil, fmt.Errorf("argument %s is not of type %s, type: %s", name, f.typesafeArgs[i].Type, args[i].Type())
 			}
 		}
 	}

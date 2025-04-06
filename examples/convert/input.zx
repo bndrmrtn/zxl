@@ -9,3 +9,22 @@ println(li);
 let num = int(read("Hello: "));
 
 println(type(num));
+
+schema MyType {
+    fn flags(flagArray) {
+        if flagArray.keys().contains("version") {
+            return MyType[version=flagArray["version"]];
+        }
+        return MyType[version=1];
+    }
+
+    fn sayHello() => "Hello";
+}
+
+define MyType[version=1] {
+    fn sayHello() => "Hello v1";
+}
+
+define MyType[version=2] {
+    fn sayHello() => "Hello v2";
+}

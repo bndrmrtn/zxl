@@ -1,0 +1,9 @@
+let s = "Hello world\n";
+
+println(s);
+
+s = s.trim().replace("world", "name");
+
+println(s);
+
+assign(1);

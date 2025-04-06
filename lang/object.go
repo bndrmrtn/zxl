@@ -24,6 +24,7 @@ const (
 	TIOStream   ObjType = "<Object:iostream>"
 	TArray      ObjType = "<Object:array>"
 	TFnRef      ObjType = "<Object:function>"
+	TAddr       ObjType = "<Object:address>"
 )
 
 func (o ObjType) String() string {

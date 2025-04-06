@@ -43,7 +43,7 @@ func (f *Fn) Variable(name string) Object {
 	default:
 		return nil
 	case "$addr":
-		return addr(f.Fn)
+		return addr(f)
 	}
 }
 

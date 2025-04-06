@@ -1,0 +1,25 @@
+const dataDump = ["1", 1.2, "78.16", "2", 4, 5, "hello", 6, "xx", 999, "877dffg"];
+
+fn numMap(n) {
+    if isInt(n) {
+        return int(n);
+    }
+    return float(n);
+}
+
+const numbers = map(numMap, dataDump.filter(fn(value) => isInt(value) || isFloat(value)));
+println(numbers);
+
+const addr = numbers.$addr;
+
+println(addr, addr.value());
+
+numbers.append(175);
+
+fn doAppend(a) {
+    a.value().append(125);
+}
+
+doAppend(addr);
+
+println(numbers, addr.value());

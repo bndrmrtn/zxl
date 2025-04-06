@@ -1,4 +1,4 @@
-.PHONY: build run serve format cache
+.PHONY: build run rund serve format cache
 
 # build the project
 build:
@@ -6,7 +6,11 @@ build:
 
 # run the project
 run: build
-	@DEBUG=true SHOW_STACK=true ./bin/zxlang run examples/$(file).zx --debug
+	@SHOW_STACK=true ./bin/zxlang run examples/$(file).zx --debug
+
+# rund the project
+rund: build
+		@DEBUG=true SHOW_STACK=true ./bin/zxlang run examples/$(file).zx --debug
 
 # start the default http server
 serve: build

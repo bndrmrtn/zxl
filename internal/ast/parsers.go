@@ -1151,17 +1151,17 @@ func (b *Builder) parseList(ts []*models.Token, inx *int) (*models.Node, error) 
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected ']', but got '%s'", errs.SyntaxError, node.Type), node.Debug)
 	}
 
+	if ts[*inx].Type == tokens.LeftBracket {
+		node.Children = children
+		return b.parseObjectAccess(ts, inx, node)
+	}
+
 	if *inx >= len(ts) {
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got 'EOF'", errs.SyntaxError), node.Debug)
 	}
 
 	if ts[*inx].Type != tokens.Semicolon && ts[*inx].Type != tokens.LeftBracket {
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected ';', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
-	}
-
-	if ts[*inx].Type == tokens.LeftBracket {
-		node.Children = children
-		return b.parseObjectAccess(ts, inx, node)
 	}
 
 	*inx++
@@ -1173,6 +1173,8 @@ func (b *Builder) parseListValue(ts []*models.Token, inx *int) (*models.Node, bo
 	var (
 		children     []*models.Token
 		bracketCount = 1
+		paranCount   = 0
+		braceCount   = 0
 	)
 
 	for {
@@ -1192,7 +1194,23 @@ func (b *Builder) parseListValue(ts []*models.Token, inx *int) (*models.Node, bo
 			bracketCount++
 		}
 
-		if ts[*inx].Type == tokens.Comma && bracketCount == 1 {
+		if ts[*inx].Type == tokens.LeftParenthesis {
+			paranCount++
+		}
+
+		if ts[*inx].Type == tokens.RightParenthesis {
+			paranCount--
+		}
+
+		if ts[*inx].Type == tokens.LeftBrace {
+			braceCount++
+		}
+
+		if ts[*inx].Type == tokens.RightBrace {
+			braceCount--
+		}
+
+		if ts[*inx].Type == tokens.Comma && bracketCount == 1 && paranCount == 0 && braceCount == 0 {
 			*inx++
 			break
 		}

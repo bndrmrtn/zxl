@@ -25,6 +25,7 @@ const (
 	While
 	Throw
 	Spin
+	Error
 
 	Number TokenType = iota + 1000
 	String
@@ -221,6 +222,8 @@ func (t TokenType) String() string {
 		return "array"
 	case Spin:
 		return "spin"
+	case Error:
+		return "error"
 	default:
 		return "unkown"
 	}

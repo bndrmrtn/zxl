@@ -201,6 +201,11 @@ func fnMap(args []lang.Object) (lang.Object, error) {
 	}
 
 	fn := args[0].Value().(*lang.Fn).Fn
+	fnArgs := fn.Args()
+
+	if len(fnArgs) != 1 {
+		return nil, fmt.Errorf("expected %s, got %v", lang.TFnRef.String(), args[0].Type())
+	}
 
 	value := args[1]
 	if value.Type() != lang.TList {
@@ -214,7 +219,10 @@ func fnMap(args []lang.Object) (lang.Object, error) {
 	)
 
 	for i, item := range list {
-		result[i], err = fn.Execute([]lang.Object{item})
+		cp := item.Copy()
+		cp.Rename(fnArgs[0])
+
+		result[i], err = fn.Execute([]lang.Object{cp})
 		if err != nil {
 			return nil, err
 		}

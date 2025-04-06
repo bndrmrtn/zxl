@@ -47,7 +47,12 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 	case tokens.IntVariable:
 		i, ok := n.Value.(int)
 		if !ok {
-			return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not an integer", errs.ValueError), n.Debug)
+			if f, ok := n.Value.(float64); ok {
+				obj = lang.NewFloat(name, f, n.Debug)
+				break
+			} else {
+				return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not an integer", errs.ValueError), n.Debug)
+			}
 		}
 		obj = lang.NewInteger(name, i, n.Debug)
 	case tokens.FloatVariable:
@@ -98,6 +103,17 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 			return "", nil, errs.WithDebug(err, n.Debug)
 		}
 		obj = arr
+	case tokens.FunctionVariable:
+		name, fn, err := e.createMethodFromNode(n)
+		if err != nil {
+			return "", nil, errs.WithDebug(err, n.Debug)
+		}
+
+		if name != "fn" {
+			return "", nil, errs.WithDebug(fmt.Errorf("inline functions should not have names, have: %s", name), n.Debug)
+		}
+
+		obj = lang.NewFn("<inlineFn>", n.Debug, fn)
 	}
 
 	if obj == nil {
@@ -154,7 +170,13 @@ func (e *Executer) createListFromNode(n *models.Node) (lang.Object, error) {
 
 	zap.L().Debug("creating list from node", zap.String("name", name), zap.Any("list", li))
 
-	return lang.NewList(name, li, n.Debug), nil
+	liObj := lang.NewList(name, li, n.Debug)
+
+	if len(n.ObjectAccessors) > 0 {
+		return e.accessObject(liObj, n.ObjectAccessors)
+	}
+
+	return liObj, nil
 }
 
 // createDefinitionFromNode creates a definition from a node

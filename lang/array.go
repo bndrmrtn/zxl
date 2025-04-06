@@ -67,7 +67,10 @@ func (a *Array) Method(name string) Method {
 		}).WithDebug(a.debug)
 	case "$bind":
 		return NewFunction(func(args []Object) (Object, error) {
-			key := args[0]
+			key, ok := a.realKey(args[0].Value())
+			if !ok {
+				key = args[0]
+			}
 			value := args[1]
 
 			if _, ok := a.Map[key]; !ok {

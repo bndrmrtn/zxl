@@ -56,7 +56,13 @@ func (i *IOStream) Method(name string) Method {
 				}
 				lines.WriteString(line)
 			}
-			return NewString("lines", lines.String(), i.debug), nil
+
+			result := lines.String()
+			if strings.HasSuffix(result, "\n") {
+				result = result[:len(result)-1]
+			}
+
+			return NewString("lines", result, i.debug), nil
 		})
 	case "close":
 		return NewFunction(func(_ []Object) (Object, error) {
