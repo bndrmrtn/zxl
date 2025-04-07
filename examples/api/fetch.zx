@@ -1,0 +1,14 @@
+use json;
+
+const config = array{
+    method: "POST",
+    body: json.toString({ name: "John", age: 30 }),
+    headers: {}
+};
+
+
+config.headers["Content-Type"] = "application/json";
+
+const res = fetch("https://httpbin.org/post", config);
+
+println(res);

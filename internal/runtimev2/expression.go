@@ -156,6 +156,8 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 				return nil, errs.WithDebug(err, n.Debug)
 			}
 
+			fmt.Println(obj, node, err)
+
 			sum := newVariableName()
 
 			expressionList = append(expressionList, sum)

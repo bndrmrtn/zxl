@@ -35,6 +35,8 @@ func GetMethods(importer ImportFunc, evaler EvalFunc) map[string]lang.Method {
 	}).WithArg("object")
 
 	m["map"] = lang.NewFunction(fnMap).WithArgs([]string{"fn", "object"})
+	m["fetch"] = lang.NewFunction(fnFetch).
+		WithArg("url").WithVariadicArg("config")
 
 	m = setTypeMethods(m)
 	m = setIsMethods(m)

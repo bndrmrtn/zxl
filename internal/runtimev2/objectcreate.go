@@ -114,6 +114,12 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 		}
 
 		obj = lang.NewFn("<inlineFn>", n.Debug, fn)
+	case tokens.FunctionCallVariable:
+		var err error
+		obj, err = e.callFunctionFromNode(n)
+		if err != nil {
+			return "", nil, errs.WithDebug(err, n.Debug)
+		}
 	}
 
 	if obj == nil {

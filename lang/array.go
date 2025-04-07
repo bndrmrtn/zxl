@@ -1,7 +1,6 @@
 package lang
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/models"
@@ -13,7 +12,7 @@ type Array struct {
 	// Keys are the keys of the array.
 	Keys []Object
 	// Map is the map of the array.
-	Map map[any]Object
+	Map map[Object]Object
 }
 
 func NewArray(name string, debug *models.Debug, keys []Object, values []Object) Object {
@@ -23,7 +22,7 @@ func NewArray(name string, debug *models.Debug, keys []Object, values []Object) 
 	array := &Array{
 		Base: NewBase(name, debug),
 		Keys: keys,
-		Map:  make(map[any]Object, len(keys)),
+		Map:  make(map[Object]Object, len(keys)),
 	}
 	for i, key := range keys {
 		array.Map[key] = values[i]
@@ -78,7 +77,7 @@ func (a *Array) Method(name string) Method {
 			}
 
 			if a.Map == nil {
-				a.Map = make(map[any]Object)
+				a.Map = make(map[Object]Object)
 			}
 
 			a.Map[key] = value
@@ -112,7 +111,10 @@ func (a *Array) Variables() []string {
 func (a *Array) SetVariable(name string, value Object) error {
 	key, ok := a.realKey(name)
 	if !ok {
-		return fmt.Errorf("key %v not found", name)
+		k := NewString("key", name, nil)
+		a.Keys = append(a.Keys, k)
+		a.Map[k] = value
+		return nil
 	}
 
 	a.Map[key] = value
