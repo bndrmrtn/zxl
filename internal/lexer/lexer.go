@@ -644,6 +644,8 @@ func (lx *Lexer) getIdentType(s string) tokens.TokenType {
 		return tokens.Array
 	case "spin":
 		return tokens.Spin
+	case "error":
+		return tokens.Error
 	default:
 		return tokens.Identifier
 	}

@@ -65,6 +65,29 @@ let result = add(10, 20);
 println(result);
 ```
 
+### Error handling:
+
+```zxl
+error err: fail("This is a helper to throw an error");
+if err != nil {
+  println("error occurred:", err);
+}
+```
+
+```zxl
+error otherErr {
+  const x = 5;
+  x = 6; // an error will happen
+}
+
+if otherErr != nil {
+  println("error occurred:", otherErr);
+}
+
+println(x); // x is in the same scope as global so it will print 5, because
+            // thats the value of x before the error occurred
+```
+
 #### Define a block and use it:
 
 ```zxl

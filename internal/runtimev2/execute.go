@@ -1,6 +1,7 @@
 package runtimev2
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/bndrmrtn/zxl/internal/errs"
@@ -91,6 +92,21 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 		return e.handleFor(node)
 	case tokens.Spin:
 		return e.handleSpin(node)
+	case tokens.Error:
+		if len(node.Children) == 0 {
+			return nil, errs.WithDebug(fmt.Errorf("%w: error keyword must have one or more children", errs.RuntimeError), node.Debug)
+		}
+
+		_, err := e.Execute(node.Children)
+		if err != nil {
+			var de errs.DebugError
+			if errors.As(err, &de) {
+				err = de.GetParentError()
+			}
+			e.BindObject(node.Content, lang.NewString(node.Content, err.Error(), node.Debug))
+		} else {
+			e.BindObject(node.Content, lang.NilObject)
+		}
 	}
 
 	return nil, nil

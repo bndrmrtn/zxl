@@ -100,6 +100,8 @@ func (b *Builder) buildNode(ts []*models.Token, inx *int) (*models.Node, error) 
 		return b.parseParenthesis(ts, inx)
 	case tokens.For, tokens.Spin:
 		return b.parseFor(ts, inx)
+	case tokens.Error:
+		return b.parseError(ts, inx)
 	case tokens.Semicolon:
 		*inx++
 		return nil, nil
