@@ -109,7 +109,7 @@ func (l *List) Method(name string) Method {
 }
 
 func (l *List) Methods() []string {
-	return []string{"append", "contains"}
+	return []string{"append", "contains", "filter"}
 }
 
 func (l *List) Variable(variable string) Object {

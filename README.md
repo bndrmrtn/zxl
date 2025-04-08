@@ -17,6 +17,10 @@ Zx is built in Go as a learning project and is not intended to be used in produc
 - Zx Blocks
 - Threads and Concurrency
 
+# Syntax Highlihting
+
+Zx now has a `VSCode` plugin for highlighting code (no LSP currently). [Download now](https://marketplace.visualstudio.com/items/?itemName=zxl.zx)
+
 ## Installation
 
 To install Zx, you need to have Go installed on your system.

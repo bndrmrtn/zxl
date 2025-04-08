@@ -1,0 +1,37 @@
+// Http servers
+
+// Theese files won't work with `zxl run filename.zx` command, because they are not cli scripts.
+// They are http server files, so they need to be run with `zxl serve filename.zx` command.
+// You can also specify `zxl serve .` to serve the current directory.
+
+use server; // this module is only available in the server context
+
+// server has methods to use
+// - `write(any)` - write a response to the client
+// - `status(int)` - set the response status code
+// - `json()` - set the response type to json
+// - `html()` - set the response type to html
+// - `text()` - set the response type to text (default)
+// - `redirect(string)` - redirect the client to a different url
+// - `sendFile(string)` - send a file to the client
+// server also has objects to use:
+// - `request` - the request object, contains information about the request
+// - `header` - the request header object, set the request headers
+
+
+server.html(); // this will set the response type to html, but will not write anything to the client
+
+const name = "Martin"; // hard coded name
+
+server.write(<>
+     <div class="demo">
+          <h1>Hello {{ name }}!</h1>
+     </div>
+</>); // this will write a html response to the client
+
+// With the <></> syntax you can write html code, and use the {{}} syntax to insert variables into the html code
+// Theese html literals are interpreted and translated to simple string literals, so you can use them in any place where a string is expected
+
+// NOTE: Http servers will cache all the files by it's hash, you may need to clear the cache if you change the file and it doesn't work as expected.
+// You can do this by deleting the `.zxcache` folder in the current directory and restarting the server.
+// This will not happen too often, but if you change the file and it doesn't work as expected, this is the first thing to check.

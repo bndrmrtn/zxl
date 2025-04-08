@@ -49,14 +49,25 @@ func (b *Builder) parseLetConst(ts []*models.Token, inx *int) (*models.Node, err
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected assignment operator, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
 
-	var values []*models.Token
+	var (
+		values     []*models.Token
+		braceCount int
+	)
 	for {
 		*inx++
 		if *inx >= len(ts) {
 			return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got 'EOF'", errs.SyntaxError), token.Debug)
 		}
 
-		if ts[*inx].Type == tokens.Semicolon {
+		if ts[*inx].Type == tokens.LeftBrace {
+			braceCount++
+		}
+
+		if ts[*inx].Type == tokens.RightBrace {
+			braceCount--
+		}
+
+		if ts[*inx].Type == tokens.Semicolon && braceCount == 0 {
 			*inx++
 			break
 		}

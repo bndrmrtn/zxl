@@ -19,7 +19,7 @@ func GetMethods(importer ImportFunc, evaler EvalFunc) map[string]lang.Method {
 	m["println"] = &Print{true}
 	m["import"] = &Import{importer}
 	m["type"] = lang.NewFunction(fnType).WithArg("object")
-	m["range"] = lang.NewFunction(fnRange).WithArg("range")
+	m["range"] = lang.NewFunction(fnRange).WithVariadicArg("range")
 	m["read"] = lang.NewFunction(fnRead).WithArg("text")
 	m["string"] = lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
 		return lang.NewString("string", args[0].String(), args[0].Debug()), nil
@@ -165,12 +165,12 @@ func rangeArgs(args []lang.Object) ([]lang.Object, error) {
 	if args[0].Type() == lang.TList {
 		li := args[0].Value().([]lang.Object)
 		if len(li) > 3 || len(li) < 1 {
-			return nil, fmt.Errorf("expected list to have 1, 2 or 3 elements, got %v", len(li))
+			return nil, fmt.Errorf("expected to have 1, 2 or 3 elements, got %v", len(li))
 		}
 
 		for _, arg := range li {
 			if arg.Type() != lang.TInt {
-				return nil, fmt.Errorf("expected list values to be <Int>, got %v", arg.Type())
+				return nil, fmt.Errorf("expected values to be <Int>, got %v", arg.Type())
 			}
 		}
 

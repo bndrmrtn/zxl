@@ -1,0 +1,32 @@
+// If
+
+// use rand module
+use rand;
+
+// Zx provides a simple way to control the flow of your program using the `if` statement.
+// The `if` statement allows you to execute a block of code only if a certain condition is true.
+
+if rand.bool() {
+     println("If")
+} else {
+     println("Else")
+}
+
+if rand.bool() {
+     println("If")
+} else if rand.bool() {
+     println("Else if")
+} else {
+     println("Else")
+}
+
+// You may use paranthesis to group conditions together.
+// This is useful when you want to check multiple conditions at once.
+
+if (rand.bool() && rand.bool()) {
+     println("If")
+} else if (rand.bool() || rand.bool()) {
+     println("Else if")
+} else {
+     println("Else")
+}

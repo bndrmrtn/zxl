@@ -1,5 +1,0 @@
-let x = 5;
-
-if x != 4 {
-    println("x is not equal to 4");
-}

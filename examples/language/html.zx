@@ -1,8 +1,0 @@
-use html;
-
-let builder = html.Builder("hu", "Saját oldalam");
-builder.setBody(<>
-    <h1>Saját oldalam</h1>
-</>);
-
-println(builder.build());

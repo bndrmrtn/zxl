@@ -1,0 +1,15 @@
+// Functions inline
+
+// Inline functions are defined in the same file as the code that uses them
+// and are typically used for small, simple functions that are not reused elsewhere in the code.
+
+const double = fn(x) => x * 2; // Inline function to double a number
+
+println(double(2)); // 4
+
+// Multi line functions also allowed to pass to other functions, etc.
+const add = fn (x, y) {
+    return x + y; // Return the sum
+};
+
+println(add(2, 3)); // 5

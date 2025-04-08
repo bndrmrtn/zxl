@@ -1,6 +1,9 @@
+// Iter namespace
+// This file is part of the Zx programming language project.
+// It contains the iter namespace for the Zx language runtime.
 namespace iter;
-use types;
 
+// KeyValue is a simple key-value pair structure
 define KeyValue {
     let key;
     let value;
@@ -11,9 +14,10 @@ define KeyValue {
     }
 }
 
+// Array is a function that takes an array and returns a list of KeyValue pairs
 fn Array(input) {
-    if type(input) != types.Array {
-        fail("Array only accepts array");
+    if type(input) != "<Object:array>" {
+        fail("iter.Array: input must be an array");
     }
 
     let li = [];
@@ -25,8 +29,9 @@ fn Array(input) {
     return li;
 }
 
+// List is a function that takes a list and returns a list of KeyValue pairs
 fn List(input) {
-    if type(input) != types.List {
+    if type(input) != "<Object:list>" {
         fail("iter.List only accepts list");
     }
 

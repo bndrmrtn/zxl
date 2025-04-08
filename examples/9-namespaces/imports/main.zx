@@ -1,0 +1,9 @@
+namespace main;
+
+// Importing a file that contains a return
+// will pass the returned value to the variable
+const greeter = import("other.zx");
+
+// Greeter is a function that runs from the other namespace
+// and it's one of the other.User's methods
+greeter("Johanna");

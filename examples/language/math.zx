@@ -1,6 +1,0 @@
-let sum = (5 + 5) * 10;
-
-println(sum);
-
-let fivePower = 5 ** 2;
-println(fivePower);

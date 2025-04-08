@@ -1,0 +1,13 @@
+// While
+
+// Zx comes with a simple way to control the flow of your program using the `while` statement.
+// The `while` statement allows you to execute a block of code repeatedly as long as a certain condition is true.
+
+let x = 10;
+
+while x > 0 {
+     println(x); // prints 10 to 1
+     x = x - 1; // decrement x by 1
+}
+
+println("Exit while loop"); // prints Exit while loop

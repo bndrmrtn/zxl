@@ -1,0 +1,25 @@
+// Errors Group Scope
+
+// It is a must to understand that error grouping uses the same
+// level of scope as the other.
+
+error err {
+     let x = 5;
+     fail("An error occurred!");
+}
+
+// Even is the error is thrown, the x variable will be available
+// in the scope of the error group.
+println("x:", x); // x: 5
+
+// The error will be thrown and the program will stop executing
+
+error constantErr {
+     const y = 15;
+     y = 20; // this will throw an error
+}
+
+println("y:", y); // y: 15
+// The error will be catched and y will be available in the scope of the error group.
+// The value of y will be 15, and it will be available in the scope of the error group.
+// Since the const y = 15 is a totally fine statement, the error will be thrown later

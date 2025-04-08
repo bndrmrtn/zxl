@@ -1,0 +1,18 @@
+// Namespaces in Zx are useful for organizing code and avoiding name collisions.
+// By default, Zx uses an empty-string namespace, but you can define your own namespaces.
+
+// Namespace MUST be defined at the top of the file, before any other code.
+// The namespace keyword is used to define a namespace. The syntax is as follows:
+namespace main;
+
+// using otherstuff namespace as utils
+use otherstuff as utils;
+// this will not throw an error if the otherstuff namespace is not defined
+// but it will throw when the otherstuff namespace is tried to be used
+
+// import the other file where the namespace is defined
+import("otherstuff.zx"); // Import the otherstuff file.
+// This will import the otherstuff namespace and make it available in this file.
+
+// Print the greeting message from the otherstuff namespace.
+println(utils.greet("Johanna"));

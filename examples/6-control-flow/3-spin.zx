@@ -1,0 +1,21 @@
+// Spin
+
+// Spin is hardly-used in real-world code, but it is a good example of how to use the control flow operators.
+// It is a simple program that spins a wheel and prints the result.
+
+const urls = ["https://facebook.com", "https://twitter.com", "https://instagram.com"];
+
+// spin through them and run the body asynchronously
+spin url in urls {
+     error err {
+          const data = fetch(url);
+          println("Data fetched from url:", url, "Status code:", data.statusCode);
+     }
+     if err != nil {
+          println("Failed to fetch url: ", url);
+     }
+}
+
+// This loop is good for iterating over a list of items and performing actions asynchronously.
+// NOTE: Error handling isn't really good with spin, so you should use it with caution
+// because if one of the urls fails, the rest of the urls may be fetched.

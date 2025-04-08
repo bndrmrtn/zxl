@@ -1,0 +1,22 @@
+// Objects
+
+// What are objects in Zx and how they work?
+// In Zx every value is an object. Which means that every value may have methods and properties.
+// Zx provides a default property for each object, which is accessible using the dot operator (.) and is called "$addr".
+
+let text = "Hello";
+
+println(text.$addr); // prints the address of the object in memory
+
+// Fun fact: $addr is also an object, which means it also has an $addr property. This is a recursive property that can be used to get the address of the address of the object in memory.
+
+// Addresses can be used to avoid the copy of the object. For example, if you want to pass an object to a function, you can pass the address of the object instead of the object itself. This is useful for large objects that take a lot of memory and time to copy.
+// This is a simple way to pass an address
+
+fn doSomethingUseful(addr) {
+     const value = addr.value(); // get the value of the address
+     println(type(addr), type(value), value);
+}
+
+let num = 5;
+doSomethingUseful(num.$addr); // prints "$addr <Object:int> 5"

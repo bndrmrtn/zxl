@@ -1,0 +1,17 @@
+// Thread spawner
+
+use thread;
+
+// Zx allows us to create a custom spawner for threads.
+// This is useful if we want to control how many threads are created.
+
+const spawner = thread.spawner(4); // create a spawner with a maximum of 4 async threads
+                                   // this works like a pool of threads
+
+for i in 8 {
+     spawner.spawn(fn() {
+          println("Hello from thread ", i);
+     });
+}
+
+thread.sleep(1000); // sleep for 1 second to allow the threads to finish

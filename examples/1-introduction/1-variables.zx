@@ -1,0 +1,36 @@
+// Variables
+
+// Variables are used to store data that can be changed during the execution of a program.
+// In Zx, variables are declared using the `let` keyword for mutable variables and `const` for immutable variables.
+// The syntax is similar to JavaScript, but with some differences.
+// A variable name should start with a letter, underscore or a dollar sign, followed by letters, digits, underscores or dollar signs.
+// Zx is a language where every statement or expression should be terminated with a semicolon.
+// The `println` (which means print line) function is used to print the value of a variable to the console.
+
+let x = "Hello,"; // string
+x = x + "World!"; // not constant so it can be reassigned
+
+let y = 42; // integer (int)
+let z = 1.5; // float
+let a = true; // boolean (bool)
+let b = false; // boolean (bool)
+let c = nil; // nil (Nil) - It's a special value that represents the absence of a value
+let d = [1, 2, 3, 4, 5]; // list
+let e = { name: "Alice", age: 30 }; // array
+let f = array{ 
+    name: 'John',
+    age: 30,
+    hobbies: ['reading', 'gaming'],
+}; // array
+
+let g = fn() => "Hello, Inline Functions!"; // Fn reference
+let h = fn(x) => x * 2; // Fn reference
+let i = fn(x, y) => x + y; // Fn reference
+
+const variables = [x, y, z, a, b, c, d, e, f, g, h, i, g(), h(5), i(3, 4)]; // list
+// it's a constant which means it cannot be reassigned, but it can be modified with list methods
+
+// printing the variables line by line
+for variable in variables {
+    println(type(variable), variable);
+}

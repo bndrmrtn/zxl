@@ -316,8 +316,9 @@ func (b *Builder) parseArrayKeyValues(ts []*models.Token, inx *int) (*models.Nod
 	*inx++
 
 	var (
-		children   []*models.Token
-		braceCount int
+		children     []*models.Token
+		braceCount   int
+		bracketCount int
 	)
 
 	for {
@@ -325,7 +326,7 @@ func (b *Builder) parseArrayKeyValues(ts []*models.Token, inx *int) (*models.Nod
 			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got 'EOF'", errs.SyntaxError), token.Debug)
 		}
 
-		if braceCount == 0 && ts[*inx].Type == tokens.RightBrace {
+		if braceCount == 0 && bracketCount == 0 && ts[*inx].Type == tokens.RightBrace {
 			break
 		}
 
@@ -337,7 +338,15 @@ func (b *Builder) parseArrayKeyValues(ts []*models.Token, inx *int) (*models.Nod
 			braceCount--
 		}
 
-		if braceCount == 0 {
+		if ts[*inx].Type == tokens.LeftBracket {
+			bracketCount++
+		}
+
+		if ts[*inx].Type == tokens.RightBracket {
+			bracketCount--
+		}
+
+		if braceCount == 0 && bracketCount == 0 {
 			if ts[*inx].Type == tokens.Comma {
 				*inx++
 				break

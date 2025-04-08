@@ -1,0 +1,9 @@
+namespace other;
+
+define User {
+     fn greet(name) {
+          println(`Hello, {{name}}!`);
+     }
+}
+
+return User().greet;

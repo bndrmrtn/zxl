@@ -1,0 +1,7 @@
+// This is a simple example of using namespaces in zx.
+namespace otherstuff;
+
+// This is a simple function that takes a name as an argument and returns a greeting message.
+fn greet(name) {
+     return `Hello, {{name}}!`;
+}

@@ -1,0 +1,49 @@
+// Definitions
+
+// Definitions in Zx are almost like classes in other languages.
+// They are mainly syntactic sugar for creating objects with properties and methods.
+
+define User {
+     let name; // let without `=` initializes the property to `nil`
+     let age;
+
+     // construct is a reserved method when creating a definition.
+     fn construct(name, age) { // the argument names are matched to the property names but they're different
+          // to avoid confusion, we can use `this` to refer to the current object
+          this.name = name;
+          this.age = age;
+          // this will set the property `name` to the value of the argument `name`
+     }
+
+     // greet is a method of the User definition
+     fn greet() {
+          // `this` will refer to the current object
+          return `Hello, my name is {{ this.name }} and I am {{ this.age }} years old.`;
+          // '`' is a template string, it allows us to use expressions inside the string between `{{` and `}}`
+     }
+
+     fn setAge(age) {
+          // this is a setter method for the age property
+          // we can use this method to set the age property to a new value
+          if !isInt(age) {
+               fail("Age must be an integer."); // this will throw an error if the age is not an integer
+          }
+
+          this.age = age;
+     }
+}
+
+// creating a new object from the definition
+// does not require any complex syntax, just call the definition like a function
+const Diana = User("Diana", 25);
+               // Zx will automatically call the `construct` method with the arguments passed to the definition
+               // the `construct` method is not required, but it's a good practice to use it to initialize the properties
+
+println(Diana.greet()); // prints "Hello, my name is Diana and I am 25 years old."
+
+// Since Zx is a weakly typed language, we can modify it's properties at any time
+// but it's a good practice to keep the properties consistent with the type of the value
+// for example, we can set the age to a string, but it's not a good practice
+// Diana.age = "25"; // this will not throw an error, but it's not a good practice
+// instead use setter methods to set the properties
+// for example, we can create a setter method for the age property

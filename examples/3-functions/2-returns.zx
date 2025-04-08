@@ -1,0 +1,17 @@
+// Function Returns
+
+// Zx functions can return values using the `return` keyword.
+// If a function does not have a return statement, it will return `nil` by default.
+
+fn nilFunc() {
+     return;
+}
+
+let x = nilFunc(); // x is nil
+println(type(x), x);
+
+fn doMath(x, y) {
+    return x + y;
+}
+
+println(doMath(1, 2)); // 3

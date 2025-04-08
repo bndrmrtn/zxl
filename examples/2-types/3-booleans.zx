@@ -1,0 +1,9 @@
+// Booleans
+
+// Booleans are a data type that can only have two values: true or false.
+// They are often used in conditional statements and logical operations.
+
+println(type(true), true);
+println(type(false), false);
+println(type(1 == 1), 1 == 1);
+println(type(1 != 1), 1 != 1);

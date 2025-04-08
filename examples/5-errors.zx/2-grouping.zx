@@ -1,0 +1,34 @@
+// Errors and Grouping
+
+// use the rand module
+use rand;
+
+// Errors can be group together to provide a better programming experience
+// with handling errors.
+
+// Checking a group of failable things are almost the same as checking only one error.
+// First define some function that might fail:
+fn mightFail(ok) {
+     if !ok {
+          fail("bool is false!");
+     }
+}
+
+fn mightFail2(n) {
+     if n > 5 {
+          fail("n is greater than 5!");
+     }
+}
+
+// Now catch the errors in a group:
+error err {
+     mightFail(rand.bool());
+     mightFail2(rand.int(0, 10));
+}
+// if one fails, the other will be skipped and the error will be returned
+
+if err != nil {
+     println("Something went wrong:", err);
+} else {
+     println("All good!");
+}

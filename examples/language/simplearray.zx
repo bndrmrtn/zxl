@@ -1,9 +1,0 @@
-let arr = array {
-    user: array {
-        name: "John",
-    },
-};
-
-arr.user.name = "Jane";
-
-println(arr["user"]["name"]);

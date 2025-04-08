@@ -1,3 +1,0 @@
-let s = "Hello, World!\n\n";
-
-println(s.trim().split(" "));

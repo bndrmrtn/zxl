@@ -1,6 +1,0 @@
-use rand;
-
-let b = rand.bool();
-println(b);
-
-println(rand.int(1, 10));

@@ -1,0 +1,15 @@
+// Threads
+
+// In Zx there are no `async` or `await` keywords. Instead, you can use the `thread` keyword to create a new thread of execution.
+// The `thread` module provides a way to create and manage threads in Zx.
+
+// use the module
+use thread;
+
+fn doPrint() {
+     println("Hello from thread!");
+}
+
+thread.spawn(doPrint); // spawn a new thread to run the doPrint function
+
+thread.sleep(1000); // sleep for 1 second to allow the thread to finish

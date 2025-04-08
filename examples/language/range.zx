@@ -1,3 +1,0 @@
-let steps = range([0, 10, 2]);
-
-println(steps);

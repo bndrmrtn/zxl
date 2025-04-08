@@ -1,0 +1,32 @@
+// Lists
+// Lists will be improved in the future, but for now they are a simple collection of items with just a few methods.
+
+// Lists are a collection of items. They can be of any type, including other lists.
+let list1 = [1, 2, 3, 4, 5];
+let list2 = ["apple", "banana", "cherry"];
+let list3 = [true, false, true];
+let list4 = [1, "apple", true, [1, 2, 3]]; // A list can contain other lists
+
+// A list can be created using the `[]` syntax. The items in the list are separated by commas.
+const list5 = [];
+// constant lists cannot be redeclared, but they can be modified with list methods
+list5.append(1);
+list5.append(2);
+
+// Lists only have one properties other than the `$addr` property, which is `length`.
+// The `length` property returns the number of items in the list.
+println(list5, list5.length); // [1, 2] 2
+
+// Lists have a number of methods that can be used to manipulate them. The most common methods are:
+// - `append(item)`: Adds an item to the end of the list.
+// - `constains(item)`: Returns true if the item is in the list, false otherwise.
+// - `filter(fn(item) bool)`: Returns a new list containing only the items that pass the test implemented by the provided function.
+
+// The append method already demonstrated above. 
+// The contains method is used to check if an item is in the list.
+println(list1.contains(1)); // true
+println(list1.contains(6)); // false
+
+// The filter method is used to create a new list containing only the items that pass the test implemented by the provided function.
+let list6 = list1.filter(fn(item) => item > 2);
+println(list6, list6.length); // [3, 4, 5] 3

@@ -21,30 +21,34 @@ define Builder {
     }
 
     fn build() {
-        let generated = <>
-            <!DOCTYPE html>
-            <html lang="{{ this.language }}">
-            <head>
-            <meta charset="utf-8">
-            <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <meta name="viewport" content="width=device-width,initial-scale=1.0">
-            <title>{{ this.title }}</title>
-        </>;
+        let head = "";
+        let body = "";
 
         if this.description != nil {
-            generated = generated + this.head;
+            head = this.head;
         }
 
         if this.description != nil && this.description != "" {
-            generated = generated + <><meta name="description" content="{{ this.description }}"></>;
+            head = head + <><meta name="description" content="{{ this.description }}"></>;
         }
-
-        generated = generated + <></head><body></>;
 
         if this.body != nil {
-            generated = generated + this.body;
+            body = this.body;
         }
 
-        return generated + <></body></html></>;
+        return "<!DOCTYPE html>" + <>
+            <html lang="{{ this.language }}">
+            <head>
+                <meta charset="utf-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width,initial-scale=1.0">
+                <title>{{ this.title }}</title>
+                {{ head }}
+            </head>
+            <body>
+                {{ body }}
+            </body>
+            </html>
+        </>;
     }
 }

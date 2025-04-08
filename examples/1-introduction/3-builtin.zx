@@ -1,0 +1,56 @@
+// Built-in
+
+// Zx comes with a set of built-in functions and types that you can use in your programs. These include:
+
+// - `print`, `println`: Prints a value to the console. You can use it to print strings, numbers, and other values.
+// - `read`: Reads a value from the console. You can use it to read strings, numbers, and other values.
+// - `import`: Imports a file or module. You can use it to import other Zx files or modules.
+// - `type`: Returns the type of a value. You can use it to check the type of a value.
+// - `range(start, stop?, step?)`: Returns a range of numbers. You can use it to generate a sequence of numbers.
+// - `string`: Converts a value to a string. You can use it to convert numbers, booleans, and other values to strings.
+// - `int`: Converts a value to an integer. You can use it to convert strings, booleans, and other values to integers.
+// - `float`: Converts a value to a float. You can use it to convert strings, booleans, and other values to floats.
+// - `bool`: Converts a value to a boolean. You can use it to convert strings, numbers, and other values to booleans.
+// - `fail`: Raises an error. You can use it to raise an error in your program.
+// - `eval`: Evaluates a string as Zx code. You can use it to execute Zx code at runtime.
+// - `map(fn(item) item, object)`: Applies a function to each element in a list. You can use it to transform a list of values.
+// - `fetch(url, config?)`: Fetches data from a URL. You can use it to make HTTP requests and get data from APIs.
+// - `isInt`: Checks if a value is an integer. You can use it to check if a value is an integer.
+// - `isFloat`: Checks if a value is a float. You can use it to check if a value is a float.
+// - `isBool`: Checks if a value is a boolean. You can use it to check if a value is a boolean.
+// - `isInstanceOf`: Checks if a value is an instance of a definition. You can use it to check if a value is an instance of a definition.
+
+// Zx also has a set of built-in modules that you can use in your programs. These include:
+
+// Rand: `use rand`
+     // - `int(min, max)`: Generates a random integer. You can use it to generate random numbers.
+     // - `bool()`: Generates a random boolean. You can use it to generate random true/false values.
+
+// JSON: `use json`
+     // - `parse(json)`: Parses a JSON string. You can use it to convert a JSON string to a Zx object.
+     // - `toString(object)`: Converts a Zx object to a JSON string. You can use it to convert a Zx object to a JSON string.
+
+// IO: `use io`
+     // - `open(file)`: Opens a file. You can use it to read from a file. It returns an IOStream object.
+          // - `readLine()`: Reads a line from the file. You can use it to read a line from a file.
+          // - `readLines()`: Reads all data from the file. You can use it to read all data from a file.
+          // - `close()`: Closes the file. You can use it to close a file after reading from it.
+     // - `writeFile(file, data)`: Writes data to a file. You can use it to write data to a file.
+
+// Http: `use http`: is contains a set of status codes:
+     // http.status{StatusName} like: http.statusOK, http.statusNotFound, http.statusBadRequest, etc.
+
+// Env: `use env`: it also preloads any .env files from the current directory.
+     // - `get(name)`: Gets an environment variable. You can use it to get the value of an environment variable.
+     // - `set(name, value)`: Sets an environment variable. You can use it to set the value of an environment variable.
+
+// Crypto: `use crypto`: it contains a set of cryptographic functions.
+     // - `hash(algorithm, data)`: Hashes data using a specified algorithm. You can use it to hash data using SHA-256, SHA-512, etc.
+     // - `md5(data)`: Hashes data using MD5. You can use it to hash data using MD5.
+     // - `sha1(data)`: Hashes data using SHA-1. You can use it to hash data using SHA-1.
+     // - `sha256(data)`: Hashes data using SHA-256. You can use it to hash data using SHA-256.
+     // - `sha512(data)`: Hashes data using SHA-512. You can use it to hash data using SHA-512.
+     // - `bcrypt(data, const)`: Hashes data using bcrypt. You can use it to hash data using bcrypt.
+     // - `bcryptCompareHashAndPassword(password, hash)`: Compares a password with a hash. You can use it to check if a password matches a hash.
+
+// Other built-in functions and types will be described soon.

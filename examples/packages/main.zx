@@ -1,5 +1,0 @@
-// using zxlanguage's package helloer
-use zxlanguage:helloer;
-
-// sayHello with imported package
-helloer.sayHello();

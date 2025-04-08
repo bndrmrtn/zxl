@@ -1,0 +1,46 @@
+// Strings
+
+// hello is a constant string containing "Hello"
+const hello = "Hello";
+
+println(hello); // prints "Hello"
+println(hello + " World!"); // prints "Hello World!"
+
+// String Methods
+// Every value in Zx is an object. Which means that every value may have methods and properties.
+
+// Trim
+// line is a line from a file which has a new line character at the end
+let line = "Hello\n";
+line = line.trim(); // trim removes the new line character
+println(line); // prints "Hello"
+
+// Split
+// str is a string containing values separated by commas
+let str = "Hello,World,ZX";
+let parts = str.split(","); // split the string into an array of strings
+println(parts); // prints ["Hello", "World", "ZX"]
+
+
+// Upper and Lower Case
+let userID = "aBcDEF00";
+println(userID.upper()); // prints "ABCDEF00"
+println(userID.lower()); // prints "abcdef00"
+
+// Replace
+let text = "Hello World!";
+let newText = text.replace("World", "Zx"); // replace "World" with "Zx"
+println(newText); // prints "Hello Zx!"
+
+// Contains
+let sentence = "Hello, this is a test.";
+let containsTest = sentence.contains("test"); // check if the string contains "test"
+println(containsTest); // prints true
+let containsZx = sentence.contains("Zx"); // check if the string contains "Zx"
+println(containsZx); // prints false
+
+// Starts With and Ends With
+let startsWithHello = sentence.startsWith("Hello"); // check if the string starts with "Hello"
+println(startsWithHello); // prints true
+let endsWithTest = sentence.endsWith("test."); // check if the string ends with "test."
+println(endsWithTest); // prints true

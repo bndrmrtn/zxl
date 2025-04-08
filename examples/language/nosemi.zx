@@ -1,7 +1,0 @@
-namespace main
-
-let x = 5 + 4;
-let z = 10;
-
-println(x)
-println(z)

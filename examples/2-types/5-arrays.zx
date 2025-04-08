@@ -1,0 +1,29 @@
+// Arrays
+
+// Arrays are a key-value data structure in Zx.
+// The key and the value can be comparable type.
+// NOTE: Zx only contains 3 non-comparable types: lists, arrays and functions.
+
+// string array keys can also be represented as identifiers if they fit the rules.
+let user = array {
+     name: "John",
+     age: 30,
+     isAdmin: true,
+     "assigned-rules": ["read", "write"], // assign-rules must be in quotes because it contains a hyphen and is not a valid identifier
+};
+
+// The array keys can be accessed using the dot notation or the bracket notation.
+println(user.name); // John
+println(user["age"]); // 30
+println(user.isAdmin); // true
+println(user["assigned-rules"][0]); // ["read", "write"]
+
+// Arrays has properties and methods.
+// - `keys` returns the keys of the array as a list.
+// - `values()` returns the values of the array as a list.
+// - `$bind(key, value)` binds a value to a key in the array.
+// NOTE: if the array contains a key named `keys`, the `keys` property will not be available anymore.
+
+// List keys are sorted in declaring order.
+println(user.keys); // ["name", "age", "isAdmin", "assigned-rules"]
+println(user.values()); // ["John", 30, true, ["read", "write"]]

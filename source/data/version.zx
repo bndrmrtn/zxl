@@ -1,5 +1,10 @@
+// Zx namespace
+// This file is part of the Zx programming language project.
+// It contains the version information for the Zx language runtime.
 namespace zx;
 
+// Using the runtime module to access the language version
 use runtime;
 
+// Define the version variable to hold the language version
 const version = runtime.langVersion;

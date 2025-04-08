@@ -1,0 +1,24 @@
+use iter;
+
+const user = array{
+     name: "John",
+     age: 30,
+};
+
+// iter through the key-value pairs in the user array
+for kv in iter.Array(user) {
+     // kv is a key-value pair
+     // kv.key is the key
+     // kv.value is the value
+     println(kv.key, ":", kv.value);
+}
+
+const items = [1, 2, 3, 4, 5];
+
+// iter through the key-value pairs in the items list
+for kv in iter.List(items) {
+     // kv is a key-value pair
+     // kv.key is the key
+     // kv.value is the value
+     println(string(kv.key) + ":", kv.value);
+}

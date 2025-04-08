@@ -1,0 +1,24 @@
+// Integers
+
+// Integers in Zx are objects.
+// Because of that they also have methods and properties, for example the default one: "$addr".
+
+let x = 1234; // x is an integer
+println(x); // prints 1234
+
+// Integer to string
+let y = x.toString(); // y is a string
+println(type(y), y); // prints "1234"
+
+// String to integer
+// There are built-in functions to convert between types.
+let numericString = "1234";
+
+if isInt(numericString) {
+     numericString = int(numericString); // numericString is an integer
+}
+
+// Integer to float
+let z = float(x);
+println(isFloat(z), type(z), z);
+// isFloat and float works the same way as isInt and int

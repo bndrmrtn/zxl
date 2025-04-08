@@ -1,0 +1,62 @@
+// Thread portals
+
+// Using thread.sleep in some cases may work, but it is not a good practice.
+// It is better to use portals instead.
+
+// A portal has 2 methods:
+// - send(any): send a message to the portal
+// - receive(): receive a message from the portal
+
+use thread;
+
+// Define a User for demonstration with portals.
+define User {
+     let name;
+     let age;
+
+     fn construct(name, age) {
+          this.name = name;
+          this.age = age;
+     }
+
+     fn introduce() {
+          println("Hello, my name is", this.name, "and I am", this.age, "years old.");
+     }
+}
+
+// create some users
+const users = [
+     User("Jane", 25),
+     User("John", 30),
+     User("Alice", 22),
+     User("Bob", 28),
+     User("Charlie", 35),
+     User("Dave", 40),
+     User("Eve", 27),
+     User("Frank", 33),
+];
+
+// Let's create a new portal:
+const portal = thread.portal(4); // create a new portal with a maximum of 4 senders at a time
+// Portals are similar to Go's channels.
+
+// create a new thread spawner with a maximum of users.length threads
+const spawner = thread.spawner(users.length); // this is a small list of users so we can set the spawner to the length of the list
+
+for user in users {
+     // spawn a new thread for each user
+     spawner.spawn(fn() {
+          // introduce the user on a new thread
+          user.introduce();
+          // send a message to the portal
+          portal.send(nil); // it can be nil or anything
+     });
+}
+
+// loop through the users and receive messages from the portal
+for _ in users.length {
+     // receive will receive a message from the portal
+     // this will block until a message is received
+     // this has nothing to do with the user, it just waits for the first message to be received
+     portal.receive();
+}

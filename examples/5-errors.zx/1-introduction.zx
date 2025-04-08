@@ -1,0 +1,22 @@
+// Errors
+
+// Errors are a common part of programming, and Zx provides a way to handle them gracefully.
+// Zx removed the need for try/catch blocks and uses a more easy to read syntax for error handling.
+// Since Zx is a weakly-typed interpreted language we can handle each error one by one or grouping them together.
+
+// Throwing an error
+// fail("An error occurred!"); // this is only commented out to prevent the program from stopping
+// This method soon will be upgraded to support the Error definition too, that can
+// group errors together and provide a better error message.
+
+// The fail() method will throw an error and stop the execution of the program.
+// To prevent the program from stopping, we can use the error catching expression.
+
+// the `error` keyword tells Zx to catch the error and continue executing the program
+// and the `err` variable will contain the error object or nil
+error err: fail("An error occurred!");
+// err can be named anything, but it is recommended to use `err` for readability
+
+if err != nil {
+     println("Something went wrong:", err);
+}

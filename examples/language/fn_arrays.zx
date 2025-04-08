@@ -1,8 +1,0 @@
-fn doSmt(user) {
-    println(user.id, user.name);
-}
-
-doSmt(array{
-    id: 15,
-    name: "John",
-});

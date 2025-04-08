@@ -1,6 +1,0 @@
-const s = eval("return 1 + 2");
-if s != 3 {
-    fail("Error: expected 3, got " + s);
-}
-
-println(s);

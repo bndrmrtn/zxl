@@ -183,7 +183,6 @@ func (db *DB) Method(name string) lang.Method {
 			}
 			rows, err := db.db.Query(args[0].Value().(string), queryArgs...)
 			if err != nil {
-				fmt.Println("err", queryArgs)
 				return nil, err
 			}
 			defer rows.Close()
