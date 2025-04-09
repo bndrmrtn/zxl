@@ -1,0 +1,9 @@
+namespace main;
+
+const global = state('global');
+
+global.set('key', 'value');
+
+println(global.get('key'), state.$addr);
+
+import('other.zx');

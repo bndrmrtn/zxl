@@ -12,6 +12,7 @@ import (
 	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/modules"
+	"github.com/bndrmrtn/zxl/internal/state"
 	"github.com/bndrmrtn/zxl/internal/tokens"
 	"github.com/bndrmrtn/zxl/lang"
 	"go.uber.org/zap"
@@ -21,6 +22,7 @@ const PackageDirectory = ".zxpack"
 
 // RuntimeMode is the runtime mode
 type Runtime struct {
+	// functions are a map of function names to function objects
 	functions map[string]lang.Method
 
 	// executers is a map of namespace names to exec
@@ -33,11 +35,13 @@ type Runtime struct {
 	// packages is a map of package names to runtime
 	packages map[string]*Runtime
 
+	stateProvider *state.Provider
+
 	mu sync.RWMutex
 }
 
 // New creates a new runtime
-func New() (*Runtime, error) {
+func New(provider *state.Provider) (*Runtime, error) {
 	zap.L().Info("creating new runtime")
 	modules := modules.Get()
 
@@ -45,8 +49,9 @@ func New() (*Runtime, error) {
 		executers:      make(map[string]*Executer),
 		packages:       make(map[string]*Runtime),
 		builtinModules: make(map[string]lang.Module, len(modules)),
+		stateProvider:  provider,
 	}
-	r.functions = builtin.GetMethods(r.importer, r.evaler)
+	r.functions = builtin.GetMethods(r.importer, r.evaler, provider)
 
 	for _, module := range modules {
 		r.BindModule(module)
@@ -205,7 +210,7 @@ func (r *Runtime) BindModule(module lang.Module) {
 func (r *Runtime) loadPackage(author string, pkg string) (*Executer, error) {
 	zap.L().Debug("loading package", zap.String("author", author), zap.String("package", pkg))
 
-	run, err := New()
+	run, err := New(r.stateProvider)
 	if err != nil {
 		return nil, err
 	}

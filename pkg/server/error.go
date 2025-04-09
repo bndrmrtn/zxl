@@ -89,7 +89,7 @@ func (s *Server) handleCustomErrorHandler(serverErr error, code int, w http.Resp
 // executeErrorHandler executes the error handler nodes.
 func (s *Server) executeErrorHandler(nodes []*models.Node, serverErr error, code int, w http.ResponseWriter, r *http.Request) bool {
 	// Execute the nodes
-	run, err := runtimev2.New()
+	run, err := runtimev2.New(s.serverStateProvider)
 	if err != nil {
 		return false
 	}

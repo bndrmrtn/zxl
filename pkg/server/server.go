@@ -11,6 +11,7 @@ import (
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/modules/servermodule"
 	"github.com/bndrmrtn/zxl/internal/runtimev2"
+	"github.com/bndrmrtn/zxl/internal/state"
 	"github.com/bndrmrtn/zxl/internal/version"
 	"github.com/bndrmrtn/zxl/pkg/language"
 	"github.com/fatih/color"
@@ -34,6 +35,9 @@ type Server struct {
 	useCaching bool
 	// cache is the cache of the nodes
 	cache map[string]*NodeCache
+	// serverStateProvider is the provider for the server state
+	serverStateProvider *state.Provider
+
 	// mu is the mutex for the cache
 	mu sync.RWMutex
 }
@@ -47,13 +51,14 @@ func New(ir *language.Interpreter, root string, isDir bool, cache, colors bool) 
 	}
 
 	return &Server{
-		ir:         ir,
-		root:       filepath.Clean(root),
-		isDir:      isDir,
-		rootFile:   rootFile,
-		colors:     colors,
-		useCaching: cache,
-		cache:      make(map[string]*NodeCache),
+		ir:                  ir,
+		root:                filepath.Clean(root),
+		isDir:               isDir,
+		rootFile:            rootFile,
+		colors:              colors,
+		useCaching:          cache,
+		cache:               make(map[string]*NodeCache),
+		serverStateProvider: state.Default(),
 	}
 }
 
@@ -143,7 +148,7 @@ func (s *Server) serveRequest(w http.ResponseWriter, r *http.Request, path strin
 
 func (s *Server) executeNodes(nodes []*models.Node, w http.ResponseWriter, r *http.Request) {
 	// Execute the nodes
-	run, err := runtimev2.New()
+	run, err := runtimev2.New(s.serverStateProvider)
 	if err != nil {
 		s.handleError(err, w, r)
 		return

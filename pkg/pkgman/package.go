@@ -6,9 +6,9 @@ type Package struct {
 	Url string `yaml:"url"`
 
 	// Author is the author of the package
-	Author string `yaml:"author"`
+	Author string `yaml:"-"`
 	// Package is the name of the package
-	Package string `yaml:"package"`
+	Package string `yaml:"-"`
 	// Version is the version of the package
-	Version string `yaml:"version"`
+	Version string `yaml:"-"`
 }

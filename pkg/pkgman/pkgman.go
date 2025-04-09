@@ -50,6 +50,13 @@ func New(root string) (*PackageManager, error) {
 		if err := yaml.Unmarshal(data, &m); err != nil {
 			return nil, err
 		}
+
+		for i, pkg := range m.Packages {
+			m.Packages[i], err = m.parseUrl(pkg.Url)
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	return &m, nil

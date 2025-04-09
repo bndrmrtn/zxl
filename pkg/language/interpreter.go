@@ -11,6 +11,7 @@ import (
 	"github.com/bndrmrtn/zxl/internal/lexer"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/internal/runtimev2"
+	"github.com/bndrmrtn/zxl/internal/state"
 	"github.com/bndrmrtn/zxl/lang"
 )
 
@@ -42,7 +43,7 @@ func (ir *Interpreter) Interpret(fileName string, data io.Reader) (lang.Object, 
 		return nil, err
 	}
 
-	run, err := runtimev2.New()
+	run, err := runtimev2.New(state.Default())
 	if err != nil {
 		return nil, err
 	}

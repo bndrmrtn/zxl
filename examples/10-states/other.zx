@@ -1,0 +1,5 @@
+namespace other;
+
+const global = state('global');
+
+println(global.get('key'), state.$addr);

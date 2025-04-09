@@ -6,13 +6,14 @@ import (
 	"strings"
 
 	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/zxl/internal/state"
 	"github.com/bndrmrtn/zxl/lang"
 )
 
 type ImportFunc func(file string, d *models.Debug) (lang.Object, error)
 type EvalFunc func(code string) (lang.Object, error)
 
-func GetMethods(importer ImportFunc, evaler EvalFunc) map[string]lang.Method {
+func GetMethods(importer ImportFunc, evaler EvalFunc, provider *state.Provider) map[string]lang.Method {
 	m := make(map[string]lang.Method)
 
 	m["print"] = &Print{}
@@ -37,6 +38,15 @@ func GetMethods(importer ImportFunc, evaler EvalFunc) map[string]lang.Method {
 	m["map"] = lang.NewFunction(fnMap).WithArgs([]string{"fn", "object"})
 	m["fetch"] = lang.NewFunction(fnFetch).
 		WithArg("url").WithVariadicArg("config")
+	m["state"] = lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
+		if provider == nil {
+			panic("Fatal error: No provider found for state.")
+		}
+
+		name := args[0].Value().(string)
+		state := provider.State(name)
+		return NewState(name, args[0].Debug(), state), nil
+	}).WithTypeSafeArgs(lang.TypeSafeArg{Name: "name", Type: lang.TString})
 
 	m = setTypeMethods(m)
 	m = setIsMethods(m)
