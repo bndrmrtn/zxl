@@ -38,11 +38,7 @@ func (s *DefaultState) Get(key string) (lang.Object, bool) {
 func (s *DefaultState) Set(key string, value lang.Object) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
-	if _, ok := s.m[key]; ok {
-		return false
-	}
-
+	
 	s.m[key] = value
 	return true
 }
