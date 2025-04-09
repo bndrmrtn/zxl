@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/lang"
 )
 
@@ -38,13 +40,14 @@ func (h *HttpServer) Objects() map[string]lang.Object {
 
 func (h *HttpServer) Methods() map[string]lang.Method {
 	return map[string]lang.Method{
-		"write":    lang.NewFunction(h.fnWrite).WithArg("data"),
-		"status":   lang.NewFunction(h.fnStatus).WithTypeSafeArgs(lang.TypeSafeArg{Name: "code", Type: lang.TInt}),
-		"json":     lang.NewFunction(h.fnContentType("json")),
-		"html":     lang.NewFunction(h.fnContentType("html")),
-		"text":     lang.NewFunction(h.fnContentType("text")),
-		"redirect": lang.NewFunction(h.fnRedirect).WithTypeSafeArgs(lang.TypeSafeArg{Name: "url", Type: lang.TString}, lang.TypeSafeArg{Name: "code", Type: lang.TInt}),
-		"sendFile": lang.NewFunction(h.fnSendFile).WithTypeSafeArgs(lang.TypeSafeArg{Name: "path", Type: lang.TString}),
+		"write":     lang.NewFunction(h.fnWrite).WithArg("data"),
+		"status":    lang.NewFunction(h.fnStatus).WithTypeSafeArgs(lang.TypeSafeArg{Name: "code", Type: lang.TInt}),
+		"json":      lang.NewFunction(h.fnContentType("json")),
+		"html":      lang.NewFunction(h.fnContentType("html")),
+		"text":      lang.NewFunction(h.fnContentType("text")),
+		"redirect":  lang.NewFunction(h.fnRedirect).WithTypeSafeArgs(lang.TypeSafeArg{Name: "url", Type: lang.TString}, lang.TypeSafeArg{Name: "code", Type: lang.TInt}),
+		"sendFile":  lang.NewFunction(h.fnSendFile).WithTypeSafeArgs(lang.TypeSafeArg{Name: "path", Type: lang.TString}),
+		"setCookie": lang.NewFunction(h.fnSetCookie).WithTypeSafeArgs(lang.TypeSafeArg{Name: "options", Type: lang.TArray}),
 	}
 }
 
@@ -95,4 +98,56 @@ func (h *HttpServer) fnSendFile(args []lang.Object) (lang.Object, error) {
 	http.ServeFile(h.w, h.r, path)
 	h.Written = true
 	return nil, nil
+}
+
+func (h *HttpServer) fnSetCookie(args []lang.Object) (lang.Object, error) {
+	cookieConfig := args[0].(*lang.Array)
+
+	var cookie http.Cookie
+
+	if name, ok := cookieConfig.Access("name"); ok {
+		if name.Type() != lang.TString {
+			return nil, errs.WithDebug(fmt.Errorf("invalid type for cookie.name, expected string"), name.Debug())
+		}
+		cookie.Name = name.String()
+	} else {
+		return nil, errs.WithDebug(fmt.Errorf("cookie.name is required"), name.Debug())
+	}
+
+	if value, ok := cookieConfig.Access("value"); ok {
+		if value.Type() != lang.TString {
+			return nil, errs.WithDebug(fmt.Errorf("invalid type for cookie.value, expected string"), value.Debug())
+		}
+		cookie.Value = value.String()
+	} else {
+		return nil, errs.WithDebug(fmt.Errorf("cookie.value is required"), value.Debug())
+	}
+
+	if path, ok := cookieConfig.Access("path"); ok && path.Type() == lang.TString {
+		cookie.Path = path.String()
+	}
+
+	if domain, ok := cookieConfig.Access("domain"); ok && domain.Type() == lang.TString {
+		cookie.Domain = domain.String()
+	}
+
+	if secure, ok := cookieConfig.Access("secure"); ok && secure.Type() == lang.TBool {
+		cookie.Secure = secure.Value().(bool)
+	}
+
+	if httpOnly, ok := cookieConfig.Access("httpOnly"); ok && httpOnly.Type() == lang.TBool {
+		cookie.HttpOnly = httpOnly.Value().(bool)
+	}
+
+	if expires, ok := cookieConfig.Access("expires"); ok && expires.Type() == lang.TString {
+		t, err := time.Parse(time.RFC1123, expires.String())
+		if err != nil {
+			return nil, errs.WithDebug(fmt.Errorf("invalid expires format, expected RFC1123: %w", err), expires.Debug())
+		}
+		cookie.Expires = t
+	}
+
+	http.SetCookie(h.w, &cookie)
+
+	return lang.NewBool("setCookie", true, args[0].Debug()), nil
 }
