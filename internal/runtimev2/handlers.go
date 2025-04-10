@@ -1,7 +1,6 @@
 package runtimev2
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 
@@ -55,7 +54,7 @@ func (e *Executer) handleIf(node *models.Node) (lang.Object, error) {
 	}
 
 	if condition.Type() != lang.TBool {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected boolean", errs.ValueError), node.Debug)
+		return nil, Error(ErrExpectedBoolean, node.Debug)
 	}
 
 	zap.L().Debug("handling if", zap.Any("condition", condition))
@@ -107,7 +106,7 @@ func (e *Executer) handleWhile(node *models.Node) (lang.Object, error) {
 		zap.L().Debug("handling while loop", zap.Any("condition", condition))
 
 		if condition.Type() != lang.TBool {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected boolean", errs.ValueError), node.Debug)
+			return nil, Error(ErrExpectedBoolean, node.Debug)
 		}
 
 		ok := condition.Value().(bool)
@@ -134,7 +133,7 @@ func (e *Executer) handleFor(node *models.Node) (lang.Object, error) {
 
 	switch iterable.Type() {
 	default:
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected iterable value or expression, got '%s'", errs.ValueError, iterable.Type()), node.Debug)
+		return nil, Error(ErrExpectedIterable, node.Debug, gotErr(iterable.Type()))
 	case lang.TList:
 		for i := range iterable.Value().([]lang.Object) {
 			item := iterable.Value().([]lang.Object)[i]
@@ -189,7 +188,7 @@ func (e *Executer) handleSpin(node *models.Node) (lang.Object, error) {
 
 	switch iterable.Type() {
 	default:
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected iterable value or expression, got '%s'", errs.ValueError, iterable.Type()), node.Debug)
+		return nil, Error(ErrExpectedIterable, node.Debug, gotErr(iterable.Type()))
 	case lang.TList:
 		var wg sync.WaitGroup
 
@@ -279,7 +278,7 @@ func (e *Executer) initFor(node *models.Node) (string, *Executer, lang.Object, e
 	ex := NewExecuter(ExecuterScopeBlock, e.runtime, e).WithName(e.name)
 
 	if len(node.Args) != 2 {
-		return "", nil, nil, errs.WithDebug(fmt.Errorf("%w: expected 1 identifier and 1 iterable expression", errs.ValueError), node.Debug)
+		return "", nil, nil, Error(ErrInvalidValue, node.Debug, "expected 1 identifier and 1 iterable expression")
 	}
 
 	// stage 1: setting up the iterator and iterable

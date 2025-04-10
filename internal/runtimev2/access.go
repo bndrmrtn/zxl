@@ -1,10 +1,8 @@
 package runtimev2
 
 import (
-	"fmt"
 	"strings"
 
-	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/lang"
 )
 
@@ -22,7 +20,7 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 				return e.GetMethod(strings.Join(append(middle, last), "."))
 			}
 
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s()'", errs.ThisNotInMethod, name), nil)
+			return nil, Error(ErrThisOutsideMethod, nil, fnErr(name))
 		}
 
 		exec, err := e.GetNamespaceExecuter(first)
@@ -70,7 +68,7 @@ func (e *Executer) GetMethod(name string) (lang.Method, error) {
 		return fn, nil
 	}
 
-	return nil, errs.WithDebug(fmt.Errorf("%w: '%s()'", errs.CannotAccessFunction, name), nil)
+	return nil, Error(ErrFunctionNotFound, nil, fnErr(name))
 }
 
 // GetVariable gets a variable by name
@@ -129,7 +127,7 @@ func (e *Executer) GetVariable(name string) (lang.Object, error) {
 		return e.parent.GetVariable(name)
 	}
 
-	return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessVariable, name), nil)
+	return nil, Error(ErrVariableNotFound, nil, name)
 }
 
 // accessNamespace accesses a method in a namespace
@@ -143,19 +141,19 @@ func (e *Executer) accessNamespace(exec *Executer, name string, middle []string,
 
 	obj, err := exec.GetVariable(first)
 	if err != nil {
-		return nil, errs.WithDebug(fmt.Errorf("%w: '%s()'", errs.CannotAccessFunction, name), nil)
+		return nil, Error(ErrFunctionNotFound, nil, fnErr(name))
 	}
 
 	for _, part := range middle {
 		obj = obj.Variable(part)
 		if obj == nil {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s()'", errs.CannotAccessFunction, name), nil)
+			return nil, Error(ErrFunctionNotFound, nil, fnErr(name))
 		}
 	}
 
 	method := obj.Method(last)
 	if method == nil {
-		return nil, errs.WithDebug(fmt.Errorf("%w: '%s()'", errs.CannotAccessFunction, name), nil)
+		return nil, Error(ErrFunctionNotFound, nil, fnErr(name))
 	}
 
 	return method, nil
@@ -168,13 +166,13 @@ func (e *Executer) accessDefinition(def lang.Object, name string, middle []strin
 	for _, part := range middle {
 		obj = obj.Variable(part)
 		if obj == nil {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s()'", errs.CannotAccessFunction, name), nil)
+			return nil, Error(ErrFunctionNotFound, nil, fnErr(name))
 		}
 	}
 
 	method := obj.Method(last)
 	if method == nil {
-		return nil, errs.WithDebug(fmt.Errorf("%w: '%s()'", errs.CannotAccessFunction, name), nil)
+		return nil, Error(ErrFunctionNotFound, nil, fnErr(name))
 	}
 
 	return method, nil
@@ -191,19 +189,19 @@ func (e *Executer) accessObjNamespace(exec *Executer, name string, middle []stri
 
 	obj, err := exec.GetVariable(first)
 	if err != nil {
-		return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessVariable, name), nil)
+		return nil, Error(ErrVariableNotFound, nil, name)
 	}
 
 	for _, part := range middle {
 		obj = obj.Variable(part)
 		if obj == nil {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessVariable, name), nil)
+			return nil, Error(ErrVariableNotFound, nil, name)
 		}
 	}
 
 	obj = obj.Variable(last)
 	if obj == nil {
-		return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessVariable, name), nil)
+		return nil, Error(ErrVariableNotFound, nil, name)
 	}
 
 	return obj, nil
@@ -216,13 +214,13 @@ func (e *Executer) accessObjDefinition(def lang.Object, name string, middle []st
 	for _, part := range middle {
 		obj = obj.Variable(part)
 		if obj == nil {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessVariable, name), nil)
+			return nil, Error(ErrVariableNotFound, nil, name)
 		}
 	}
 
 	obj = obj.Variable(last)
 	if obj == nil {
-		return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessVariable, name), nil)
+		return nil, Error(ErrVariableNotFound, nil, name)
 	}
 
 	return obj, nil

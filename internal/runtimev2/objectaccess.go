@@ -16,11 +16,13 @@ func (e *Executer) accessObject(obj lang.Object, accessors []*models.Node) (lang
 		return obj, nil
 	}
 
+	currentAccessor := accessors[0]
+
 	if obj.Type() != lang.TList && obj.Type() != lang.TDefinition && obj.Type() != lang.TArray {
-		return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
+		return nil, Error(ErrInvalidIndexAccess, accessors[0].Debug, obj.Type())
 	}
 
-	access, err := e.getObjAccessors(accessors[0])
+	access, err := e.getObjAccessors(currentAccessor)
 	if err != nil {
 		return nil, err
 	}
@@ -31,34 +33,34 @@ func (e *Executer) accessObject(obj lang.Object, accessors []*models.Node) (lang
 	if obj.Type() == lang.TList {
 		li, ok := obj.Value().([]lang.Object)
 		if !ok {
-			return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
+			return nil, Error(ErrInvalidIndexAccess, currentAccessor.Debug, obj.Type())
 		}
 
 		i, ok := access.(int)
 		if !ok || i < 0 || i >= len(li) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: %v, length: %d", errs.IndexOutOfRange, i, len(li)), accessors[0].Debug)
+			return nil, Error(ErrIndexOutOfBounds, currentAccessor.Debug, fmt.Sprintf("%d length: %d", i, len(li)))
 		}
 		value = li[i]
 	} else if obj.Type() == lang.TArray {
 		arr, ok := obj.(*lang.Array)
 		if !ok {
-			return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
+			return nil, Error(ErrInvalidIndexAccess, currentAccessor.Debug, obj.Type())
 		}
 
 		o, ok := arr.Access(access)
 		if !ok {
-			return nil, errs.WithDebug(fmt.Errorf("%w: key not found: '%v'", errs.ValueError, access), accessors[0].Debug)
+			return nil, Error(ErrKeyNotFound, currentAccessor.Debug, access)
 		}
 		value = o
 	} else {
-		return nil, errs.WithDebug(fmt.Errorf("%w: unsupported object type '%s'", errs.ValueError, obj.Type()), accessors[0].Debug)
+		return nil, Error(ErrInvalidValue, currentAccessor.Debug, fmt.Sprintf("unsupported object type: %s", obj.Type()))
 	}
 
 	if len(accessors) > 1 {
 		if nextObj, ok := value.(lang.Object); ok {
 			return e.accessObject(nextObj, accessors[1:])
 		}
-		return nil, errs.WithDebug(fmt.Errorf("%w: unexpected value type", errs.ValueError), accessors[0].Debug)
+		return nil, Error(ErrInvalidValue, currentAccessor.Debug, "unexpected value type")
 	}
 
 	if v, ok := value.(lang.Object); ok {

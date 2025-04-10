@@ -17,7 +17,7 @@ import (
 // evaluateExpression evaluates an expression node
 func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 	if n.VariableType != tokens.ExpressionVariable {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected expression", errs.ValueError), n.Debug)
+		return nil, Error(ErrExpectedExpression, n.Debug)
 	}
 
 	var (
@@ -111,7 +111,7 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 			}
 
 			if name != "fn" {
-				return nil, errs.WithDebug(fmt.Errorf("%w: inline functions cannot have names", errs.RuntimeError), n.Debug)
+				return nil, Error(ErrNamedInlineFunction, n.Debug)
 			}
 
 			obj := lang.NewFn(name, node.Debug, method)
@@ -216,7 +216,7 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 			value = strings.ReplaceAll(value, name, fmt.Sprintf("%v", val))
 		}
 
-		return nil, errs.WithDebug(fmt.Errorf("%w: %w: %s", errs.RuntimeError, err, value), n.Debug)
+		return nil, Error(err, n.Debug, value)
 	}
 
 	result, err := expression.Evaluate(args)
@@ -225,7 +225,7 @@ func (e *Executer) evaluateExpression(n *models.Node) (lang.Object, error) {
 			value = strings.ReplaceAll(value, name, fmt.Sprintf("%v", val))
 		}
 
-		return nil, errs.WithDebug(fmt.Errorf("%w: %w: %s", errs.RuntimeError, err, value), n.Debug)
+		return nil, Error(err, n.Debug, value)
 	}
 
 	if fmt.Sprintf("%T", result) == "float64" && result.(float64) == float64(int64(result.(float64))) {

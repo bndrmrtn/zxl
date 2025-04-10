@@ -49,6 +49,20 @@ func (p *PrettyCode) HighlightHtml() string {
 	return sb.String()
 }
 
+// HighlightConsole highlights the code with console
+func (p *PrettyCode) HighlightConsole() string {
+	var sb strings.Builder
+	defer sb.Reset()
+
+	for i, token := range p.tokens {
+		next := p.nextToken(i)
+
+		sb.WriteString(p.highlightToken(ConsoleMode, token, next))
+	}
+
+	return sb.String()
+}
+
 // highlightToken highlights the token with the given mode
 func (p *PrettyCode) highlightToken(mode Mode, token *models.Token, next *models.Token) string {
 	token.Value = html.EscapeString(token.Value)

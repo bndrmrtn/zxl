@@ -20,17 +20,17 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 
 	switch n.VariableType {
 	default:
-		return "", nil, fmt.Errorf("unknown variable type: '%s'", n.VariableType)
+		return "", nil, Error(ErrInvalidValue, n.Debug, fmt.Sprintf("unknown variable type: %s", n.VariableType))
 	case tokens.StringVariable:
 		s, ok := n.Value.(string)
 		if !ok {
-			return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not string", errs.ValueError), n.Debug)
+			return "", nil, Error(ErrInvalidValue, n.Debug, valueIsNotErr("string"))
 		}
 		obj = lang.NewString(name, s, n.Debug)
 	case tokens.TemplateVariable:
 		str, ok := n.Value.(string)
 		if !ok {
-			return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not a template", errs.ValueError), n.Debug)
+			return "", nil, Error(ErrInvalidValue, n.Debug, valueIsNotErr("template"))
 		}
 
 		template, err := tmpl.NewTemplate(str)
@@ -51,20 +51,20 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 				obj = lang.NewFloat(name, f, n.Debug)
 				break
 			} else {
-				return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not an integer", errs.ValueError), n.Debug)
+				return "", nil, Error(ErrInvalidValue, n.Debug, valueIsNotErr("int"))
 			}
 		}
 		obj = lang.NewInteger(name, i, n.Debug)
 	case tokens.FloatVariable:
 		f, ok := n.Value.(float64)
 		if !ok {
-			return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not a float", errs.ValueError), n.Debug)
+			return "", nil, Error(ErrInvalidValue, n.Debug, valueIsNotErr("float"))
 		}
 		obj = lang.NewFloat(name, f, n.Debug)
 	case tokens.ListVariable:
 		li, err := e.createListFromNode(n)
 		if err != nil {
-			return "", nil, errs.WithDebug(err, n.Debug)
+			return "", nil, Error(err, n.Debug)
 		}
 		obj = li
 	case tokens.InlineValue:
@@ -74,7 +74,7 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 	case tokens.ExpressionVariable:
 		expr, err := e.evaluateExpression(n)
 		if err != nil {
-			return "", nil, errs.WithDebug(err, n.Debug)
+			return "", nil, Error(err, n.Debug)
 		}
 		obj = expr
 	case tokens.ReferenceVariable:
@@ -86,13 +86,13 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 
 		ref, err := e.GetVariable(refName)
 		if err != nil {
-			return "", nil, errs.WithDebug(err, n.Debug)
+			return "", nil, Error(err, n.Debug)
 		}
 		obj = ref
 	case tokens.BoolVariable:
 		b, ok := n.Value.(bool)
 		if !ok {
-			return "", nil, errs.WithDebug(fmt.Errorf("%w: value is not boolean", errs.ValueError), n.Debug)
+			return "", nil, Error(ErrInvalidValue, n.Debug, valueIsNotErr("bool"))
 		}
 		obj = lang.NewBool(name, b, n.Debug)
 	case tokens.NilVariable:
@@ -110,7 +110,7 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 		}
 
 		if name != "fn" {
-			return "", nil, errs.WithDebug(fmt.Errorf("inline functions should not have names, have: %s", name), n.Debug)
+			return "", nil, Error(ErrNamedInlineFunction, n.Debug)
 		}
 
 		obj = lang.NewFn("<inlineFn>", n.Debug, fn)
@@ -123,7 +123,7 @@ func (e *Executer) createObjectFromNode(n *models.Node) (string, lang.Object, er
 	}
 
 	if obj == nil {
-		return "", nil, errs.WithDebug(fmt.Errorf("%w: invalid object", errs.ValueError), n.Debug)
+		return "", nil, Error(ErrInvalidObject, n.Debug)
 	}
 
 	zap.L().Debug("object created", zap.String("name", name), zap.String("type", obj.Type().String()))
@@ -200,17 +200,17 @@ func (e *Executer) getObjectValueByNodes(obj lang.Object, nodes []*models.Node) 
 
 	for _, node := range nodes {
 		if node.Type != tokens.FuncCall && node.Type != tokens.Identifier {
-			return nil, errs.WithDebug(fmt.Errorf("%w: cannot access object with type '%s'", errs.ValueError, obj.Type()), node.Debug)
+			return nil, Error(ErrInvalidObjectAccess, node.Debug, obj.Type())
 		}
 
 		if node.Type == tokens.FuncCall {
 			m := obj.Method(node.Content)
 			if m == nil {
-				return nil, errs.WithDebug(fmt.Errorf("%w: method '%s()' not found", errs.RuntimeError, node.Content), node.Debug)
+				return nil, Error(ErrInvalidObjectAccess, node.Debug, fnErr(node.Content))
 			}
 
 			if len(node.Args) != len(m.Args()) {
-				return nil, errs.WithDebug(fmt.Errorf("%w: '%s' expects %d arguments, got %d", errs.InvalidArguments, node.Content, len(m.Args()), len(node.Args)), node.Debug)
+				return nil, Error(ErrInvalidArguments, node.Debug, expectedErr(len(m.Args()), node.Args))
 			}
 
 			args := make([]lang.Object, len(node.Args))
@@ -233,7 +233,7 @@ func (e *Executer) getObjectValueByNodes(obj lang.Object, nodes []*models.Node) 
 		if node.Type == tokens.Identifier {
 			m := obj.Variable(node.Content)
 			if m == nil {
-				return nil, errs.WithDebug(fmt.Errorf("%w: variable '%s' not found", errs.RuntimeError, node.Content), node.Debug)
+				return nil, Error(ErrInvalidObjectAccess, node.Debug, node.Content)
 			}
 
 			obj = m

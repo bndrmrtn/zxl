@@ -2,7 +2,6 @@ package runtimev2
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/internal/models"
@@ -14,12 +13,12 @@ import (
 func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 	switch node.Type {
 	default:
-		return nil, errs.WithDebug(fmt.Errorf("unhandled node type: %s", node.Type), node.Debug)
+		return nil, Error(ErrUnhandledNodeType, node.Debug, node.Type)
 	case tokens.Use:
 		using := node.Content
 		as := node.Value.(string)
 		if _, ok := e.usedNamespaces[as]; ok {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s' as '%s'", errs.CannotReUseNamespace, using, as), node.Debug)
+			return nil, Error(ErrNamespaceInUse, node.Debug, nsErr(using, as))
 		}
 		e.usedNamespaces[as] = using
 	case tokens.Function:
@@ -28,7 +27,7 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 			return nil, err
 		}
 		if _, ok := e.functions[name]; ok {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s(...)'", errs.CannotRedecareFunction, name), node.Debug)
+			return nil, Error(ErrFunctionRedeclared, node.Debug, fnErr(name))
 		}
 
 		e.mu.Lock()
@@ -40,7 +39,7 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 			return nil, err
 		}
 		if _, ok := e.objects[name]; ok {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotRedeclareVariable, name), node.Debug)
+			return nil, Error(ErrVariableNotDeclared, node.Debug, name)
 		}
 		e.mu.Lock()
 		e.objects[name] = object
@@ -62,7 +61,7 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 		}
 
 		if v.Type() != lang.TInt {
-			return nil, errs.WithDebug(fmt.Errorf("%w: cannot increment type: '%s'", errs.RuntimeError, v.Type()), node.Debug)
+			return nil, Error(ErrInvalidIncrementTarget, node.Debug, v.Type())
 		}
 
 		add := 1
@@ -77,7 +76,7 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 			return nil, err
 		}
 		if _, ok := e.objects[name]; ok {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotRedeclareVariable, name), node.Debug)
+			return nil, Error(ErrVariableRedeclared, node.Debug, name)
 		}
 		e.mu.Lock()
 		e.objects[name] = object
@@ -94,7 +93,7 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 		return e.handleSpin(node)
 	case tokens.Error:
 		if len(node.Children) == 0 {
-			return nil, errs.WithDebug(fmt.Errorf("%w: error keyword must have one or more children", errs.RuntimeError), node.Debug)
+			return nil, Error(ErrEmptyErrorBlock, node.Debug)
 		}
 
 		_, err := e.Execute(node.Children)

@@ -1,8 +1,6 @@
 package runtimev2
 
 import (
-	"fmt"
-
 	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/lang"
@@ -37,12 +35,12 @@ func (e *Executer) callFunctionFromNode(n *models.Node) (lang.Object, error) {
 	if !isVariadic {
 		// argument number should match
 		if expectedArgs != givenArgs {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s' expects %d arguments, got %d", errs.InvalidArguments, name, expectedArgs, givenArgs), n.Debug)
+			return nil, Error(ErrInvalidArguments, n.Debug, joinCustom(fnErr(name), expectedErr(expectedArgs, givenArgs)))
 		}
 	} else {
 		// if the arguments are less than expected return error
 		if expectedArgs > givenArgs {
-			return nil, errs.WithDebug(fmt.Errorf("%w: '%s' expects %d arguments, got %d", errs.InvalidArguments, name, expectedArgs, givenArgs), n.Debug)
+			return nil, Error(ErrInvalidArguments, n.Debug, joinCustom(fnErr(name), expectedErr(expectedArgs, givenArgs)))
 		}
 	}
 

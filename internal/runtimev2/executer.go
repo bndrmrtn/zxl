@@ -2,7 +2,6 @@ package runtimev2
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -10,7 +9,6 @@ import (
 
 	"github.com/bndrmrtn/zxl/internal/ast"
 	"github.com/bndrmrtn/zxl/internal/cache"
-	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/internal/lexer"
 	"github.com/bndrmrtn/zxl/internal/models"
 	"github.com/bndrmrtn/zxl/lang"
@@ -96,7 +94,7 @@ func (e *Executer) AssignVariable(name string, object lang.Object) error {
 			if e.parent != nil && e.parent.scope == ExecuterScopeDefinition {
 				return e.parent.AssignVariable(strings.Join(append(middle, last), "."), object)
 			}
-			return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.ThisNotInMethod, name), nil)
+			return Error(ErrThisOutsideMethod, nil, name)
 		}
 
 		variable := strings.Join(append([]string{first}, middle...), ".")
@@ -115,15 +113,15 @@ func (e *Executer) AssignVariable(name string, object lang.Object) error {
 		if e.parent != nil && e.scope == ExecuterScopeBlock {
 			return e.parent.AssignVariable(name, object)
 		}
-		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.VariableNotDeclared, name), nil)
+		return Error(ErrVariableNotDeclared, nil, name)
 	}
 
 	if !obj.IsMutable() {
-		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotReassignConstant, name), nil)
+		return Error(ErrConstantReassignment, nil, name)
 	}
 
 	if obj.Type() == lang.TDefinition {
-		return errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotReassignDefinition, name), nil)
+		return Error(ErrDefinitionReassignment, nil, name)
 	}
 
 	e.mu.Lock()
@@ -171,17 +169,17 @@ func (e *Executer) Copy() lang.Executer {
 func (e *Executer) GetNamespaceExecuter(namespace string) (*Executer, error) {
 	nses := e.getUsedNamespaces()
 	if nses == nil {
-		return nil, errs.WithDebug(errs.CannotAccessNamespace, nil)
+		return nil, Error(ErrNamespaceNotFound, nil, namespace)
 	}
 
 	ns, ok := nses[namespace]
 	if !ok {
-		return nil, errs.WithDebug(fmt.Errorf("%w: '%s'", errs.CannotAccessNamespace, namespace), nil)
+		return nil, Error(ErrNamespaceNotFound, nil, namespace)
 	}
 
 	exec, err := e.runtime.GetNamespaceExecuter(ns)
 	if err != nil {
-		return nil, errs.WithDebug(fmt.Errorf("%w: %w", errs.CannotAccessNamespace, err), nil)
+		return nil, Error(ErrNamespaceNotFound, nil, namespace)
 	}
 
 	return exec, nil

@@ -3,6 +3,7 @@ package errs
 import (
 	"errors"
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 
@@ -33,12 +34,19 @@ type DebugError struct {
 
 // Error returns the error message with debug information
 func (de DebugError) Error() string {
+	return de.PrettyError(func(r io.Reader) string {
+		b, _ := io.ReadAll(r)
+		return string(b)
+	})
+}
+
+func (de DebugError) PrettyError(pf func(r io.Reader) string) string {
 	if de.debug == nil {
 		return de.err.Error()
 	}
 
 	redBold := color.New(color.FgRed, color.Bold).SprintFunc()
-	near := de.getNear()
+	near := de.getNear(pf)
 
 	return fmt.Sprintf("%s\n%s\nat %s:%d:%d\n%s", color.New(color.FgBlue, color.Bold).Sprint("Zx - ", version.Version), redBold(de.err.Error()), de.debug.File, de.debug.Line, de.debug.Column, near)
 }
@@ -47,29 +55,27 @@ func (de DebugError) GetParentError() error {
 	return de.err
 }
 
-func (de DebugError) getNear() string {
+func (de DebugError) getNear(pf func(r io.Reader) string) string {
 	if de.debug == nil {
 		return ""
 	}
 
 	var near string
 
-	parts := strings.Split(de.debug.Near, "\n")
+	parts := strings.Split(pf(strings.NewReader(de.debug.Near)), "\n")
 	maxLineNumLen := len(strconv.Itoa(de.debug.Line + len(parts) - 1))
 
 	for i, part := range parts {
 		lineNum := de.debug.Line + i
 		lineNumStr := strconv.Itoa(lineNum)
 		lineNumStr = strings.Repeat(" ", maxLineNumLen-len(lineNumStr)) + lineNumStr
-		near += fmt.Sprintf("%s | %s", color.New(color.FgHiBlack).Sprint(lineNumStr), part)
+		near += fmt.Sprintf("%s %s", color.New(color.FgHiBlack).Sprint(lineNumStr+" |"), part)
 		if i < len(parts)-1 {
 			near += "\n"
 		}
 	}
 
-	near = fmt.Sprintf("near:\n%s", color.New(color.FgHiBlack).Sprint(near))
-
-	return near
+	return fmt.Sprintf("near:\n%s", near)
 }
 
 // HttpError returns the error message with debug information for HTTP

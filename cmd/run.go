@@ -1,9 +1,14 @@
 package cmd
 
 import (
+	"bytes"
+	"errors"
+	"io"
 	"os"
 
+	"github.com/bndrmrtn/zxl/internal/errs"
 	"github.com/bndrmrtn/zxl/pkg/language"
+	"github.com/bndrmrtn/zxl/pkg/prettycode"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -71,6 +76,24 @@ func execRun(cmd *cobra.Command, args []string) {
 	interpreter := language.NewInterpreter(mode, caching)
 
 	if _, err = interpreter.Interpret(args[0], file); err != nil {
+		var de errs.DebugError
+
+		if errors.As(err, &de) {
+			s := de.PrettyError(func(r io.Reader) string {
+				b, _ := io.ReadAll(r)
+
+				pc, err := prettycode.New(bytes.NewReader(b))
+				if err != nil {
+					return string(b)
+				}
+
+				return pc.HighlightConsole()
+			})
+
+			cmd.PrintErrln(errors.New(s))
+			return
+		}
+
 		cmd.PrintErrln(err)
 		return
 	}
