@@ -25,6 +25,7 @@ func (ir *Interpreter) writeDebug(file, suffix string, v any) {
 	_ = os.MkdirAll("debug/", os.ModePerm)
 
 	file = strings.ReplaceAll(file, "/", ".")
+	file = strings.ReplaceAll(file, "\\", ".")
 	file = strings.Trim(file, ".")
 	file = file + "." + suffix + ".yaml"
 
