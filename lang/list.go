@@ -105,11 +105,29 @@ func (l *List) Method(name string) Method {
 
 			return NewList(l.name, filtered, l.debug), nil
 		}).WithTypeSafeArgs(TypeSafeArg{"filterFunc", TFnRef})
+	case "insert":
+		return NewFunction(func(args []Object) (Object, error) {
+			if args[0].Type() != TInt {
+				return nil, fmt.Errorf("index must be an integer")
+			}
+
+			index := args[0].Value().(int)
+			item := args[1].Copy()
+
+			if index < 0 || index > l.length {
+				return nil, fmt.Errorf("index out of range")
+			}
+
+			l.value = append(l.value[:index], append([]Object{item}, l.value[index:]...)...)
+			l.length++
+
+			return nil, nil
+		}).WithArgs([]string{"index", "item"}).WithDebug(l.debug)
 	}
 }
 
 func (l *List) Methods() []string {
-	return []string{"append", "contains", "filter"}
+	return []string{"append", "contains", "filter", "insert"}
 }
 
 func (l *List) Variable(variable string) Object {
