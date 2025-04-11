@@ -25,6 +25,7 @@ const (
 	TArray      ObjType = "<Object:array>"
 	TFnRef      ObjType = "<Object:function>"
 	TAddr       ObjType = "<Object:address>"
+	TAny        ObjType = "<Object:any>"
 )
 
 func (o ObjType) String() string {

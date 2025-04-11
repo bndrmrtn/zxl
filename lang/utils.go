@@ -4,7 +4,9 @@ import "fmt"
 
 func FromValue(data any) (Object, error) {
 	switch value := data.(type) {
-	case map[string]interface{}:
+	case Object:
+		return value, nil
+	case map[string]any:
 		var obj = NewArray("object", nil, nil, nil)
 		for key, val := range value {
 			value, err := FromValue(val)
@@ -21,7 +23,7 @@ func FromValue(data any) (Object, error) {
 			}
 		}
 		return obj, nil
-	case []interface{}:
+	case []any:
 		var li = make([]Object, len(value))
 		for i, val := range value {
 			value, err := FromValue(val)
@@ -52,7 +54,7 @@ func FromValue(data any) (Object, error) {
 		return NewBool("bool", value, nil), nil
 	case nil:
 		return NewNil("nil", nil), nil
-	case interface{}:
+	case any:
 		return FromValue(value)
 	}
 	return nil, fmt.Errorf("unsupported type %T", data)
