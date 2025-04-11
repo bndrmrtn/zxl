@@ -91,8 +91,9 @@ func (e *Executer) AssignVariable(name string, object lang.Object) error {
 		last := names[len(names)-1]
 
 		if first == "this" {
-			if e.parent != nil && e.parent.scope == ExecuterScopeDefinition {
-				return e.parent.AssignVariable(strings.Join(append(middle, last), "."), object)
+			def := e.isInsideDefinitionMethod(e)
+			if def != nil {
+				return def.AssignVariable(strings.Join(append(middle, last), "."), object)
 			}
 			return Error(ErrThisOutsideMethod, nil, name)
 		}

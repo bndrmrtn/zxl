@@ -49,7 +49,7 @@ func (s *Server) handleError(err error, w http.ResponseWriter, r *http.Request) 
 }
 
 func (s *Server) handleCustomErrorHandler(serverErr error, code int, w http.ResponseWriter, r *http.Request) bool {
-	path := filepath.Join(s.root, "error.zx")
+	path := filepath.Join(s.root, "err.zx")
 
 	// Execute the cached nodes if they exist
 	if s.useCaching {
@@ -103,12 +103,12 @@ func (s *Server) executeErrorHandler(nodes []*models.Node, serverErr error, code
 		return false
 	}
 
-	ex, err := run.GetNamespaceExecuter("error")
+	ex, err := run.GetNamespaceExecuter("err")
 	if err != nil {
 		return false
 	}
 
-	handler, err := ex.GetMethod("error")
+	handler, err := ex.GetMethod("handle")
 	if err != nil {
 		return false
 	}

@@ -235,3 +235,17 @@ func (e *Executer) isInsideDefinition(ex *Executer) *Executer {
 	}
 	return nil
 }
+
+func (e *Executer) isInsideDefinitionMethod(ex *Executer) *Executer {
+	var isInsideMethod bool
+
+	for ex.parent != nil {
+		ex = ex.parent
+		if ex.scope == ExecuterScopeFunction {
+			isInsideMethod = true
+		} else if isInsideMethod && ex.scope == ExecuterScopeDefinition {
+			return ex
+		}
+	}
+	return nil
+}
