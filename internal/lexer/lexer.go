@@ -36,7 +36,9 @@ func (lx *Lexer) Parse(r io.Reader) ([]*models.Token, error) {
 func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 	// Fix Carriage Return error on Windows PCs
 	s = strings.ReplaceAll(s, "\r", "")
+
 	var (
+		runes   = []rune(s)
 		pos     int
 		line    int = 1
 		col     int = 1
@@ -44,8 +46,8 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 		parsed  []*models.Token
 	)
 
-	for pos < len(s) {
-		switch s[pos] {
+	for pos < len(runes) {
+		switch runes[pos] {
 		// Handle new lines
 		case '\n':
 			// Add the new line token for debugging purposes
@@ -63,14 +65,14 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 			col = 1
 		// Handle single line comments
 		case '/':
-			if pos+1 < len(s) && s[pos+1] == '/' {
+			if pos+1 < len(s) && runes[pos+1] == '/' {
 				// Skip the entire comment line
 				pos += 2
 
 				var sb strings.Builder
 				sb.WriteString("//")
 
-				for pos < len(s) && s[pos] != '\n' {
+				for pos < len(s) && runes[pos] != '\n' {
 					sb.WriteByte(s[pos])
 					pos++
 				}
@@ -91,14 +93,14 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				// New line reached
 				line++
 				col = 1
-			} else if pos+1 < len(s) && s[pos+1] == '*' {
+			} else if pos+1 < len(s) && runes[pos+1] == '*' {
 				pos += 2
 
 				var sb strings.Builder
 				sb.WriteString("/*")
 
 				for pos < len(s) {
-					if s[pos] == '*' && pos+1 < len(s) && s[pos+1] == '/' {
+					if runes[pos] == '*' && pos+1 < len(s) && runes[pos+1] == '/' {
 						pos += 2
 
 						// Add the multi line comment token for debugging purposes
@@ -115,7 +117,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						})
 						sb.Reset()
 						break
-					} else if s[pos] == '\n' {
+					} else if runes[pos] == '\n' {
 						sb.WriteByte('\n')
 						line++
 						col = 1
@@ -140,14 +142,14 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 		// Handle strings
 		case '"', '\'', '`':
 			// Skip the opening quote
-			quote := s[pos] // Store the opening quote character
+			quote := runes[pos] // Store the opening quote character
 			pos++
 
 			var value string
 			start := pos // Start of the string content
 
 			for pos < len(s) {
-				if s[pos] == '\\' {
+				if runes[pos] == '\\' {
 					// Escape sequence detected
 					if pos+1 < len(s) {
 						pos += 2
@@ -160,10 +162,10 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 							Near:   lx.near(s, pos, fileLen),
 						})
 					}
-				} else if s[pos] == quote {
+				} else if runes[pos] == quote {
 					// Closing quote found
-					value = s[start:pos] // Extract the string content
-					pos++                // Skip the closing quote
+					value = string(runes[start:pos]) // Extract the string content
+					pos++                            // Skip the closing quote
 					break
 				} else {
 					pos++
@@ -214,7 +216,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 			})
 			col++
 		case ';', ':', ',', '.', '(', ')', '{', '}', '[', ']':
-			ch := s[pos]
+			ch := runes[pos]
 			parsed = append(parsed, &models.Token{
 				Type:  lx.getCharIdent(ch),
 				Value: string(ch),
@@ -227,7 +229,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 			})
 			col++
 		case '=':
-			if pos+1 < len(s) && s[pos+1] == '=' {
+			if pos+1 < len(s) && runes[pos+1] == '=' {
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.Equation,
 					Value: "==",
@@ -239,7 +241,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					},
 				})
 				pos++
-			} else if pos+1 < len(s) && s[pos+1] == '>' {
+			} else if pos+1 < len(s) && runes[pos+1] == '>' {
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.Arrow,
 					Value: "=>",
@@ -264,7 +266,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				})
 			}
 		case '!':
-			if pos+1 < len(s) && s[pos+1] == '=' {
+			if pos+1 < len(s) && runes[pos+1] == '=' {
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.NotEquation,
 					Value: "!=",
@@ -290,7 +292,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				})
 			}
 		case '&':
-			if pos+1 < len(s) && s[pos+1] == '&' {
+			if pos+1 < len(s) && runes[pos+1] == '&' {
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.And,
 					Value: "&&",
@@ -317,7 +319,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				col++
 			}
 		case '|':
-			if pos+1 < len(s) && s[pos+1] == '|' {
+			if pos+1 < len(s) && runes[pos+1] == '|' {
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.Or,
 					Value: "||",
@@ -344,7 +346,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				col++
 			}
 		case '+':
-			if pos+1 < len(s) && s[pos+1] == '+' {
+			if pos+1 < len(s) && runes[pos+1] == '+' {
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.Increment,
 					Value: "++",
@@ -370,7 +372,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 			}
 			col++
 		case '-':
-			if pos+1 < len(s) && s[pos+1] == '-' {
+			if pos+1 < len(s) && runes[pos+1] == '-' {
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.Decrement,
 					Value: "--",
@@ -396,7 +398,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 			}
 			col++
 		case '*':
-			if pos+1 < len(s) && s[pos+1] == '*' {
+			if pos+1 < len(s) && runes[pos+1] == '*' {
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.Power,
 					Value: "**",
@@ -421,16 +423,16 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				})
 			}
 		case '<':
-			if pos+1 < len(s) && s[pos+1] == '>' {
+			if pos+1 < len(s) && runes[pos+1] == '>' {
 				var str strings.Builder
 				pos += 2
 				str.WriteString("<>")
-				for pos < len(s)-2 && !(s[pos] == '<' && (s[pos+1] == '/' && s[pos+2] == '>')) {
+				for pos < len(s)-2 && !(runes[pos] == '<' && (runes[pos+1] == '/' && runes[pos+2] == '>')) {
 					str.WriteByte(s[pos])
 					pos++
 					col++
 
-					if s[pos] == '\n' {
+					if runes[pos] == '\n' {
 						line++
 						col = 0
 					}
@@ -448,7 +450,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 						Near:   lx.near(s, pos, fileLen),
 					},
 				})
-			} else if pos+1 < len(s) && s[pos+1] == '=' {
+			} else if pos+1 < len(s) && runes[pos+1] == '=' {
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.LessOrEqual,
 					Value: "<=",
@@ -473,7 +475,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 				})
 			}
 		case '>':
-			if pos+1 < len(s) && s[pos+1] == '=' {
+			if pos+1 < len(s) && runes[pos+1] == '=' {
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.GreaterOrEqual,
 					Value: ">=",
@@ -499,12 +501,12 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 			}
 		default:
 			start := pos
-			if isLetter(s[pos]) {
+			if isLetter(runes[pos]) {
 				// Identifier parsing
-				for pos < len(s) && (isLetter(s[pos]) || isDigit(s[pos])) {
+				for pos < len(runes) && (isLetter(runes[pos]) || isDigit(runes[pos])) {
 					pos++
 				}
-				value := s[start:pos]
+				value := string(runes[start:pos])
 				// Appending the identifier
 				parsed = append(parsed, &models.Token{
 					Type:  lx.getIdentType(value),
@@ -517,11 +519,11 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					},
 				})
 				pos--
-			} else if isDigit(s[pos]) || (s[pos] == '.' && pos+1 < len(s) && isDigit(s[pos+1])) {
+			} else if isDigit(runes[pos]) || (s[pos] == '.' && pos+1 < len(s) && isDigit(runes[pos+1])) {
 				// Number parsing (integer or float)
 				isFloat := false
-				for pos < len(s) && (isDigit(s[pos]) || s[pos] == '.') {
-					if s[pos] == '.' {
+				for pos < len(s) && (isDigit(runes[pos]) || runes[pos] == '.') {
+					if runes[pos] == '.' {
 						if isFloat {
 							// Second dot found, invalid number
 							return nil, errs.WithDebug(fmt.Errorf("%w invalid number format", errs.SyntaxError), &models.Debug{
@@ -535,7 +537,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 					}
 					pos++
 				}
-				value := s[start:pos]
+				value := string(runes[start:pos])
 				// Appending the number
 				parsed = append(parsed, &models.Token{
 					Type:  tokens.Number,
@@ -571,7 +573,7 @@ func (lx *Lexer) parse(s string) ([]*models.Token, error) {
 	return parsed, nil
 }
 
-func (lx *Lexer) getCharIdent(ch byte) tokens.TokenType {
+func (lx *Lexer) getCharIdent(ch rune) tokens.TokenType {
 	switch ch {
 	case '*':
 		return tokens.Multiplication
