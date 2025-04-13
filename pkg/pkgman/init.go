@@ -33,7 +33,7 @@ func NewInitializer(root string) (*PackageManager, error) {
 	pm.PackageType = typ
 
 	if typ != TypeModule {
-		var entry = "main.zx"
+		var entry = "main.fl"
 		if typ == TypeWeb {
 			entry = "public/"
 		}
@@ -85,7 +85,7 @@ func getPackageType() (Type, error) {
 	return items[i], nil
 }
 
-func getEntryPoint(def string, mustZx bool) (string, error) {
+func getEntryPoint(def string, mustFlare bool) (string, error) {
 	prompt := promptui.Prompt{
 		Label:   "Entry Point",
 		Default: def,
@@ -93,8 +93,8 @@ func getEntryPoint(def string, mustZx bool) (string, error) {
 			if len(s) == 0 {
 				return errors.New("entry point cannot be empty")
 			}
-			if mustZx && !strings.HasSuffix(s, ".zx") {
-				return errors.New("entry point must end with .zx")
+			if mustFlare && !strings.HasSuffix(s, ".fl") {
+				return errors.New("entry point must end with .fl")
 			}
 			return nil
 		},

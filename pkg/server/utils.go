@@ -7,17 +7,17 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/lexer"
-	"github.com/bndrmrtn/zxl/pkg/prettycode"
+	"github.com/bndrmrtn/flare/internal/errs"
+	"github.com/bndrmrtn/flare/internal/lexer"
+	"github.com/bndrmrtn/flare/pkg/prettycode"
 )
 
 // getExecutablePath gets the executable path
 func (s *Server) getExecutablePath(path string) (string, error) {
-	if filepath.Ext(path) != ".zx" {
-		stat, err := os.Stat(path + ".zx")
+	if filepath.Ext(path) != ".fl" {
+		stat, err := os.Stat(path + ".fl")
 		if err == nil && !stat.IsDir() {
-			return path + ".zx", nil
+			return path + ".fl", nil
 		}
 	}
 
@@ -26,7 +26,7 @@ func (s *Server) getExecutablePath(path string) (string, error) {
 		return path, nil
 	}
 
-	path = filepath.Join(path, "index.zx")
+	path = filepath.Join(path, "index.fl")
 	stat, err = os.Stat(path)
 	if err == nil && !stat.IsDir() {
 		return path, nil

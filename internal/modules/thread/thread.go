@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 type Thread struct {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 // TimeNamespace implements a namespace for time operations
@@ -44,7 +44,7 @@ func fnFrom(args []lang.Object) (lang.Object, error) {
 	format := args[0]
 	value := args[1]
 
-	goFormat, err := ZxTimeFormatToGo(format.Value().(string))
+	goFormat, err := FlareTimeFormatToGo(format.Value().(string))
 	if err != nil {
 		return nil, err
 	}

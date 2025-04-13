@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 // Time wraps the Go time.Time type
@@ -131,7 +131,7 @@ func (t *Time) fnFormat(args []lang.Object) (lang.Object, error) {
 		return nil, fmt.Errorf("format argument must be a string")
 	}
 
-	goFormat, err := ZxTimeFormatToGo(format.Value().(string))
+	goFormat, err := FlareTimeFormatToGo(format.Value().(string))
 	if err != nil {
 		return nil, err
 	}

@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"embed"
 
-	"github.com/bndrmrtn/zxl/internal/ast"
-	"github.com/bndrmrtn/zxl/internal/lexer"
-	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/flare/internal/ast"
+	"github.com/bndrmrtn/flare/internal/lexer"
+	"github.com/bndrmrtn/flare/internal/models"
 )
 
-//go:embed data/*.zx
+//go:embed data/*.fl
 var sourceFiles embed.FS
 
 func Get() (map[string][]*models.Node, error) {

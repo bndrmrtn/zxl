@@ -2,7 +2,7 @@
 
 use thread;
 
-// Zx allows us to create a custom spawner for threads.
+// Flare allows us to create a custom spawner for threads.
 // This is useful if we want to control how many threads are created.
 
 const spawner = thread.spawner(4); // create a spawner with a maximum of 4 async threads

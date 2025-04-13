@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bndrmrtn/zxl/internal/version"
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/internal/version"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 type Runtime struct{}

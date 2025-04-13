@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/flare/internal/models"
 )
 
 // CacheDirectory is the directory where cache files are stored
-const CacheDirectory = ".zxcache"
+const CacheDirectory = ".flcache"
 
 // Cache is the cache information
 type Cache struct {

@@ -1,4 +1,4 @@
-// This is a simple example of using namespaces in zx.
+// This is a simple example of using namespaces in flare.
 namespace otherstuff;
 
 // This is a simple function that takes a name as an argument and returns a greeting message.

@@ -2,8 +2,8 @@ package ztime
 
 import "strings"
 
-// ZxTimeFormatToGo converts a ZxTime format string to a Go format string.
-func ZxTimeFormatToGo(format string) (string, error) {
+// FlareTimeFormatToGo converts a FlareTime format string to a Go format string.
+func FlareTimeFormatToGo(format string) (string, error) {
 	mapping := map[string]string{
 		// Year
 		"Y": "2006", // 4 digit year (e.g., 2006)

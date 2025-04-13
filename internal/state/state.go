@@ -3,7 +3,7 @@ package state
 import (
 	"sync"
 
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 // State represents a stateful object that can be used to store and retrieve data
@@ -38,7 +38,7 @@ func (s *DefaultState) Get(key string) (lang.Object, bool) {
 func (s *DefaultState) Set(key string, value lang.Object) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	
+
 	s.m[key] = value
 	return true
 }

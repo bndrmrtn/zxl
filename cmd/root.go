@@ -3,14 +3,14 @@ package cmd
 import (
 	"log"
 
-	"github.com/bndrmrtn/zxl/internal/version"
+	"github.com/bndrmrtn/flare/internal/version"
 	"github.com/spf13/cobra"
 )
 
 // rootCmd is the root command for the CLI
 var rootCmd = &cobra.Command{
-	Use:     "zxl",
-	Short:   "ZxLang ✨ A small programming language for template rendering.",
+	Use:     "flare",
+	Short:   "Flare ✨ A small programming language for template rendering.",
 	Version: version.Version,
 }
 

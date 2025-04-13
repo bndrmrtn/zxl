@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/internal/state"
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/internal/state"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 type ImportFunc func(file string, d *models.Debug) (lang.Object, error)

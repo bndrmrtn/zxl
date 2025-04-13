@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 type Request struct {

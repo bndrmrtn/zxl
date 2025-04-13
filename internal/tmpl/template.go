@@ -4,10 +4,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bndrmrtn/zxl/internal/ast"
-	"github.com/bndrmrtn/zxl/internal/lexer"
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/internal/tokens"
+	"github.com/bndrmrtn/flare/internal/ast"
+	"github.com/bndrmrtn/flare/internal/lexer"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/internal/tokens"
 )
 
 // Part represents a part of a template.

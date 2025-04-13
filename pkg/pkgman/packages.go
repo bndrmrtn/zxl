@@ -2,6 +2,7 @@ package pkgman
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
-const PackageDirectory = ".zxpack"
+const PackageDirectory = ".flmod"
 
 // installPackage installs a package from a given URL and version.
 func (pm *PackageManager) installPackage(pkg *Package) error {
@@ -49,6 +50,20 @@ func (pm *PackageManager) installPackage(pkg *Package) error {
 		ref = head.Name()
 	} else {
 		ref = plumbing.NewTagReferenceName(pkg.Version)
+		if _, err := repo.Reference(ref, true); err != nil {
+			// Try as short commit hash
+			h, err := repo.ResolveRevision(plumbing.Revision(pkg.Version))
+			if err != nil {
+				return err
+			}
+			w, err := repo.Worktree()
+			if err != nil {
+				return err
+			}
+			return w.Checkout(&git.CheckoutOptions{
+				Hash: *h,
+			})
+		}
 	}
 
 	// Checkout to the specified version
@@ -103,7 +118,9 @@ func (pm *PackageManager) isOtherPackageUsing(pkg *Package) bool {
 
 // deletePackage removes an installed package from the package manager.
 func (pm *PackageManager) deletePackage(pkg *Package) error {
-	dest := filepath.Join(pm.root, PackageDirectory, pkg.Author, pkg.Package)
+	pkgDest := filepath.Join(pm.root, PackageDirectory)
+	authorDest := filepath.Join(pkgDest, pkg.Author)
+	dest := filepath.Join(authorDest, pkg.Package)
 
 	if _, err := os.Stat(dest); os.IsNotExist(err) {
 		return fmt.Errorf("package not found: %s", pkg.Package)
@@ -125,5 +142,32 @@ func (pm *PackageManager) deletePackage(pkg *Package) error {
 		return fmt.Errorf("failed to delete package: %s, error: %v", pkg.Package, err)
 	}
 
+	// Remove author folder if empty
+	empty, err := isDirEmpty(authorDest)
+	if err == nil && empty {
+		_ = os.Remove(authorDest)
+	}
+
+	// Remove main pkg directory if empty
+	empty, err = isDirEmpty(pkgDest)
+	if err == nil && empty {
+		_ = os.Remove(pkgDest)
+	}
+
 	return nil
+}
+
+func isDirEmpty(path string) (bool, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	_, err = f.Readdirnames(1)
+	if err == io.EOF {
+		return true, nil
+	}
+
+	return false, err
 }

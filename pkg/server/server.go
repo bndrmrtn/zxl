@@ -8,12 +8,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/internal/modules/servermodule"
-	"github.com/bndrmrtn/zxl/internal/runtimev2"
-	"github.com/bndrmrtn/zxl/internal/state"
-	"github.com/bndrmrtn/zxl/internal/version"
-	"github.com/bndrmrtn/zxl/pkg/language"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/internal/modules/servermodule"
+	"github.com/bndrmrtn/flare/internal/runtimev2"
+	"github.com/bndrmrtn/flare/internal/state"
+	"github.com/bndrmrtn/flare/internal/version"
+	"github.com/bndrmrtn/flare/pkg/language"
 	"github.com/fatih/color"
 )
 
@@ -66,7 +66,7 @@ func New(ir *language.Interpreter, root string, isDir bool, cache, colors bool) 
 func (s *Server) Serve(addr string) error {
 	blue := color.New(color.FgBlue, color.Bold)
 
-	fmt.Printf("%s\n", blue.Sprint("Zx Web - ", version.Version))
+	fmt.Printf("%s\n", blue.Sprint("Flare Web - ", version.Version))
 	color.New(color.FgYellow).Printf("Server listening on %s\n", addr)
 	color.New(color.FgRed).Printf("Press Ctrl+C to quit\n\n")
 
@@ -87,11 +87,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	// Set the version header
-	w.Header().Add("X-Zx-Version", version.Version)
+	w.Header().Add("X-Flare-Version", version.Version)
 
 	// Serve files if they exist
 	path := filepath.Join(s.root, r.URL.Path[1:])
-	if filepath.Ext(path) != ".zx" {
+	if filepath.Ext(path) != ".fl" {
 		if stat, err := os.Stat(path); err == nil && !stat.IsDir() {
 			http.ServeFile(w, r, path)
 			return

@@ -3,7 +3,7 @@ package runtimev2
 import (
 	"strings"
 
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 // GetMethod gets a method by name

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 var allowedDrivers = []string{"sqlite3", "mysql", "postgres"}

@@ -6,18 +6,18 @@ import (
 	"io"
 	"os"
 
-	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/pkg/language"
-	"github.com/bndrmrtn/zxl/pkg/prettycode"
+	"github.com/bndrmrtn/flare/internal/errs"
+	"github.com/bndrmrtn/flare/pkg/language"
+	"github.com/bndrmrtn/flare/pkg/prettycode"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
-	Use:     "run <file.zx>",
+	Use:     "run <file.fl>",
 	Aliases: []string{"r", "exec"},
-	Short:   "Interpret and execute Zx (.zx) files",
+	Short:   "Interpret and execute Flare (.fl) files",
 	Run:     execRun,
 }
 

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/internal/tokens"
+	"github.com/bndrmrtn/flare/internal/errs"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/internal/tokens"
 )
 
 // Builder is the AST builder

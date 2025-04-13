@@ -6,4 +6,4 @@ global.set('key', 'value');
 
 println(global.get('key'), state.$addr);
 
-import('other.zx');
+import('other.fl');

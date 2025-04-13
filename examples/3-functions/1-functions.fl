@@ -7,10 +7,10 @@
 fn add(a, b) {
     return a + b;
 }
-// Zx is a weakly typed language, so you don't need to specify the types of the arguments or the return value.
+// Flare is a weakly typed language, so you don't need to specify the types of the arguments or the return value.
 
-// Zx function arguments are always copied by value, so if you pass an object to a function,
-// the function will receive a copy of the object, not a reference to the original object. 
+// Flare function arguments are always copied by value, so if you pass an object to a function,
+// the function will receive a copy of the object, not a reference to the original object.
 // This means that if you modify the object inside the function, the original object will not be affected.
 
 let x = 10;

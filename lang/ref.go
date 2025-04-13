@@ -1,7 +1,7 @@
 package lang
 
 import (
-	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/flare/internal/models"
 )
 
 type Ref struct {

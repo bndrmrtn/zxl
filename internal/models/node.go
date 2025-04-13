@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zxl/internal/tokens"
+	"github.com/bndrmrtn/flare/internal/tokens"
 )
 
 // Node represents a node in the AST

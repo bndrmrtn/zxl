@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/internal/version"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/internal/version"
 	"github.com/fatih/color"
 )
 
@@ -48,7 +48,7 @@ func (de DebugError) PrettyError(pf func(r io.Reader) string) string {
 	redBold := color.New(color.FgRed, color.Bold).SprintFunc()
 	near := de.getNear(pf)
 
-	return fmt.Sprintf("%s\n%s\nat %s:%d:%d\n%s", color.New(color.FgBlue, color.Bold).Sprint("Zx - ", version.Version), redBold(de.err.Error()), de.debug.File, de.debug.Line, de.debug.Column, near)
+	return fmt.Sprintf("%s\n%s\nat %s:%d:%d\n%s", color.New(color.FgBlue, color.Bold).Sprint("Flare - ", version.Version), redBold(de.err.Error()), de.debug.File, de.debug.Line, de.debug.Column, near)
 }
 
 func (de DebugError) GetParentError() error {

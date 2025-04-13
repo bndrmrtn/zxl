@@ -3,16 +3,16 @@ package cmd
 import (
 	"os"
 
-	"github.com/bndrmrtn/zxl/pkg/prettycode"
+	"github.com/bndrmrtn/flare/pkg/prettycode"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
 // highlightCmd highlights code for a given file
 var highlightCmd = &cobra.Command{
-	Use:     "highlight <file.zx>",
+	Use:     "highlight <file.fl>",
 	Aliases: []string{"hl"},
-	Short:   "Highlight Zx (.zx) files",
+	Short:   "Highlight Flare (.fl) files",
 	Run:     execHighlight,
 }
 

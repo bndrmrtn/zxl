@@ -1,6 +1,6 @@
 // While
 
-// Zx comes with a simple way to control the flow of your program using the `while` statement.
+// Flare comes with a simple way to control the flow of your program using the `while` statement.
 // The `while` statement allows you to execute a block of code repeatedly as long as a certain condition is true.
 
 let x = 10;

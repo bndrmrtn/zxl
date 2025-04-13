@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/flare/internal/models"
 )
 
 // List represents a list object

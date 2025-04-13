@@ -3,7 +3,7 @@ package lang
 import (
 	"strings"
 
-	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/flare/internal/models"
 )
 
 type Array struct {

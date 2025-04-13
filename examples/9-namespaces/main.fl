@@ -1,5 +1,5 @@
-// Namespaces in Zx are useful for organizing code and avoiding name collisions.
-// By default, Zx uses an empty-string namespace, but you can define your own namespaces.
+// Namespaces in Flare are useful for organizing code and avoiding name collisions.
+// By default, Flare uses an empty-string namespace, but you can define your own namespaces.
 
 // Namespace MUST be defined at the top of the file, before any other code.
 // The namespace keyword is used to define a namespace. The syntax is as follows:
@@ -11,7 +11,7 @@ use otherstuff as utils;
 // but it will throw when the otherstuff namespace is tried to be used
 
 // import the other file where the namespace is defined
-import("otherstuff.zx"); // Import the otherstuff file.
+import("otherstuff.fl"); // Import the otherstuff file.
 // This will import the otherstuff namespace and make it available in this file.
 
 // Print the greeting message from the otherstuff namespace.

@@ -3,7 +3,7 @@
 // use rand module
 use rand;
 
-// Zx provides a simple way to control the flow of your program using the `if` statement.
+// Flare provides a simple way to control the flow of your program using the `if` statement.
 // The `if` statement allows you to execute a block of code only if a certain condition is true.
 
 if rand.bool() {

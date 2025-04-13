@@ -3,10 +3,10 @@ package builtin
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/internal/state"
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/internal/errs"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/internal/state"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 type State struct {
@@ -29,7 +29,7 @@ func (s *State) Type() lang.ObjType {
 }
 
 func (s *State) TypeString() string {
-	return "zx.stateClient"
+	return "flare.stateClient"
 }
 
 func (s *State) Value() any {
@@ -81,7 +81,7 @@ func (s *State) SetVariable(_ string, _ lang.Object) error {
 }
 
 func (s *State) String() string {
-	return fmt.Sprintf("<zx.stateClient %s>", s.name)
+	return fmt.Sprintf("<flare.stateClient %s>", s.name)
 }
 
 func (s *State) Copy() lang.Object {

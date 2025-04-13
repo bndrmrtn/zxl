@@ -10,5 +10,5 @@ type Package struct {
 	// Package is the name of the package
 	Package string `yaml:"-"`
 	// Version is the version of the package
-	Version string `yaml:"-"`
+	Version string `yaml:"version"`
 }

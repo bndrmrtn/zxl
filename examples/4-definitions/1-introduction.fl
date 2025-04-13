@@ -1,6 +1,6 @@
 // Definitions
 
-// Definitions in Zx are almost like classes in other languages.
+// Definitions in Flare are almost like classes in other languages.
 // They are mainly syntactic sugar for creating objects with properties and methods.
 
 define User {
@@ -36,12 +36,12 @@ define User {
 // creating a new object from the definition
 // does not require any complex syntax, just call the definition like a function
 const Diana = User("Diana", 25);
-               // Zx will automatically call the `construct` method with the arguments passed to the definition
+               // Flare will automatically call the `construct` method with the arguments passed to the definition
                // the `construct` method is not required, but it's a good practice to use it to initialize the properties
 
 println(Diana.greet()); // prints "Hello, my name is Diana and I am 25 years old."
 
-// Since Zx is a weakly typed language, we can modify it's properties at any time
+// Since Flare is a weakly typed language, we can modify it's properties at any time
 // but it's a good practice to keep the properties consistent with the type of the value
 // for example, we can set the age to a string, but it's not a good practice
 // Diana.age = "25"; // this will not throw an error, but it's not a good practice

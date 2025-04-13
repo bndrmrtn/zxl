@@ -1,7 +1,7 @@
-// Zx namespace
-// This file is part of the Zx programming language project.
-// It contains the version information for the Zx language runtime.
-namespace zx;
+// Flare namespace
+// This file is part of the Flare programming language project.
+// It contains the version information for the Flare language runtime.
+namespace flare;
 
 // Using the runtime module to access the language version
 use runtime;

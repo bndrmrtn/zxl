@@ -1,10 +1,10 @@
 // Variables
 
 // Variables are used to store data that can be changed during the execution of a program.
-// In Zx, variables are declared using the `let` keyword for mutable variables and `const` for immutable variables.
+// In Flare, variables are declared using the `let` keyword for mutable variables and `const` for immutable variables.
 // The syntax is similar to JavaScript, but with some differences.
 // A variable name should start with a letter, underscore or a dollar sign, followed by letters, digits, underscores or dollar signs.
-// Zx is a language where every statement or expression should be terminated with a semicolon.
+// Flare is a language where every statement or expression should be terminated with a semicolon.
 // The `println` (which means print line) function is used to print the value of a variable to the console.
 
 let x = "Hello,"; // string
@@ -17,7 +17,7 @@ let b = false; // boolean (bool)
 let c = nil; // nil (Nil) - It's a special value that represents the absence of a value
 let d = [1, 2, 3, 4, 5]; // list
 let e = { name: "Alice", age: 30 }; // array
-let f = array{ 
+let f = array{
     name: 'John',
     age: 30,
     hobbies: ['reading', 'gaming'],

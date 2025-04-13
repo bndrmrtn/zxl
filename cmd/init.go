@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/bndrmrtn/zxl/pkg/pkgman"
+	"github.com/bndrmrtn/flare/pkg/pkgman"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -9,7 +9,7 @@ import (
 // initCmd represents the init command
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Initializes a new Zx project",
+	Short: "Initializes a new Flare project",
 	Run:   execInit,
 }
 

@@ -7,11 +7,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/bndrmrtn/zxl/internal/ast"
-	"github.com/bndrmrtn/zxl/internal/cache"
-	"github.com/bndrmrtn/zxl/internal/lexer"
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/internal/ast"
+	"github.com/bndrmrtn/flare/internal/cache"
+	"github.com/bndrmrtn/flare/internal/lexer"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 // Executer represents a node executer in the runtime

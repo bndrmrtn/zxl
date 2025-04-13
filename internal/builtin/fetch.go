@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/internal/errs"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 type fetchConfig struct {
@@ -81,7 +81,7 @@ func fnFetch(args []lang.Object) (lang.Object, error) {
 
 func fnRealFetch(conf *fetchConfig) (lang.Object, error) {
 	req, err := http.NewRequest(conf.method, conf.url, conf.body)
-	req.Header.Set("User-Agent", "Zx-Http-Fetch/1.0")
+	req.Header.Set("User-Agent", "Flare-Http-Fetch/1.0")
 	if err != nil {
 		return nil, err
 	}

@@ -1,66 +1,64 @@
-# Zx (/ziː.ɛks/) Language
+# Flare ✨
 
-Zx is a simple programming language
-that is designed to be easy to use and understand.
-
-[Examples](https://github.com/orgs/zxlgo/repositories)
+Flare is a simple programming language
+that is designed to be easy to use and understand. [Examples](https://github.com/orgs/flarelang/repositories).
 
 ## About
 
-Zx is a weakly-typed, interpreted language that is designed to be easy to use and understand.
-Zx is built in Go as a learning project and is not intended to be used in production.
+Flare is a weakly-typed, interpreted language that is designed to be easy to use and understand.
+Flare is built in Go as a learning project and is not intended to be used in production.
 
 ## Features
 
 - Weakly-typed
 - Interpreted
-- Zx Blocks
+- Flare Blocks
 - Threads and Concurrency
 
 # Syntax Highlihting
 
-Zx now has a `VSCode` plugin for highlighting code (no LSP currently). [Download now](https://marketplace.visualstudio.com/items/?itemName=zxl.zx)
+Flare now has a `VSCode` plugin for highlighting code (no LSP currently). [Download now](https://marketplace.visualstudio.com/items/?itemName=flarelang.flarelang)
 
 ## Installation
 
-To install Zx, you need to have Go installed on your system.
+To install Flare, you need to have Go installed on your system.
 
 ```bash
-go install github.com/bndrmrtn/zxl@latest
+go install github.com/bndrmrtn/flare@latest
 ```
 
 ## Usage
 
-To run a Zx program, you can use the `zxl` command.
+To run a Flare program, you can use the `flare` command.
 
 ```bash
-zxl run <file>
+flare run <file>
 ```
 
 Flags can be used to cache or debug the program.
 
 ```bash
-zxl run <file> --cache --debug
+flare run <file> --cache --debug
 ```
 
 ## Examples
 
 #### Basic Hello World program:
 
-```zxl
+```flare
 println("Hello, World!");
 ```
 
 #### Define a variable and print it:
 
-```zxl
+```flare
 let x = 10;
 println(x);
 ```
 
 #### Define a function and call it:
 
-```zxl
+```flare
 fn add(a, b) {
   return a + b;
 }
@@ -71,14 +69,14 @@ println(result);
 
 ### Error handling:
 
-```zxl
+```flare
 error err: fail("This is a helper to throw an error");
 if err != nil {
   println("error occurred:", err);
 }
 ```
 
-```zxl
+```flare
 error otherErr {
   const x = 5;
   x = 6; // an error will happen
@@ -94,7 +92,7 @@ println(x); // x is in the same scope as global so it will print 5, because
 
 #### Define a block and use it:
 
-```zxl
+```flare
 define MyBlock {
   let x = 10;
 
@@ -109,26 +107,26 @@ println(block.x);
 
 ### Using namespaces:
 
-File `main.zx`:
-```zxl
+File `main.fl`:
+```flare
 namespace main;
 
-import("other.zx");
+import("other.fl");
 other.printHello();
 ```
 
-File `other.zx`:
-```zxl
+File `other.fl`:
+```flare
 namespace other;
 
 fn printHello() {
-  println("Hello from other.zx!");
+  println("Hello from other.fl!");
 }
 ```
 
 ### Loops
 
-```zxl
+```flare
 for i in range(10) {
   println(i);
 }
@@ -162,7 +160,7 @@ while i < 10 {
 
 ### Arrays
 
-```zxl
+```flare
 use iter;
 
 let myArr = array {
@@ -178,7 +176,7 @@ for row in iter.Array(myArr) {
 
 ### Concurrency
 
-```zxl
+```flare
 use thread;
 
 fn doLater() {
@@ -191,7 +189,7 @@ thread.sleep(1000); // Wait one second
 
 ### Usage of Portals
 
-```zxl
+```flare
 use thread;
 
 define User {

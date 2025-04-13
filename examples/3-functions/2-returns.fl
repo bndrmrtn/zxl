@@ -1,6 +1,6 @@
 // Function Returns
 
-// Zx functions can return values using the `return` keyword.
+// Flare functions can return values using the `return` keyword.
 // If a function does not have a return statement, it will return `nil` by default.
 
 fn nilFunc() {

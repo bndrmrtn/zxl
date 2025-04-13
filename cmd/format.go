@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/bndrmrtn/zxl/pkg/formatter"
+	"github.com/bndrmrtn/flare/pkg/formatter"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -12,7 +12,7 @@ import (
 var formatCmd = &cobra.Command{
 	Use:     "format <folder>",
 	Aliases: []string{"fmt"},
-	Short:   "Format Zx (.zx) files in a directory",
+	Short:   "Format Flare (.fl) files in a directory",
 	Run:     execFormat,
 }
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 type Spawner struct {

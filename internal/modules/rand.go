@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 type Rand struct {

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/bndrmrtn/zxl/pkg/pkgman"
+	"github.com/bndrmrtn/flare/pkg/pkgman"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -10,7 +10,7 @@ import (
 var removeCmd = &cobra.Command{
 	Use:     "remove <packageUrl>",
 	Aliases: []string{"uninstall", "u"},
-	Short:   "Uninstalls a Zx Package",
+	Short:   "Uninstalls a Flare Package",
 	Run:     execRemove,
 }
 
@@ -50,7 +50,7 @@ func execRemove(cmd *cobra.Command, args []string) {
 	}
 
 	if pm.PackageName == "" {
-		cmd.PrintErrln("Package name cannot be empty\nUse `zxl init <packageName>` to initialize your package")
+		cmd.PrintErrln("Package name cannot be empty\nUse `flare init <packageName>` to initialize your package")
 		return
 	}
 

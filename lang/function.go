@@ -3,7 +3,7 @@ package lang
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/flare/internal/models"
 )
 
 // Function represents a function method

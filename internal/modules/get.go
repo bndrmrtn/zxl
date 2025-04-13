@@ -1,11 +1,11 @@
 package modules
 
 import (
-	"github.com/bndrmrtn/zxl/internal/modules/sqlmodule"
-	"github.com/bndrmrtn/zxl/internal/modules/thread"
-	"github.com/bndrmrtn/zxl/internal/modules/zruntime"
-	"github.com/bndrmrtn/zxl/internal/modules/ztime"
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/internal/modules/sqlmodule"
+	"github.com/bndrmrtn/flare/internal/modules/thread"
+	"github.com/bndrmrtn/flare/internal/modules/zruntime"
+	"github.com/bndrmrtn/flare/internal/modules/ztime"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 // Get returns a list of all available modules.

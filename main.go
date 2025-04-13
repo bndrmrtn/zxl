@@ -1,7 +1,7 @@
-// ZxLang is a simple templating programming language
+// FlareLang is a simple templating programming language
 // that is designed to be easy to use and understand.
 //
-// Zx is built in Go and is designed to be a simple.
+// Flare is built in Go and is designed to be a simple.
 // Created by Martin Binder
 // Website: https://mrtn.vip
 package main
@@ -11,7 +11,7 @@ import (
 	"os"
 	"runtime/debug"
 
-	"github.com/bndrmrtn/zxl/cmd"
+	"github.com/bndrmrtn/flare/cmd"
 	"github.com/fatih/color"
 	"go.uber.org/zap"
 )
@@ -28,7 +28,7 @@ func initLogger() {
 	zap.ReplaceGlobals(logger)
 }
 
-// main is the entry point of the ZxLang program
+// main is the entry point of the FlareLang program
 func main() {
 	// Recover from a panic if the program is not in debug mode
 	if os.Getenv("DEBUG") != "true" {

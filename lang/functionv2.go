@@ -3,7 +3,7 @@ package lang
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/flare/internal/models"
 )
 
 type ExecFuncV2 func(args *ArgCtx) (any, error)

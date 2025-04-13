@@ -3,7 +3,7 @@ package lang
 import (
 	"strconv"
 
-	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/flare/internal/models"
 )
 
 // Float represents a float object

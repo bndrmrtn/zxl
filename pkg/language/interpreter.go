@@ -6,13 +6,13 @@ import (
 	"io"
 	"strings"
 
-	"github.com/bndrmrtn/zxl/internal/ast"
-	"github.com/bndrmrtn/zxl/internal/cache"
-	"github.com/bndrmrtn/zxl/internal/lexer"
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/internal/runtimev2"
-	"github.com/bndrmrtn/zxl/internal/state"
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/internal/ast"
+	"github.com/bndrmrtn/flare/internal/cache"
+	"github.com/bndrmrtn/flare/internal/lexer"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/internal/runtimev2"
+	"github.com/bndrmrtn/flare/internal/state"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 // Interpreter is a language interpreter
@@ -33,8 +33,8 @@ func NewInterpreter(mode InterpreterMode, cache bool) *Interpreter {
 
 // Interpret interprets the given data
 func (ir *Interpreter) Interpret(fileName string, data io.Reader) (lang.Object, error) {
-	if !strings.HasSuffix(fileName, ".zx") {
-		return nil, fmt.Errorf("Zx can only run files that has .zx extesion.")
+	if !strings.HasSuffix(fileName, ".fl") {
+		return nil, fmt.Errorf("Flare can only run files that has .fl extesion.")
 	}
 
 	// Get the nodes from the given data
@@ -53,8 +53,8 @@ func (ir *Interpreter) Interpret(fileName string, data io.Reader) (lang.Object, 
 
 // GetNodes gets the nodes from the given data
 func (ir *Interpreter) GetNodes(fileName string, data io.Reader) ([]*models.Node, error) {
-	if !strings.HasSuffix(fileName, ".zx") {
-		return nil, fmt.Errorf("Zx can only run files that has .zx extesion.")
+	if !strings.HasSuffix(fileName, ".fl") {
+		return nil, fmt.Errorf("Flare can only run files that has .fl extesion.")
 	}
 	return ir.getNodes(fileName, data)
 }

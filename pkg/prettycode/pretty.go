@@ -5,9 +5,9 @@ import (
 	"io"
 	"strings"
 
-	"github.com/bndrmrtn/zxl/internal/lexer"
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/internal/tokens"
+	"github.com/bndrmrtn/flare/internal/lexer"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/internal/tokens"
 )
 
 // PrettyCode is a struct that holds the tokens of the code

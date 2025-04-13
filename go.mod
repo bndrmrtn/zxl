@@ -1,4 +1,4 @@
-module github.com/bndrmrtn/zxl
+module github.com/bndrmrtn/flare
 
 go 1.23.6
 

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/bndrmrtn/zxl/pkg/pkgman"
+	"github.com/bndrmrtn/flare/pkg/pkgman"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -10,7 +10,7 @@ import (
 var getCmd = &cobra.Command{
 	Use:     "get <packageUrl>",
 	Aliases: []string{"install", "i"},
-	Short:   "Installs a Zx Package",
+	Short:   "Installs a Flare Package",
 	Run:     execGet,
 }
 
@@ -50,7 +50,7 @@ func execGet(cmd *cobra.Command, args []string) {
 	}
 
 	if pm.PackageName == "" {
-		cmd.PrintErrln("Package name cannot be empty\nUse `zxl init <packageName>` to initialize your package")
+		cmd.PrintErrln("Package name cannot be empty\nUse `flare init <packageName>` to initialize your package")
 		return
 	}
 

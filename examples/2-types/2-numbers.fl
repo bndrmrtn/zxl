@@ -1,6 +1,6 @@
 // Integers
 
-// Integers in Zx are objects.
+// Integers in Flare are objects.
 // Because of that they also have methods and properties, for example the default one: "$addr".
 
 let x = 1234; // x is an integer

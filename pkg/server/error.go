@@ -6,11 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/internal/modules/servermodule"
-	"github.com/bndrmrtn/zxl/internal/runtimev2"
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/internal/errs"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/internal/modules/servermodule"
+	"github.com/bndrmrtn/flare/internal/runtimev2"
+	"github.com/bndrmrtn/flare/lang"
 )
 
 var errNotFound = errors.New("not found")
@@ -49,7 +49,7 @@ func (s *Server) handleError(err error, w http.ResponseWriter, r *http.Request) 
 }
 
 func (s *Server) handleCustomErrorHandler(serverErr error, code int, w http.ResponseWriter, r *http.Request) bool {
-	path := filepath.Join(s.root, "err.zx")
+	path := filepath.Join(s.root, "err.fl")
 
 	// Execute the cached nodes if they exist
 	if s.useCaching {

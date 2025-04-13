@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/bndrmrtn/zxl/pkg/pkgman"
+	"github.com/bndrmrtn/flare/pkg/pkgman"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -9,7 +9,7 @@ import (
 // downloadCmd represents the download command
 var downloadCmd = &cobra.Command{
 	Use:   "download",
-	Short: "Downloads all Zx Packages from zxpack.yaml",
+	Short: "Downloads all Flare Packages from flare.yaml",
 	Run:   execDownload,
 }
 

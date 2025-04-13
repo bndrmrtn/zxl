@@ -3,7 +3,7 @@ package server
 import (
 	"time"
 
-	"github.com/bndrmrtn/zxl/internal/models"
+	"github.com/bndrmrtn/flare/internal/models"
 )
 
 // CacheDuration is the duration of the cache

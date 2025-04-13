@@ -1,8 +1,8 @@
 // Http servers
 
-// Theese files won't work with `zxl run filename.zx` command, because they are not cli scripts.
-// They are http server files, so they need to be run with `zxl serve filename.zx` command.
-// You can also specify `zxl serve .` to serve the current directory.
+// Theese files won't work with `flare run filename.fl` command, because they are not cli scripts.
+// They are http server files, so they need to be run with `flare serve filename.fl` command.
+// You can also specify `flare serve .` to serve the current directory.
 
 use server; // this module is only available in the server context
 
@@ -33,5 +33,5 @@ server.write(<>
 // Theese html literals are interpreted and translated to simple string literals, so you can use them in any place where a string is expected
 
 // NOTE: Http servers will cache all the files by it's hash, you may need to clear the cache if you change the file and it doesn't work as expected.
-// You can do this by deleting the `.zxcache` folder in the current directory and restarting the server.
+// You can do this by deleting the `.flcache` folder in the current directory and restarting the server.
 // This will not happen too often, but if you change the file and it doesn't work as expected, this is the first thing to check.

@@ -7,7 +7,7 @@ println(hello); // prints "Hello"
 println(hello + " World!"); // prints "Hello World!"
 
 // String Methods
-// Every value in Zx is an object. Which means that every value may have methods and properties.
+// Every value in Flare is an object. Which means that every value may have methods and properties.
 
 // Trim
 // line is a line from a file which has a new line character at the end
@@ -29,15 +29,15 @@ println(userID.lower()); // prints "abcdef00"
 
 // Replace
 let text = "Hello World!";
-let newText = text.replace("World", "Zx"); // replace "World" with "Zx"
-println(newText); // prints "Hello Zx!"
+let newText = text.replace("World", "Flare"); // replace "World" with "Flare"
+println(newText); // prints "Hello Flare!"
 
 // Contains
 let sentence = "Hello, this is a test.";
 let containsTest = sentence.contains("test"); // check if the string contains "test"
 println(containsTest); // prints true
-let containsZx = sentence.contains("Zx"); // check if the string contains "Zx"
-println(containsZx); // prints false
+let containsFlare = sentence.contains("Flare"); // check if the string contains "Flare"
+println(containsFlare); // prints false
 
 // Starts With and Ends With
 let startsWithHello = sentence.startsWith("Hello"); // check if the string starts with "Hello"

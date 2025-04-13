@@ -1,5 +1,0 @@
-// Version
-
-use zx; // use the zx module
-
-println(zx.version);

@@ -1,9 +1,9 @@
 package runtimev2
 
 import (
-	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/internal/errs"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/lang"
 	"go.uber.org/zap"
 )
 

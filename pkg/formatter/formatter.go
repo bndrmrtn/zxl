@@ -11,7 +11,7 @@ func New(folder string) *Formatter {
 }
 
 func (f *Formatter) Format() error {
-	files, err := getFiles(f.folder, ".zx")
+	files, err := getFiles(f.folder, ".fl")
 	if err != nil {
 		return err
 	}

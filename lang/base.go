@@ -1,6 +1,6 @@
 package lang
 
-import "github.com/bndrmrtn/zxl/internal/models"
+import "github.com/bndrmrtn/flare/internal/models"
 
 // Base is the base object
 type Base struct {

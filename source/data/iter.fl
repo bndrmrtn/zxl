@@ -1,6 +1,6 @@
 // Iter namespace
-// This file is part of the Zx programming language project.
-// It contains the iter namespace for the Zx language runtime.
+// This file is part of the Flare programming language project.
+// It contains the iter namespace for the Flare language runtime.
 namespace iter;
 
 // KeyValue is a simple key-value pair structure

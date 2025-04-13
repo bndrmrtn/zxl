@@ -1,8 +1,8 @@
 // Arrays
 
-// Arrays are a key-value data structure in Zx.
+// Arrays are a key-value data structure in Flare.
 // The key and the value can be comparable type.
-// NOTE: Zx only contains 3 non-comparable types: lists, arrays and functions.
+// NOTE: Flare only contains 3 non-comparable types: lists, arrays and functions.
 
 // string array keys can also be represented as identifiers if they fit the rules.
 let user = array {

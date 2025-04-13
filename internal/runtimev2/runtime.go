@@ -8,17 +8,17 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/bndrmrtn/zxl/internal/builtin"
-	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/internal/modules"
-	"github.com/bndrmrtn/zxl/internal/state"
-	"github.com/bndrmrtn/zxl/internal/tokens"
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/internal/builtin"
+	"github.com/bndrmrtn/flare/internal/errs"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/internal/modules"
+	"github.com/bndrmrtn/flare/internal/state"
+	"github.com/bndrmrtn/flare/internal/tokens"
+	"github.com/bndrmrtn/flare/lang"
 	"go.uber.org/zap"
 )
 
-const PackageDirectory = ".zxpack"
+const PackageDirectory = ".flmod"
 
 // RuntimeMode is the runtime mode
 type Runtime struct {
@@ -241,7 +241,7 @@ func (r *Runtime) loadPackage(author string, pkg string) (*Executer, error) {
 		if err != nil {
 			return err
 		}
-		if filepath.Ext(d.Name()) == ".zx" {
+		if filepath.Ext(d.Name()) == ".fl" {
 			files = append(files, s)
 		}
 		return nil

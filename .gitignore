@@ -1,4 +1,5 @@
 bin
-.zxcache
+.flcache
+.flmod
 debug
 testcodes

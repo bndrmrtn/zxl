@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/bndrmrtn/zxl/pkg/language"
-	"github.com/bndrmrtn/zxl/pkg/pkgman"
-	"github.com/bndrmrtn/zxl/pkg/server"
+	"github.com/bndrmrtn/flare/pkg/language"
+	"github.com/bndrmrtn/flare/pkg/pkgman"
+	"github.com/bndrmrtn/flare/pkg/server"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -15,7 +15,7 @@ import (
 // startCmd represents the init command
 var startCmd = &cobra.Command{
 	Use:   "start",
-	Short: "Starts a Zx project with package configuration",
+	Short: "Starts a Flare project with package configuration",
 	Run:   execStart,
 }
 
@@ -66,7 +66,7 @@ func execStart(cmd *cobra.Command, args []string) {
 
 		interpreter := language.NewInterpreter(mode, true)
 
-		if _, err = interpreter.Interpret(args[0], file); err != nil {
+		if _, err = interpreter.Interpret(entry, file); err != nil {
 			cmd.PrintErrln(err)
 			return
 		}
@@ -79,7 +79,7 @@ func execStart(cmd *cobra.Command, args []string) {
 
 		var listenAddr = ":3000"
 		if webConfigAny, ok := pm.PackageConfig["web"]; ok {
-			if webConfig, ok := webConfigAny.(map[string]interface{}); ok {
+			if webConfig, ok := webConfigAny.(map[string]any); ok {
 				host, hostOk := webConfig["host"]
 				port, portOk := webConfig["port"]
 

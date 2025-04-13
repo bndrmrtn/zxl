@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bndrmrtn/zxl/internal/ast"
-	"github.com/bndrmrtn/zxl/internal/cache"
-	"github.com/bndrmrtn/zxl/internal/errs"
-	"github.com/bndrmrtn/zxl/internal/lexer"
-	"github.com/bndrmrtn/zxl/internal/models"
-	"github.com/bndrmrtn/zxl/lang"
+	"github.com/bndrmrtn/flare/internal/ast"
+	"github.com/bndrmrtn/flare/internal/cache"
+	"github.com/bndrmrtn/flare/internal/errs"
+	"github.com/bndrmrtn/flare/internal/lexer"
+	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/bndrmrtn/flare/lang"
 	"go.uber.org/zap"
 )
 
@@ -40,7 +40,7 @@ func (r *Runtime) importer(filename string, dg *models.Debug) (lang.Object, erro
 				return err
 			}
 
-			if !info.IsDir() && filepath.Ext(filePath) == ".zx" {
+			if !info.IsDir() && filepath.Ext(filePath) == ".fl" {
 				// Calculate relative path correctly
 				relPath, err := filepath.Rel(rootDir, filePath)
 				if err != nil {

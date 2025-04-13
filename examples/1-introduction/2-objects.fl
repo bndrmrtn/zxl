@@ -1,8 +1,8 @@
 // Objects
 
-// What are objects in Zx and how they work?
-// In Zx every value is an object. Which means that every value may have methods and properties.
-// Zx provides a default property for each object, which is accessible using the dot operator (.) and is called "$addr".
+// What are objects in Flare and how they work?
+// In Flare every value is an object. Which means that every value may have methods and properties.
+// Flare provides a default property for each object, which is accessible using the dot operator (.) and is called "$addr".
 
 let text = "Hello";
 
