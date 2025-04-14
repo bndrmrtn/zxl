@@ -16,15 +16,32 @@ type HttpServer struct {
 	Body    bytes.Buffer
 	Code    int
 	Written bool
+
+	Params lang.Object
 }
 
 func New(w http.ResponseWriter, r *http.Request) *HttpServer {
-	return &HttpServer{
+	params := r.Context().Value("__params__").(map[string]string)
+
+	hs := &HttpServer{
 		w:       w,
 		r:       r,
 		Code:    http.StatusOK,
 		Written: false,
 	}
+
+	var (
+		keys   []lang.Object
+		values []lang.Object
+	)
+	for key, value := range params {
+		keys = append(keys, lang.NewString("key", key, nil))
+		values = append(values, lang.NewString("value", value, nil))
+	}
+
+	hs.Params = lang.NewArray("params", nil, keys, values)
+
+	return hs
 }
 
 func (*HttpServer) Namespace() string {
@@ -35,6 +52,7 @@ func (h *HttpServer) Objects() map[string]lang.Object {
 	return map[string]lang.Object{
 		"request": lang.Immute(NewRequest(h.r)),
 		"header":  lang.Immute(lang.NewDefinitionInstance(lang.NewDefinition("server.header", "header", nil, nil, nil), newHeader(h.r.Header, h.w.Header()))),
+		"params":  lang.Immute(h.Params),
 	}
 }
 

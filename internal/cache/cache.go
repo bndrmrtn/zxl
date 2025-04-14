@@ -2,6 +2,7 @@ package cache
 
 import (
 	"crypto/md5"
+	"crypto/sha256"
 	"encoding/gob"
 	"fmt"
 	"os"
@@ -31,8 +32,7 @@ func Store(file string, data []byte, nodes []*models.Node) {
 		_ = os.MkdirAll(CacheDirectory, os.ModePerm)
 	}
 
-	hash := fmt.Sprintf("%x", md5.Sum(data))
-
+	hash := fmt.Sprintf("%x", sha256.Sum256(data))
 	cacheData := Cache{
 		Hash:  hash,
 		Nodes: nodes,

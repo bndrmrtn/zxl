@@ -58,21 +58,15 @@ func (s *Server) handleCustomErrorHandler(serverErr error, code int, w http.Resp
 		}
 	}
 
-	// Get the executable path
-	zxPath, err := s.getExecutablePath(path)
-	if err != nil {
-		return false
-	}
-
 	// Open the file
-	file, err := os.Open(zxPath)
+	file, err := os.Open(path)
 	if err != nil {
 		return false
 	}
 	defer file.Close()
 
 	// Get the nodes
-	nodes, err := s.ir.GetNodes(zxPath, file)
+	nodes, err := s.ir.GetNodes(path, file)
 	if err != nil {
 		return false
 	}

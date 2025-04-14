@@ -10,7 +10,7 @@ import (
 // rootCmd is the root command for the CLI
 var rootCmd = &cobra.Command{
 	Use:     "flare",
-	Short:   "Flare ✨ A small programming language for template rendering.",
+	Short:   "Flare ✨ A simple interpreted programming language for easy web development.",
 	Version: version.Version,
 }
 

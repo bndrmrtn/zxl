@@ -23,13 +23,15 @@ func init() {
 	// Add the start command to the root command
 	rootCmd.AddCommand(startCmd)
 	startCmd.Flags().BoolP("nocolor", "n", false, "Enable or disable colorized output")
-	startCmd.Flags().BoolP("debug", "d", false, "Run the program in debug mode")
+	startCmd.Flags().BoolP("debug", "", false, "Run the program in debug mode")
+	startCmd.Flags().BoolP("dev", "d", false, "Run the program in debug mode")
 }
 
 // execStart executes the init command
 func execStart(cmd *cobra.Command, args []string) {
 	colors := cmd.Flag("nocolor").Value.String() == "false"
 	debug := cmd.Flag("debug").Value.String() == "true"
+	dev := cmd.Flag("dev").Value.String() == "true"
 
 	if !colors {
 		color.NoColor = true
@@ -94,7 +96,7 @@ func execStart(cmd *cobra.Command, args []string) {
 		}
 
 		interpreter := language.NewInterpreter(mode, true)
-		httpServer := server.New(interpreter, entry, info.IsDir(), true, colors)
+		httpServer := server.New(interpreter, entry, info.IsDir(), true, colors, dev)
 
 		if err := httpServer.Serve(listenAddr); err != nil && err != http.ErrServerClosed {
 			cmd.PrintErrln("Error: " + err.Error())

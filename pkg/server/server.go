@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -15,6 +16,7 @@ import (
 	"github.com/bndrmrtn/flare/internal/version"
 	"github.com/bndrmrtn/flare/pkg/language"
 	"github.com/fatih/color"
+	"github.com/flarelang/webrouter"
 )
 
 // Server is a language server
@@ -30,6 +32,10 @@ type Server struct {
 	rootFile string
 	// colors is the color flag
 	colors bool
+	// dev is the development flag
+	dev bool
+	// router is the router for the server
+	wr *webrouter.Router
 
 	// useCaching is the caching flag
 	useCaching bool
@@ -43,11 +49,17 @@ type Server struct {
 }
 
 // NewServer creates a new server
-func New(ir *language.Interpreter, root string, isDir bool, cache, colors bool) *Server {
-	var rootFile string
+func New(ir *language.Interpreter, root string, isDir, cache, colors, dev bool) *Server {
+	var (
+		rootFile string
+		router   *webrouter.Router
+	)
+
 	if !isDir {
 		rootFile = filepath.Base(root)
 		root = filepath.Dir(root)
+	} else {
+		router = webrouter.New(root)
 	}
 
 	return &Server{
@@ -59,6 +71,8 @@ func New(ir *language.Interpreter, root string, isDir bool, cache, colors bool) 
 		useCaching:          cache,
 		cache:               make(map[string]*NodeCache),
 		serverStateProvider: state.Default(),
+		dev:                 dev,
+		wr:                  router,
 	}
 }
 
@@ -89,41 +103,41 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Set the version header
 	w.Header().Add("X-Flare-Version", version.Version)
 
-	// Serve files if they exist
-	path := filepath.Join(s.root, r.URL.Path[1:])
-	if filepath.Ext(path) != ".fl" {
-		if stat, err := os.Stat(path); err == nil && !stat.IsDir() {
-			http.ServeFile(w, r, path)
-			return
+	if s.dev {
+		if err := s.wr.Reload(); err != nil {
+			s.handleError(err, w, r)
 		}
 	}
 
-	if !s.isDir {
-		path = filepath.Join(s.root, s.rootFile)
+	route, ok := s.wr.Match(r.URL.Path)
+	if !ok {
+		s.handleError(fmt.Errorf("not found"), w, r)
+		return
 	}
 
-	s.serveRequest(w, r, path, &cached)
+	if !route.IsExecutable {
+		http.ServeFile(w, r, route.FilePath)
+		return
+	}
+
+	ctx := context.WithValue(r.Context(), "__params__", route.Params)
+	r = r.WithContext(ctx)
+
+	s.serveRequest(w, r, route, &cached)
 }
 
-func (s *Server) serveRequest(w http.ResponseWriter, r *http.Request, path string, cached *bool) {
+func (s *Server) serveRequest(w http.ResponseWriter, r *http.Request, route *webrouter.Route, cached *bool) {
 	// Execute the cached nodes if they exist
 	if s.useCaching {
-		if nodes, ok := s.getCache(path); ok {
+		if nodes, ok := s.getCache(route.FilePath); ok {
 			*cached = true
 			s.executeNodes(nodes, w, r)
 			return
 		}
 	}
 
-	// Get the executable path
-	zxPath, err := s.getExecutablePath(path)
-	if err != nil {
-		s.handleError(err, w, r)
-		return
-	}
-
 	// Open the file
-	file, err := os.Open(zxPath)
+	file, err := os.Open(route.FilePath)
 	if err != nil {
 		s.handleError(err, w, r)
 		return
@@ -131,7 +145,7 @@ func (s *Server) serveRequest(w http.ResponseWriter, r *http.Request, path strin
 	defer file.Close()
 
 	// Get the nodes
-	nodes, err := s.ir.GetNodes(zxPath, file)
+	nodes, err := s.ir.GetNodes(route.FilePath, file)
 	if err != nil {
 		s.handleError(err, w, r)
 		return
@@ -139,7 +153,7 @@ func (s *Server) serveRequest(w http.ResponseWriter, r *http.Request, path strin
 
 	// Cache the nodes for faster execution
 	if s.useCaching {
-		s.setCache(path, nodes)
+		s.setCache(route.FilePath, nodes)
 	}
 
 	// Execute the nodes

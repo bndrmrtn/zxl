@@ -21,10 +21,11 @@ var serveCmd = &cobra.Command{
 func init() {
 	// Add the serve command to the root command
 	rootCmd.AddCommand(serveCmd)
-	serveCmd.Flags().BoolP("debug", "d", false, "Run the program in debug mode")
+	serveCmd.Flags().BoolP("debug", "", false, "Run the program in debug mode")
 	serveCmd.Flags().BoolP("nocolor", "n", false, "Enable or disable colorized output")
 	serveCmd.Flags().StringP("listenAddr", "l", ":3000", "Server listen address")
 	serveCmd.Flags().BoolP("cache", "c", false, "Cache the parsed files for faster execution")
+	serveCmd.Flags().BoolP("dev", "d", false, "Run the program in development mode")
 }
 
 // execRun executes the run command
@@ -38,6 +39,7 @@ func execServe(cmd *cobra.Command, args []string) {
 	debug := cmd.Flag("debug").Value.String() == "true"
 	cache := cmd.Flag("cache").Value.String() == "true"
 	listenAddr := cmd.Flag("listenAddr").Value.String()
+	dev := cmd.Flag("dev").Value.String() == "true"
 
 	if !colors {
 		color.NoColor = true
@@ -67,7 +69,7 @@ func execServe(cmd *cobra.Command, args []string) {
 	}
 
 	interpreter := language.NewInterpreter(mode, true)
-	httpServer := server.New(interpreter, args[0], info.IsDir(), cache, colors)
+	httpServer := server.New(interpreter, args[0], info.IsDir(), cache, colors, dev)
 
 	if err := httpServer.Serve(listenAddr); err != nil && err != http.ErrServerClosed {
 		cmd.PrintErrln("Error: " + err.Error())

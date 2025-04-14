@@ -9,7 +9,7 @@ import (
 // removeCmd represents the remove command
 var removeCmd = &cobra.Command{
 	Use:     "remove <packageUrl>",
-	Aliases: []string{"uninstall", "u"},
+	Aliases: []string{"uninstall", "rm"},
 	Short:   "Uninstalls a Flare Package",
 	Run:     execRemove,
 }
