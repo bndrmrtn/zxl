@@ -237,7 +237,7 @@ func (e *Executer) isInsideDefinition(ex *Executer) *Executer {
 }
 
 func (e *Executer) isInsideDefinitionMethod(ex *Executer) *Executer {
-	var isInsideMethod bool
+	var isInsideMethod bool = ex.scope == ExecuterScopeFunction
 
 	for ex.parent != nil {
 		ex = ex.parent
