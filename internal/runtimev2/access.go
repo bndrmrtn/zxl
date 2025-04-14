@@ -93,7 +93,7 @@ func (e *Executer) GetVariable(name string) (lang.Object, error) {
 			}
 		}
 
-		exec, err := e.runtime.GetNamespaceExecuter(first)
+		exec, err := e.GetNamespaceExecuter(first)
 		if err == nil {
 			ob, err := e.accessObjNamespace(exec, name, middle, last)
 			if ob != nil || err != nil {

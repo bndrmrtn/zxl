@@ -167,7 +167,7 @@ func (pm *PackageManager) save() error {
 
 	gitignorePath := filepath.Join(pm.root, ".gitignore")
 	if _, err := os.Stat(gitignorePath); os.IsNotExist(err) {
-		gitignoreContent := "# Ignore Flare directories\n.flare/\n.flmod/\n.flcache/\n"
+		gitignoreContent := "# Ignore Flare directories\n.flare\n.flmod\n.flcache\n"
 		if err := os.WriteFile(gitignorePath, []byte(gitignoreContent), os.ModePerm); err != nil {
 			return err
 		}
@@ -178,7 +178,7 @@ func (pm *PackageManager) save() error {
 		}
 
 		content := string(data)
-		dirs := []string{"# Ignore Flare directories", ".flare/", ".flmod/", ".flcache/"}
+		dirs := []string{"# Ignore Flare directories", ".flare", ".flmod", ".flcache"}
 		for _, dir := range dirs {
 			if !strings.Contains(content, dir) {
 				content += "\n" + dir
