@@ -22,15 +22,15 @@ const (
 // writeDebug writes debug information to file
 func (ir *Interpreter) writeDebug(file, suffix string, v any) {
 	// Create debug directory if it does not exist
-	_ = os.MkdirAll("debug/", os.ModePerm)
+	_ = os.MkdirAll(".flare/", os.ModePerm)
 
 	file = strings.ReplaceAll(file, "/", ".")
 	file = strings.ReplaceAll(file, "\\", ".")
 	file = strings.Trim(file, ".")
-	file = file + "." + suffix + ".yaml"
+	file = "debug-" + file + suffix + ".yaml"
 
 	// Write debug information to file
-	f, err := os.Create("debug/" + file)
+	f, err := os.Create(".flare/" + file)
 	if err != nil {
 		return
 	}

@@ -65,7 +65,10 @@ func (p *PrettyCode) HighlightConsole() string {
 
 // highlightToken highlights the token with the given mode
 func (p *PrettyCode) highlightToken(mode Mode, token *models.Token, next *models.Token) string {
-	token.Value = html.EscapeString(token.Value)
+	if mode == HtmlMode {
+		token.Value = html.EscapeString(token.Value)
+	}
+
 	switch token.Type {
 	case tokens.Let, tokens.Const,
 		tokens.Function, tokens.Define, tokens.Return,

@@ -8,6 +8,7 @@ import (
 	"github.com/bndrmrtn/flare/internal/models"
 	"github.com/bndrmrtn/flare/internal/state"
 	"github.com/bndrmrtn/flare/lang"
+	"github.com/bndrmrtn/flare/pkg/prettycode"
 )
 
 type ImportFunc func(file string, d *models.Debug) (lang.Object, error)
@@ -47,6 +48,13 @@ func GetMethods(importer ImportFunc, evaler EvalFunc, provider *state.Provider) 
 		state := provider.State(name)
 		return NewState(name, args[0].Debug(), state), nil
 	}).WithTypeSafeArgs(lang.TypeSafeArg{Name: "name", Type: lang.TString})
+	m["highlight"] = lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
+		pc, err := prettycode.New(strings.NewReader(args[0].Value().(string)))
+		if err != nil {
+			return nil, err
+		}
+		return lang.NewString("string", pc.HighlightHtml(), args[0].Debug()), nil
+	}).WithArg("code")
 
 	m = setTypeMethods(m)
 	m = setIsMethods(m)

@@ -33,8 +33,8 @@ func NewInterpreter(mode InterpreterMode, cache bool) *Interpreter {
 
 // Interpret interprets the given data
 func (ir *Interpreter) Interpret(fileName string, data io.Reader) (lang.Object, error) {
-	if !strings.HasSuffix(fileName, ".fl") {
-		return nil, fmt.Errorf("Flare can only run files that has .fl extesion.")
+	if !strings.HasSuffix(fileName, ".fl") && !strings.HasSuffix(fileName, ".flb") && !strings.HasSuffix(fileName, ".flare") {
+		return nil, fmt.Errorf("Flare can only run files that has .fl, .flb or .flare extesion.")
 	}
 
 	// Get the nodes from the given data
@@ -78,10 +78,6 @@ func (ir *Interpreter) getNodes(fileName string, data io.Reader) ([]*models.Node
 	ts, err := lx.Parse(bytes.NewReader(b))
 	if err != nil {
 		return nil, err
-	}
-
-	if ir.mode == ModeDebug {
-		ir.writeDebug(fileName, "lexer", ts)
 	}
 
 	// Build the abstract syntax tree from tokens

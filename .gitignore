@@ -1,5 +1,15 @@
+# Binaries
 bin
+
+# Cache
 .flcache
+
+# Modules
 .flmod
+
+# Debug
+.flare
 debug
+
+# Test Codes
 testcodes
