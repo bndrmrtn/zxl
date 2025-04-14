@@ -59,7 +59,8 @@ func New(ir *language.Interpreter, root string, isDir, cache, colors, dev bool) 
 		rootFile = filepath.Base(root)
 		root = filepath.Dir(root)
 	} else {
-		router = webrouter.New(root)
+		router = webrouter.New(filepath.Clean(root))
+		router.Reload()
 	}
 
 	return &Server{
@@ -111,7 +112,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	route, ok := s.wr.Match(r.URL.Path)
 	if !ok {
-		s.handleError(fmt.Errorf("not found"), w, r)
+		s.handleError(errNotFound, w, r)
 		return
 	}
 

@@ -21,13 +21,16 @@ type HttpServer struct {
 }
 
 func New(w http.ResponseWriter, r *http.Request) *HttpServer {
-	params := r.Context().Value("__params__").(map[string]string)
-
 	hs := &HttpServer{
 		w:       w,
 		r:       r,
 		Code:    http.StatusOK,
 		Written: false,
+	}
+
+	params, ok := r.Context().Value("__params__").(map[string]string)
+	if !ok {
+		return hs
 	}
 
 	var (
@@ -38,7 +41,6 @@ func New(w http.ResponseWriter, r *http.Request) *HttpServer {
 		keys = append(keys, lang.NewString("key", key, nil))
 		values = append(values, lang.NewString("value", value, nil))
 	}
-
 	hs.Params = lang.NewArray("params", nil, keys, values)
 
 	return hs
