@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/bndrmrtn/flare/pkg/language"
-	"github.com/bndrmrtn/flare/pkg/pkgman"
-	"github.com/bndrmrtn/flare/pkg/server"
+	"github.com/flarelang/flare/pkg/language"
+	"github.com/flarelang/flare/pkg/pkgman"
+	"github.com/flarelang/flare/pkg/server"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )

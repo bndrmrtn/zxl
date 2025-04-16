@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bndrmrtn/flare/internal/models"
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/internal/models"
+	"github.com/flarelang/flare/lang"
 )
 
 // Header

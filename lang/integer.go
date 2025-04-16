@@ -3,7 +3,7 @@ package lang
 import (
 	"strconv"
 
-	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/flarelang/flare/internal/models"
 )
 
 type Integer struct {

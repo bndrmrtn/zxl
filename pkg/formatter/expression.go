@@ -3,7 +3,7 @@ package formatter
 import (
 	"strings"
 
-	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/flarelang/flare/internal/models"
 )
 
 func (f *FileFmt) formatExpression(wrap bool, nodes []*models.Node, indent int) string {

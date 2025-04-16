@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/bndrmrtn/flare/pkg/prettycode"
+	"github.com/flarelang/flare/pkg/prettycode"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )

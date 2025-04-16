@@ -8,7 +8,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/lang"
 	"golang.org/x/crypto/bcrypt"
 )
 

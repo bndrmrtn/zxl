@@ -3,8 +3,8 @@ package builtin
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/flare/internal/errs"
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/internal/errs"
+	"github.com/flarelang/flare/lang"
 )
 
 func setIsMethods(m map[string]lang.Method) map[string]lang.Method {

@@ -6,13 +6,13 @@ import (
 	"io"
 	"strings"
 
-	"github.com/bndrmrtn/flare/internal/ast"
-	"github.com/bndrmrtn/flare/internal/cache"
-	"github.com/bndrmrtn/flare/internal/lexer"
-	"github.com/bndrmrtn/flare/internal/models"
-	"github.com/bndrmrtn/flare/internal/runtimev2"
-	"github.com/bndrmrtn/flare/internal/state"
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/internal/ast"
+	"github.com/flarelang/flare/internal/cache"
+	"github.com/flarelang/flare/internal/lexer"
+	"github.com/flarelang/flare/internal/models"
+	"github.com/flarelang/flare/internal/runtimev2"
+	"github.com/flarelang/flare/internal/state"
+	"github.com/flarelang/flare/lang"
 )
 
 // Interpreter is a language interpreter

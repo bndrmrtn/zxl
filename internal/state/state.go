@@ -3,7 +3,7 @@ package state
 import (
 	"sync"
 
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/lang"
 )
 
 // State represents a stateful object that can be used to store and retrieve data

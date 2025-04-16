@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bndrmrtn/flare/internal/models"
-	"github.com/bndrmrtn/flare/internal/state"
-	"github.com/bndrmrtn/flare/lang"
-	"github.com/bndrmrtn/flare/pkg/prettycode"
+	"github.com/flarelang/flare/internal/models"
+	"github.com/flarelang/flare/internal/state"
+	"github.com/flarelang/flare/lang"
+	"github.com/flarelang/flare/pkg/prettycode"
 )
 
 type ImportFunc func(file string, d *models.Debug) (lang.Object, error)

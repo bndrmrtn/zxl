@@ -6,9 +6,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/bndrmrtn/flare/internal/errs"
-	"github.com/bndrmrtn/flare/pkg/language"
-	"github.com/bndrmrtn/flare/pkg/prettycode"
+	"github.com/flarelang/flare/internal/errs"
+	"github.com/flarelang/flare/pkg/language"
+	"github.com/flarelang/flare/pkg/prettycode"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )

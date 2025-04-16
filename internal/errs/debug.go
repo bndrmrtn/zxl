@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bndrmrtn/flare/internal/models"
-	"github.com/bndrmrtn/flare/internal/version"
+	"github.com/flarelang/flare/internal/models"
+	"github.com/flarelang/flare/internal/version"
 	"github.com/fatih/color"
 )
 

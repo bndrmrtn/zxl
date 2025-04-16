@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bndrmrtn/flare/internal/errs"
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/internal/errs"
+	"github.com/flarelang/flare/lang"
 )
 
 type HttpServer struct {

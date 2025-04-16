@@ -24,7 +24,7 @@ Flare now has a `VSCode` plugin for highlighting code (no LSP currently). [Downl
 To install Flare, you need to have Go installed on your system.
 
 ```bash
-go install github.com/bndrmrtn/flare@latest
+go install github.com/flarelang/flare@latest
 ```
 
 ## Usage

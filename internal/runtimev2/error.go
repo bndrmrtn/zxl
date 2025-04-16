@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bndrmrtn/flare/internal/errs"
-	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/flarelang/flare/internal/errs"
+	"github.com/flarelang/flare/internal/models"
 )
 
 // Error creates a new error with debug information.

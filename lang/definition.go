@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/flarelang/flare/internal/models"
 )
 
 type Definition struct {

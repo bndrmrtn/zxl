@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bndrmrtn/flare/internal/ast"
-	"github.com/bndrmrtn/flare/internal/lexer"
-	"github.com/bndrmrtn/flare/internal/models"
-	"github.com/bndrmrtn/flare/internal/tokens"
+	"github.com/flarelang/flare/internal/ast"
+	"github.com/flarelang/flare/internal/lexer"
+	"github.com/flarelang/flare/internal/models"
+	"github.com/flarelang/flare/internal/tokens"
 )
 
 type FileFmt struct {

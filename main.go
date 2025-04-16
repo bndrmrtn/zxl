@@ -11,7 +11,7 @@ import (
 	"os"
 	"runtime/debug"
 
-	"github.com/bndrmrtn/flare/cmd"
+	"github.com/flarelang/flare/cmd"
 	"github.com/fatih/color"
 	"go.uber.org/zap"
 )

@@ -1,8 +1,8 @@
 package runtimev2
 
 import (
-	"github.com/bndrmrtn/flare/internal/models"
-	"github.com/bndrmrtn/flare/source"
+	"github.com/flarelang/flare/internal/models"
+	"github.com/flarelang/flare/source"
 	"go.uber.org/zap"
 )
 

@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bndrmrtn/flare/internal/ast"
-	"github.com/bndrmrtn/flare/internal/cache"
-	"github.com/bndrmrtn/flare/internal/errs"
-	"github.com/bndrmrtn/flare/internal/lexer"
-	"github.com/bndrmrtn/flare/internal/models"
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/internal/ast"
+	"github.com/flarelang/flare/internal/cache"
+	"github.com/flarelang/flare/internal/errs"
+	"github.com/flarelang/flare/internal/lexer"
+	"github.com/flarelang/flare/internal/models"
+	"github.com/flarelang/flare/lang"
 	"go.uber.org/zap"
 )
 

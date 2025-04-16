@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/lang"
 )
 
 // Time wraps the Go time.Time type

@@ -1,7 +1,7 @@
 package lang
 
 import (
-	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/flarelang/flare/internal/models"
 )
 
 type Bool struct {

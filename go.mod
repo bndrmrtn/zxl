@@ -1,4 +1,4 @@
-module github.com/bndrmrtn/flare
+module github.com/flarelang/flare
 
 go 1.23.7
 

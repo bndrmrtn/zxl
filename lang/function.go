@@ -3,7 +3,7 @@ package lang
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/flarelang/flare/internal/models"
 )
 
 // Function represents a function method

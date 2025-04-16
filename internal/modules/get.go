@@ -1,11 +1,11 @@
 package modules
 
 import (
-	"github.com/bndrmrtn/flare/internal/modules/sqlmodule"
-	"github.com/bndrmrtn/flare/internal/modules/thread"
-	"github.com/bndrmrtn/flare/internal/modules/zruntime"
-	"github.com/bndrmrtn/flare/internal/modules/ztime"
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/internal/modules/sqlmodule"
+	"github.com/flarelang/flare/internal/modules/thread"
+	"github.com/flarelang/flare/internal/modules/zruntime"
+	"github.com/flarelang/flare/internal/modules/ztime"
+	"github.com/flarelang/flare/lang"
 )
 
 // Get returns a list of all available modules.

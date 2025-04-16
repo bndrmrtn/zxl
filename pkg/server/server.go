@@ -9,12 +9,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bndrmrtn/flare/internal/models"
-	"github.com/bndrmrtn/flare/internal/modules/servermodule"
-	"github.com/bndrmrtn/flare/internal/runtimev2"
-	"github.com/bndrmrtn/flare/internal/state"
-	"github.com/bndrmrtn/flare/internal/version"
-	"github.com/bndrmrtn/flare/pkg/language"
+	"github.com/flarelang/flare/internal/models"
+	"github.com/flarelang/flare/internal/modules/servermodule"
+	"github.com/flarelang/flare/internal/runtimev2"
+	"github.com/flarelang/flare/internal/state"
+	"github.com/flarelang/flare/internal/version"
+	"github.com/flarelang/flare/pkg/language"
 	"github.com/fatih/color"
 	"github.com/flarelang/webrouter"
 )

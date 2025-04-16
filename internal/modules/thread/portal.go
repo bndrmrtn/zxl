@@ -3,7 +3,7 @@ package thread
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/lang"
 )
 
 type Portal struct {

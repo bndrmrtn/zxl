@@ -1,6 +1,6 @@
 package models
 
-import "github.com/bndrmrtn/flare/internal/tokens"
+import "github.com/flarelang/flare/internal/tokens"
 
 // Token represents a token in the lexer
 type Token struct {

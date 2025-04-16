@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bndrmrtn/flare/internal/errs"
-	"github.com/bndrmrtn/flare/internal/models"
-	"github.com/bndrmrtn/flare/internal/tokens"
+	"github.com/flarelang/flare/internal/errs"
+	"github.com/flarelang/flare/internal/models"
+	"github.com/flarelang/flare/internal/tokens"
 )
 
 var SemiColonToken = &models.Token{

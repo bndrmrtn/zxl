@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/bndrmrtn/flare/pkg/formatter"
+	"github.com/flarelang/flare/pkg/formatter"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )

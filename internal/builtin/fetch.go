@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bndrmrtn/flare/internal/errs"
-	"github.com/bndrmrtn/flare/internal/models"
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/internal/errs"
+	"github.com/flarelang/flare/internal/models"
+	"github.com/flarelang/flare/lang"
 )
 
 type fetchConfig struct {

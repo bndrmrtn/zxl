@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/bndrmrtn/flare/internal/bundler"
+	"github.com/flarelang/flare/internal/bundler"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )

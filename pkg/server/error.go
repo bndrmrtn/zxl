@@ -6,11 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bndrmrtn/flare/internal/errs"
-	"github.com/bndrmrtn/flare/internal/models"
-	"github.com/bndrmrtn/flare/internal/modules/servermodule"
-	"github.com/bndrmrtn/flare/internal/runtimev2"
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/internal/errs"
+	"github.com/flarelang/flare/internal/models"
+	"github.com/flarelang/flare/internal/modules/servermodule"
+	"github.com/flarelang/flare/internal/runtimev2"
+	"github.com/flarelang/flare/lang"
 )
 
 var errNotFound = errors.New("not found")

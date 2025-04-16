@@ -3,9 +3,9 @@ package ast
 import (
 	"fmt"
 
-	"github.com/bndrmrtn/flare/internal/errs"
-	"github.com/bndrmrtn/flare/internal/models"
-	"github.com/bndrmrtn/flare/internal/tokens"
+	"github.com/flarelang/flare/internal/errs"
+	"github.com/flarelang/flare/internal/models"
+	"github.com/flarelang/flare/internal/tokens"
 )
 
 func (b *Builder) parseObjectAccess(ts []*models.Token, inx *int, node *models.Node) (*models.Node, error) {

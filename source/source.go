@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"embed"
 
-	"github.com/bndrmrtn/flare/internal/ast"
-	"github.com/bndrmrtn/flare/internal/lexer"
-	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/flarelang/flare/internal/ast"
+	"github.com/flarelang/flare/internal/lexer"
+	"github.com/flarelang/flare/internal/models"
 )
 
 //go:embed data/*.fl

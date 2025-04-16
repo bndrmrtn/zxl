@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/lang"
 )
 
 func GetVariables() map[string]lang.Object {

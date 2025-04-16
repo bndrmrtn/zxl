@@ -3,7 +3,7 @@ package lang
 import (
 	"strings"
 
-	"github.com/bndrmrtn/flare/internal/models"
+	"github.com/flarelang/flare/internal/models"
 )
 
 // String represents a string object

@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/bndrmrtn/flare/internal/errs"
-	"github.com/bndrmrtn/flare/internal/lexer"
-	"github.com/bndrmrtn/flare/pkg/prettycode"
+	"github.com/flarelang/flare/internal/errs"
+	"github.com/flarelang/flare/internal/lexer"
+	"github.com/flarelang/flare/pkg/prettycode"
 )
 
 func (s *Server) makePrettyCode(htmlErr *errs.HtmlError) string {

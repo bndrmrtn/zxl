@@ -3,7 +3,7 @@ package modules
 import (
 	"net/http"
 
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/lang"
 )
 
 type Http struct{}

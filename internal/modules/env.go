@@ -3,7 +3,7 @@ package modules
 import (
 	"os"
 
-	"github.com/bndrmrtn/flare/lang"
+	"github.com/flarelang/flare/lang"
 	"github.com/joho/godotenv"
 )
 

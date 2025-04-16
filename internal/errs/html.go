@@ -8,7 +8,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/bndrmrtn/flare/internal/version"
+	"github.com/flarelang/flare/internal/version"
 )
 
 //go:embed assets/*

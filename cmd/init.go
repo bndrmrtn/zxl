@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/bndrmrtn/flare/pkg/pkgman"
+	"github.com/flarelang/flare/pkg/pkgman"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )

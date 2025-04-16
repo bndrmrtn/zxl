@@ -3,7 +3,7 @@ package cmd
 import (
 	"log"
 
-	"github.com/bndrmrtn/flare/internal/version"
+	"github.com/flarelang/flare/internal/version"
 	"github.com/spf13/cobra"
 )
 
