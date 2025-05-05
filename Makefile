@@ -1,4 +1,4 @@
-.PHONY: build build-windows build-all run rundebug serve format cache
+.PHONY: build build-windows build-all run rundebug serve format cache proto
 
 FILE ?= main
 FOLDER ?= .
@@ -48,3 +48,6 @@ cache:
 	@rm -rf bin
 	@rm -rf .flmod
 	@rm -rf debug
+
+proto:
+	@protoc --go_out=. --go-grpc_out=. --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative internal/extensions/extension.proto

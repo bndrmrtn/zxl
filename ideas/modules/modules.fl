@@ -1,0 +1,10 @@
+// This file may not run and may not be compatible with the current version of Flare.
+namespace flare.main;
+
+use (spawn) from flare.std.thread;
+// or
+use (spawn as spawnThread) from 'flare.std.thread';
+// or
+use flare.std.thread;
+// or
+use 'flare.std.thread' as thread;

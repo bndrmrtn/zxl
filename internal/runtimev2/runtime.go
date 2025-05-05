@@ -109,6 +109,7 @@ func (r *Runtime) Exec(scope ExecuterScope, parent *Executer, namespace string, 
 		r.executers[namespace] = ex
 		r.mu.Unlock()
 	}
+
 	return ex.Execute(nodes)
 }
 

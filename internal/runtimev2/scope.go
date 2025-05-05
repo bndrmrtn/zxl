@@ -6,6 +6,8 @@ type ExecuterScope int
 const (
 	// ExecuterScopeGlobal is the global scope
 	ExecuterScopeGlobal ExecuterScope = iota
+	// ExecuterScopeFile is the file scope
+	ExecuterScopeFile
 	// ExecuterScopeBlock is the block scope (if, else, for, etc.)
 	ExecuterScopeBlock
 	// ExecuterScopeFunction is the function scope

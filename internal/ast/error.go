@@ -16,16 +16,14 @@ func (b *Builder) parseError(ts []*models.Token, inx *int) (*models.Node, error)
 	}
 
 	if *inx >= len(ts) {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got EOF", errs.SyntaxError), token.Debug)
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier or ':', '{', but got EOF", errs.SyntaxError), token.Debug)
 	}
 
-	if ts[*inx].Type != tokens.Identifier {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected identifier, but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	if ts[*inx].Type == tokens.Identifier {
+		node.Content = ts[*inx].Value
+		*inx++
 	}
 
-	node.Content = ts[*inx].Value
-
-	*inx++
 	if *inx >= len(ts) {
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected : or {, but got EOF", errs.SyntaxError), token.Debug)
 	}

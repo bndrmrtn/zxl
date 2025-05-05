@@ -8,7 +8,7 @@ error err {
      fail("An error occurred!");
 }
 
-// Even is the error is thrown, the x variable will be available
+// Even if the error is thrown, the x variable will be available
 // in the scope of the error group.
 println("x:", x); // x: 5
 

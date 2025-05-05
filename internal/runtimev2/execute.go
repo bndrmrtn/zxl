@@ -17,10 +17,10 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 	case tokens.Use:
 		using := node.Content
 		as := node.Value.(string)
-		if _, ok := e.usedNamespaces[as]; ok {
-			return nil, Error(ErrNamespaceInUse, node.Debug, nsErr(using, as))
+		if _, ok := e.usedNamespaces[as]; !ok {
+			//return nil, Error(ErrNamespaceInUse, node.Debug, nsErr(using, as))
+			e.usedNamespaces[as] = using
 		}
-		e.usedNamespaces[as] = using
 	case tokens.Function:
 		name, method, err := e.createMethodFromNode(node)
 		if err != nil {
@@ -96,15 +96,23 @@ func (e *Executer) executeNode(node *models.Node) (lang.Object, error) {
 			return nil, Error(ErrEmptyErrorBlock, node.Debug)
 		}
 
-		_, err := e.Execute(node.Children)
+		ret, err := e.Execute(node.Children)
 		if err != nil {
 			var de errs.DebugError
 			if errors.As(err, &de) {
 				err = de.GetParentError()
 			}
-			e.BindObject(node.Content, lang.NewString(node.Content, err.Error(), node.Debug))
+			if node.Content != "" {
+				e.BindObject(node.Content, lang.NewString(node.Content, err.Error(), node.Debug))
+			}
 		} else {
-			e.BindObject(node.Content, lang.NilObject)
+			if node.Content != "" {
+				e.BindObject(node.Content, lang.NilObject)
+			}
+
+			if ret != nil {
+				return ret, nil
+			}
 		}
 	}
 

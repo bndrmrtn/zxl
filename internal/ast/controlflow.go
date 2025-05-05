@@ -23,9 +23,19 @@ func (b *Builder) parseIf(ts []*models.Token, inx *int) (*models.Node, error) {
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected value or expression, but got 'EOF'", errs.SyntaxError), token.Debug)
 	}
 
-	var args []*models.Token
+	var (
+		args       []*models.Token
+		isOneLiner bool
+	)
 	for {
-		if ts[*inx].Type == tokens.LeftBrace {
+		if *inx >= len(ts) {
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected '{' or ':', but got EOF", errs.SyntaxError), token.Debug)
+		}
+
+		if ts[*inx].Type == tokens.LeftBrace || ts[*inx].Type == tokens.Colon {
+			if ts[*inx].Type == tokens.Colon {
+				isOneLiner = true
+			}
 			break
 		}
 
@@ -53,19 +63,27 @@ func (b *Builder) parseIf(ts []*models.Token, inx *int) (*models.Node, error) {
 
 	for {
 		if *inx >= len(ts) {
-			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got 'EOF'", errs.SyntaxError), token.Debug)
+			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}' or ';', but got 'EOF'", errs.SyntaxError), token.Debug)
 		}
 
-		if ts[*inx].Type == tokens.RightBrace {
-			braceCount--
-			if braceCount == 0 {
+		if isOneLiner {
+			if ts[*inx].Type == tokens.Semicolon {
+				braceCount = 0
 				*inx++
 				break
 			}
-		}
+		} else {
+			if ts[*inx].Type == tokens.RightBrace {
+				braceCount--
+				if braceCount == 0 {
+					*inx++
+					break
+				}
+			}
 
-		if ts[*inx].Type == tokens.LeftBrace {
-			braceCount++
+			if ts[*inx].Type == tokens.LeftBrace {
+				braceCount++
+			}
 		}
 
 		children = append(children, ts[*inx])
@@ -119,9 +137,11 @@ func (b *Builder) handleElse(ts []*models.Token, inx *int) (*models.Node, error)
 		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{' or 'if', but got 'EOF'", errs.SyntaxError), token.Debug)
 	}
 
-	if ts[*inx].Type != tokens.LeftBrace && ts[*inx].Type != tokens.If {
-		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{' or 'if', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
+	if ts[*inx].Type != tokens.LeftBrace && ts[*inx].Type != tokens.Colon && ts[*inx].Type != tokens.If {
+		return nil, errs.WithDebug(fmt.Errorf("%w: expected '{', ':' or 'if', but got '%s'", errs.SyntaxError, ts[*inx].Type), ts[*inx].Debug)
 	}
+
+	var isOneLiner = ts[*inx].Type == tokens.Colon
 
 	if ts[*inx].Type == tokens.If {
 		ifNode, err := b.parseIf(ts, inx)
@@ -144,16 +164,24 @@ func (b *Builder) handleElse(ts []*models.Token, inx *int) (*models.Node, error)
 			return nil, errs.WithDebug(fmt.Errorf("%w: expected '}', but got 'EOF'", errs.SyntaxError), token.Debug)
 		}
 
-		if ts[*inx].Type == tokens.RightBrace {
-			elseBraceCount--
-			if elseBraceCount == 0 {
+		if isOneLiner {
+			if ts[*inx].Type == tokens.Semicolon {
+				elseBraceCount = 0
 				*inx++
 				break
 			}
-		}
+		} else {
+			if ts[*inx].Type == tokens.RightBrace {
+				elseBraceCount--
+				if elseBraceCount == 0 {
+					*inx++
+					break
+				}
+			}
 
-		if ts[*inx].Type == tokens.LeftBrace {
-			elseBraceCount++
+			if ts[*inx].Type == tokens.LeftBrace {
+				elseBraceCount++
+			}
 		}
 
 		elseChildren = append(elseChildren, ts[*inx])

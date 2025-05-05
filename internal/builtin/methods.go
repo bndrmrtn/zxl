@@ -3,6 +3,7 @@ package builtin
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/flarelang/flare/internal/models"
@@ -20,6 +21,14 @@ func GetMethods(importer ImportFunc, evaler EvalFunc, provider *state.Provider) 
 	m["print"] = &Print{}
 	m["println"] = &Print{true}
 	m["import"] = &Import{importer}
+	m["log"] = lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
+		log.Print(args[0].String())
+		return nil, nil
+	}).WithArg("content")
+	m["logln"] = lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
+		log.Println(args[0].String())
+		return nil, nil
+	}).WithArg("content")
 	m["type"] = lang.NewFunction(fnType).WithArg("object")
 	m["range"] = lang.NewFunction(fnRange).WithVariadicArg("range")
 	m["read"] = lang.NewFunction(fnRead).WithArg("text")
@@ -49,12 +58,21 @@ func GetMethods(importer ImportFunc, evaler EvalFunc, provider *state.Provider) 
 		return NewState(name, args[0].Debug(), state), nil
 	}).WithTypeSafeArgs(lang.TypeSafeArg{Name: "name", Type: lang.TString})
 	m["highlight"] = lang.NewFunction(func(args []lang.Object) (lang.Object, error) {
+		typ := args[1].Value().(string)
+		if typ == "html" && typ != "console" {
+			return nil, errors.New("invalid type: type must be 'html' or 'console'")
+		}
+
 		pc, err := prettycode.New(strings.NewReader(args[0].Value().(string)))
 		if err != nil {
 			return nil, err
 		}
-		return lang.NewString("string", pc.HighlightHtml(), args[0].Debug()), nil
-	}).WithArg("code")
+
+		if typ == "html" {
+			return lang.NewString("string", pc.HighlightHtml(), args[0].Debug()), nil
+		}
+		return lang.NewString("string", pc.HighlightConsole(), args[0].Debug()), nil
+	}).WithTypeSafeArgs(lang.TypeSafeArg{Name: "code", Type: lang.TString}, lang.TypeSafeArg{Name: "type", Type: lang.TString})
 
 	m = setTypeMethods(m)
 	m = setIsMethods(m)

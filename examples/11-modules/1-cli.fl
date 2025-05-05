@@ -1,0 +1,9 @@
+namespace main;
+
+@[plugin=flare-plugin-image];
+
+fn main() {
+    println("Hello, world!");
+}
+
+if __mode__ == "main": main();
